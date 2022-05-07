@@ -5,6 +5,7 @@ homeassistant:
   packages:
     pack_1: !include vacuum.yaml
     pack_2: !include mop.yaml
+    pack_3: !include git.yaml
   external_url: !secret external_url
   customize_glob:
     "cover.*":

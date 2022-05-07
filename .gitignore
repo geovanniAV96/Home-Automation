@@ -8,9 +8,14 @@
 !*.md
 !*.sh
 !*.js*
-!ui_lovelace_minimalist/
+!ui_lovelace_minimalist/custom_cards/custom_card_room/
+!ui_lovelace_minimalist/custom_cards/custom_card_welcome_scenes/
+!ui_lovelace_minimalist/custom_cards/custom_card_welcome_scenes_menus/
+!ui_lovelace_minimalist/dashboard/
 !sensors/
-!custom_configs/
+!custom_configs/input_selects/
+!custom_configs/rest_commands
+!custom_configs/sensors
 
 # Comment these 2 lines if you don't want to include your SSH keys
 #!.ssh/
