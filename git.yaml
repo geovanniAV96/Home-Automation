@@ -1,2 +1,2 @@
 shell_command:
-  vacuum_clear_log: /config/ha_gitpush.sh
+  git_push: /config/ha_gitpush.sh
