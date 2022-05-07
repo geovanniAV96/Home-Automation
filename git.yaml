@@ -1,2 +1,2 @@
 shell_command:
-  git_push: ssh /config/ha_gitpush.sh
+  git_push: bash /config/ha_gitpush.sh
