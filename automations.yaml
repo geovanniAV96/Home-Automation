@@ -2091,4 +2091,6 @@
     data:
       addon: core_ssh
       input: /config/ha_gitpush.sh
+  - service: shell_command.git_push
+    data: {}
   mode: single
