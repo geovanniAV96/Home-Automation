@@ -315,7 +315,7 @@ turn_on_tv:
     state: 'off'
   - service: wake_on_lan.send_magic_packet
     data:
-      mac: !secret lg_tv_mac
+      mac: 64:95:6C:AD:70:F8
   mode: single
   icon: mdi:television
 change_tv_sound_output:

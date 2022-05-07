@@ -8,6 +8,9 @@
 !*.md
 !*.sh
 !*.js*
+!ui_lovelace_minimalist
+!sensors
+!custom_configs
 
 # Comment these 2 lines if you don't want to include your SSH keys
 #!.ssh/
