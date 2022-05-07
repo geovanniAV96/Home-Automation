@@ -2091,8 +2091,4 @@
     data:
       addon: core_ssh
       input: /config/ha_gitpush.sh
-  - service: hassio.addon_stdin
-    data:
-      addon: core_ssh
-      input: /config/ha_gitpush.sh
   mode: single
