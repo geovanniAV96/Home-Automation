@@ -1,0 +1,56 @@
+- platform: template
+  lights:
+    pc_rgb:
+      unique_id: 92ac9984-52e1-4bf0-a8dc-38cd7c860aae
+      friendly_name: "PC RGB"
+      turn_on:
+        service: script.turn_on_rgb
+      turn_off:
+        service: script.turn_off_rgb
+      set_color:
+        - service: script.set_rgb_color
+          data_template:
+            rgb_color: >-
+                {%- set h = (h / 360) | float %}
+                {%- set s = (s / 100) | float %}
+                {%- set v = ((states.input_number.pc_rgb_brightness.state | int) / 255) %}
+                
+
+                {%- set i = (h * 6)|int %}
+                {%- set f = h * 6 - i %}
+                {%- set p = v * (1 - s) %}
+                {%- set q = v * (1 - f * s) %}
+                {%- set t = v * (1 - (1 - f) * s) %}
+
+                {%- if i % 6 == 0 %}
+                  {% set r = v %}
+                  {% set g = t %}
+                  {% set b = p %}
+                {%- elif i % 6 == 1 %}
+                  {% set r = q %}
+                  {% set g = v %}
+                  {% set b = p %}
+                {%- elif i % 6 == 2 %}
+                  {% set r = p %}
+                  {% set g = v %}
+                  {% set b = t %}
+                {%- elif i % 6 == 3 %}
+                  {% set r = p %}
+                  {% set g = q %}
+                  {% set b = v %}
+                {%- elif i % 6 == 4 %}
+                  {% set r = t %}
+                  {% set g = p %}
+                  {% set b = v %}
+                {%- elif i % 6 == 5 %}
+                  {% set r = v %}
+                  {% set g = p %}
+                  {% set b = q %}
+                {%- endif %}
+
+                {{ (255*r)|round(0) }}, {{ (255*g)|round(0) }}, {{ (255*b)|round(0) }}
+      set_level:
+        - service: input_number.set_value
+          data:
+            value: "{{ brightness }}"
+            entity_id: input_number.pc_rgb_brightness

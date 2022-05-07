@@ -1,0 +1,59 @@
+# PS5 On/Off
+- platform: command_line
+  name: ps5
+  command: python /config/sensors/ps5.py -q -b 192.168.1.91
+  scan_interval: 10
+
+- platform: group
+  name: Updates
+  entities:
+    - binary_sensor.updater_core
+    - binary_sensor.updater_supervisor
+    - binary_sensor.updater_os
+    - binary_sensor.updater_addons
+
+# Workdays
+- platform: workday
+  country: MX
+  add_holidays:
+    - "2021-12-31"
+  
+- platform: template
+  sensors:
+    updater_core:
+      friendly_name: Core
+      device_class: problem
+      value_template: "{{ states('sensor.core_updates') }}"
+      attribute_templates:
+        installed_version: "{{ state_attr('sensor.core_updates', 'installed_version') }}"
+        latest_version: "{{ state_attr('sensor.core_updates', 'latest_version') }}"
+
+    updater_supervisor:
+      friendly_name: Supervisor
+      device_class: problem
+      value_template: "{{ states('sensor.supervisor_updates') }}"
+      attribute_templates:
+        installed_version: "{{ state_attr('sensor.supervisor_updates', 'installed_version') }}"
+        latest_version: "{{ state_attr('sensor.supervisor_updates', 'latest_version') }}"
+
+    updater_os:
+      friendly_name: OS
+      device_class: problem
+      value_template: "{{ states('sensor.os_updates') }}"
+      attribute_templates:
+        installed_version: "{{ state_attr('sensor.os_updates', 'installed_version') }}"
+        latest_version: "{{ state_attr('sensor.os_updates', 'latest_version') }}"
+
+    updater_addons:
+      friendly_name: Supervisor Add-ons
+      device_class: problem
+      value_template: "{{ states('sensor.addons_updates')|int(0) != 0 }}"
+      attribute_templates:
+        addons: "{{ state_attr('sensor.addons_updates', 'addons') }}"
+
+    updater_hacs:
+      friendly_name: HACS Integrations
+      device_class: problem
+      value_template: "{{ states('sensor.hacs')|int(0) != 0 }}"
+      attribute_templates:
+        repositories: "{{ state_attr('sensor.hacs', 'repositories') }}"

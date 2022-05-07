@@ -1,0 +1,1218 @@
+switch_hdmi_to_tv:
+  alias: Switch HDMI to TV
+  sequence:
+  - condition: and
+    conditions:
+    - condition: state
+      entity_id: input_boolean.hdmi_on_tv
+      state: 'off'
+    - condition: state
+      entity_id: input_boolean.hdmi_on_pc
+      state: 'on'
+  - service: button.press
+    data: {}
+    target:
+      entity_id: button.hdmiswitch_button
+  - service: input_boolean.turn_off
+    data: {}
+    target:
+      entity_id: input_boolean.hdmi_on_pc
+  - service: input_boolean.turn_on
+    data: {}
+    target:
+      entity_id: input_boolean.hdmi_on_tv
+  mode: queued
+  icon: mdi:video-input-hdmi
+switch_hdmi_to_pc:
+  alias: Switch HDMI to PC
+  sequence:
+  - condition: and
+    conditions:
+    - condition: state
+      entity_id: input_boolean.hdmi_on_tv
+      state: 'on'
+    - condition: state
+      entity_id: input_boolean.hdmi_on_pc
+      state: 'off'
+  - service: button.press
+    data: {}
+    target:
+      entity_id: button.hdmiswitch_button
+  - service: input_boolean.turn_off
+    data: {}
+    target:
+      entity_id: input_boolean.hdmi_on_tv
+  - service: input_boolean.turn_on
+    data: {}
+    target:
+      entity_id: input_boolean.hdmi_on_pc
+  mode: queued
+  icon: mdi:video-input-hdmi
+  max: 10
+turn_on_pc:
+  alias: Turn On PC
+  sequence:
+  - condition: state
+    entity_id: switch.sonoff_1000331d93
+    state: 'off'
+  - service: switch.turn_on
+    data: {}
+    target:
+      entity_id: switch.sonoff_1000331d93
+  - wait_for_trigger:
+    - platform: state
+      entity_id: sensor.pc_escritori_system_uptime
+      from: unavailable
+    timeout: 00:05:00
+  - service: script.turn_on_rgb
+    data: {}
+  mode: single
+  icon: mdi:desktop-classic
+turn_on_laptop:
+  alias: Turn On Laptop
+  sequence:
+  - condition: state
+    entity_id: switch.sonoff_1000332281
+    state: 'off'
+  - service: switch.turn_on
+    data: {}
+    target:
+      entity_id: switch.sonoff_1000332281
+  mode: single
+  icon: mdi:laptop
+turn_on_left_monitor:
+  alias: Turn On Left Monitor
+  sequence:
+  - condition: state
+    entity_id: switch.left_monitor
+    state: 'off'
+  - service: switch.turn_on
+    data: {}
+    target:
+      entity_id: switch.left_monitor
+  mode: single
+  icon: mdi:monitor
+turn_on_right_monitor:
+  alias: Turn On Right Monitor
+  sequence:
+  - condition: state
+    entity_id: switch.right_monitor
+    state: 'off'
+  - service: switch.turn_on
+    data: {}
+    target:
+      entity_id: switch.right_monitor
+  mode: single
+  icon: mdi:monitor
+turn_off_pc:
+  alias: Turn Off Laptop
+  sequence:
+  - condition: state
+    entity_id: switch.sonoff_1000332281
+    state: 'on'
+  - service: mqtt.publish
+    data:
+      topic: iotlink/netlogistik/0529gaguilar/commands/shutdown
+      payload: ''
+      qos: '2'
+  - wait_for_trigger:
+    - platform: numeric_state
+      entity_id: sensor.sonoff_1000332281_power
+      below: '10'
+    continue_on_timeout: false
+  - service: switch.turn_off
+    data: {}
+    target:
+      entity_id: switch.sonoff_1000332281
+  - delay:
+      hours: 0
+      minutes: 0
+      seconds: 5
+      milliseconds: 0
+  mode: single
+  icon: mdi:laptop-off
+turn_off_pc_2:
+  alias: Turn Off PC
+  sequence:
+  - condition: state
+    entity_id: switch.sonoff_1000331d93
+    state: 'on'
+  - service: mqtt.publish
+    data:
+      topic: iotlink/workgroup/pc-escritori/commands/shutdown
+      payload: ''
+      qos: '1'
+  - wait_template: '{{states("sensor.sonoff_1000331d93_power") | int < 10}}'
+  - service: switch.turn_off
+    data: {}
+    target:
+      entity_id: switch.sonoff_1000331d93
+  - delay:
+      hours: 0
+      minutes: 0
+      seconds: 5
+      milliseconds: 0
+  mode: single
+  icon: mdi:laptop-off
+alexa_tell_me_the_weather:
+  alias: Alexa Tell Me The Weather
+  sequence:
+  - service: media_player.volume_set
+    data:
+      volume_level: 0.2
+    target:
+      entity_id: media_player.echo_de_cristian
+  - service: media_player.play_media
+    data:
+      media_content_id: Alexa.Weather.Play
+      media_content_type: sequence
+    target:
+      entity_id: media_player.echo_de_cristian
+  mode: single
+  icon: mdi:weather-cloudy
+alexa_whats_on_my_calendar:
+  alias: Alexa What's On My Calendar
+  sequence:
+  - service: media_player.volume_set
+    data:
+      volume_level: 0.2
+    target:
+      entity_id: media_player.echo_de_cristian
+  - service: media_player.play_media
+    data:
+      media_content_id: Alexa.Calendar.PlayToday
+      media_content_type: sequence
+    target:
+      entity_id: media_player.echo_de_cristian
+  mode: single
+  icon: mdi:weather-cloudy
+set_air_purifier_at_max:
+  alias: Set Air Purifier At Max
+  sequence:
+  - condition: template
+    value_template: '{{states(''counter.air_purifier'') != ''5''}}'
+  - repeat:
+      until:
+      - condition: state
+        entity_id: counter.air_purifier
+        state: '5'
+      sequence:
+      - service: counter.increment
+        data: {}
+        target:
+          entity_id: counter.air_purifier
+      - service: button.press
+        data: {}
+        target:
+          entity_id: button.airpurifier_button
+      - delay:
+          hours: 0
+          minutes: 0
+          seconds: 8
+          milliseconds: 0
+  mode: single
+  icon: mdi:numeric-5
+set_air_purifier_at_0:
+  alias: Set Air Purifier At 0
+  sequence:
+  - condition: not
+    conditions:
+    - condition: numeric_state
+      entity_id: counter.air_purifier
+      below: '1'
+  - repeat:
+      until:
+      - condition: state
+        entity_id: counter.air_purifier
+        state: '0'
+      sequence:
+      - choose:
+        - conditions:
+          - condition: state
+            entity_id: counter.air_purifier
+            state: '5'
+          sequence:
+          - service: button.press
+            data: {}
+            target:
+              entity_id: button.airpurifier_button
+          - service: counter.reset
+            data: {}
+            target:
+              entity_id: counter.air_purifier
+          - delay:
+              hours: 0
+              minutes: 0
+              seconds: 8
+              milliseconds: 0
+        default:
+        - service: counter.increment
+          data: {}
+          target:
+            entity_id: counter.air_purifier
+        - service: button.press
+          data: {}
+          target:
+            entity_id: button.airpurifier_button
+        - delay:
+            hours: 0
+            minutes: 0
+            seconds: 8
+            milliseconds: 0
+  mode: single
+  icon: mdi:numeric-0
+set_air_purifier_at_4:
+  alias: Set Air Purifier At 4
+  sequence:
+  - condition: template
+    value_template: '{{states(''counter.air_purifier'') != ''4''}}'
+  - repeat:
+      until:
+      - condition: state
+        entity_id: counter.air_purifier
+        state: '4'
+      sequence:
+      - choose:
+        - conditions:
+          - condition: state
+            entity_id: counter.air_purifier
+            state: '5'
+          sequence:
+          - service: button.press
+            data: {}
+            target:
+              entity_id: button.airpurifier_button
+          - service: counter.reset
+            data: {}
+            target:
+              entity_id: counter.air_purifier
+          - delay:
+              hours: 0
+              minutes: 0
+              seconds: 8
+              milliseconds: 0
+        default:
+        - service: counter.increment
+          data: {}
+          target:
+            entity_id: counter.air_purifier
+        - service: button.press
+          data: {}
+          target:
+            entity_id: button.airpurifier_button
+        - delay:
+            hours: 0
+            minutes: 0
+            seconds: 8
+            milliseconds: 0
+  mode: single
+  icon: mdi:numeric-4
+turn_on_tv:
+  alias: Turn On TV
+  sequence:
+  - condition: state
+    entity_id: media_player.lg_webos_smart_tv
+    state: 'off'
+  - service: wake_on_lan.send_magic_packet
+    data:
+      mac: !secret lg_tv_mac
+  mode: single
+  icon: mdi:television
+change_tv_sound_output:
+  alias: Change TV Sound Output
+  sequence:
+  - condition: not
+    conditions:
+    - condition: state
+      entity_id: media_player.lg_webos_smart_tv
+      attribute: sound_output
+      state: bt_soundbar
+  - wait_template: '{{states("device_tracker.wf_1000xm4") == "home"}}'
+    timeout: 00:00:45
+    continue_on_timeout: true
+  - service: webostv.button
+    data:
+      entity_id: media_player.lg_webos_smart_tv
+      button: ENTER
+  - delay:
+      hours: 0
+      minutes: 0
+      seconds: 10
+      milliseconds: 0
+  - condition: not
+    conditions:
+    - condition: state
+      entity_id: media_player.lg_webos_smart_tv
+      attribute: sound_output
+      state: bt_soundbar
+  - service: webostv.button
+    data:
+      entity_id: media_player.lg_webos_smart_tv
+      button: MENU
+  - delay:
+      hours: 0
+      minutes: 0
+      seconds: 1
+      milliseconds: 0
+  - service: webostv.button
+    data:
+      entity_id: media_player.lg_webos_smart_tv
+      button: DOWN
+  - delay:
+      hours: 0
+      minutes: 0
+      seconds: 1
+      milliseconds: 0
+  - service: webostv.button
+    data:
+      entity_id: media_player.lg_webos_smart_tv
+      button: ENTER
+  - delay:
+      hours: 0
+      minutes: 0
+      seconds: 1
+      milliseconds: 0
+  - service: webostv.button
+    data:
+      entity_id: media_player.lg_webos_smart_tv
+      button: RIGHT
+  - delay:
+      hours: 0
+      minutes: 0
+      seconds: 1
+      milliseconds: 0
+  - service: webostv.button
+    data:
+      entity_id: media_player.lg_webos_smart_tv
+      button: DOWN
+  - delay:
+      hours: 0
+      minutes: 0
+      seconds: 1
+      milliseconds: 0
+  - service: webostv.button
+    data:
+      entity_id: media_player.lg_webos_smart_tv
+      button: ENTER
+  - delay:
+      hours: 0
+      minutes: 0
+      seconds: 5
+      milliseconds: 0
+  - service: webostv.button
+    data:
+      button: ENTER
+      entity_id: media_player.lg_webos_smart_tv
+  - delay:
+      hours: 0
+      minutes: 0
+      seconds: 1
+      milliseconds: 0
+  - service: webostv.button
+    data:
+      entity_id: media_player.lg_webos_smart_tv
+      button: BACK
+  - delay:
+      hours: 0
+      minutes: 0
+      seconds: 1
+      milliseconds: 0
+  - service: webostv.button
+    data:
+      entity_id: media_player.lg_webos_smart_tv
+      button: BACK
+  - delay:
+      hours: 0
+      minutes: 0
+      seconds: 1
+      milliseconds: 0
+  - service: webostv.button
+    data:
+      entity_id: media_player.lg_webos_smart_tv
+      button: BACK
+  mode: single
+  icon: mdi:soundbar
+change_air_conditioner_temperature:
+  alias: Change Air Conditioner Temperature
+  fields:
+    temperature:
+      description: Temperature to change
+      example: '23'
+  sequence:
+  - condition: state
+    entity_id: input_boolean.air_conditioner
+    state: 'on'
+  - service: climate.set_temperature
+    data:
+      temperature: '{{temperature}}'
+    target:
+      entity_id: climate.air_conditioner
+  - service: rest_command.control_ac
+    data:
+      temperature: '{{temperature}}'
+      fan_speed: "{% if states('input_number.air_conditioner_fan_speed') | int >=\
+        \ 33 and states('input_number.air_conditioner_fan_speed') | int < 66  -%}\n\
+        \  2\n{%- elif states('input_number.air_conditioner_fan_speed') | int >= 66\
+        \ and states('input_number.air_conditioner_fan_speed') | int < 100 -%}\n \
+        \ 3\n{%- elif states('input_number.air_conditioner_fan_speed') | int == 100\
+        \ -%}\n  4\n{%- else -%}\n  1\n{%- endif %}"
+      state: '{{states(''input_boolean.air_conditioner'')}}'
+  - delay:
+      hours: 0
+      minutes: 0
+      seconds: 5
+      milliseconds: 0
+  mode: restart
+  icon: mdi:air-conditioner
+turn_off_monitor:
+  alias: Turn Off Left Monitor
+  sequence:
+  - service: switch.turn_off
+    data: {}
+    target:
+      entity_id: switch.left_monitor
+  - delay:
+      hours: 0
+      minutes: 0
+      seconds: 5
+      milliseconds: 0
+  mode: single
+  icon: mdi:monitor-off
+turn_off_right_monitor:
+  alias: Turn Off Right Monitor
+  sequence:
+  - service: switch.turn_off
+    data: {}
+    target:
+      entity_id: switch.right_monitor
+  - delay:
+      hours: 0
+      minutes: 0
+      seconds: 5
+      milliseconds: 0
+  mode: single
+  icon: mdi:monitor-off
+turn_on_hue_sync_box:
+  alias: Turn On Hue Sync Box
+  sequence:
+  - service: input_select.select_option
+    data:
+      option: Passthrough
+    target:
+      entity_id: input_select.hue_sync_mode
+  mode: single
+  icon: mdi:set-top-box
+turn_off_hue_sync_box:
+  alias: Turn Off Hue Sync Box
+  sequence:
+  - service: input_select.select_option
+    data:
+      option: Standby
+    target:
+      entity_id: input_select.hue_sync_mode
+  mode: single
+  icon: mdi:set-top-box
+turn_on_fire_tv:
+  alias: Turn On Fire TV
+  sequence:
+  - service: media_player.turn_on
+    data: {}
+    target:
+      entity_id:
+      - media_player.fire_tv_192_168_1_85
+      - media_player.fire_tv_de_cristian
+  mode: single
+  icon: mdi:television-box
+turn_off_tv:
+  alias: Turn Off TV
+  sequence:
+  - condition: state
+    entity_id: media_player.lg_webos_smart_tv
+    state: 'on'
+  - service: webostv.command
+    data:
+      command: system/turnOff
+      entity_id: media_player.lg_webos_smart_tv
+  mode: single
+  icon: mdi:television-off
+open_youtube_in_tv:
+  alias: Open Youtube in TV
+  sequence:
+  - service: media_player.select_source
+    data:
+      source: YouTube
+    target:
+      entity_id: media_player.lg_webos_smart_tv
+  mode: single
+  icon: mdi:youtube
+turn_off_air_conditioner:
+  alias: Turn Off Air Conditioner
+  sequence:
+  - condition: state
+    entity_id: input_boolean.air_conditioner
+    state: 'on'
+  - service: rest_command.turn_off_ac
+    data: {}
+  - service: input_boolean.turn_off
+    data: {}
+    target:
+      entity_id: input_boolean.air_conditioner
+  - service: climate.turn_off
+    data: {}
+    target:
+      entity_id: climate.air_conditioner
+  - delay:
+      hours: 0
+      minutes: 0
+      seconds: 5
+      milliseconds: 0
+  mode: single
+  icon: mdi:hvac-off
+turn_on_fan:
+  alias: Turn On Fan
+  sequence:
+  - condition: state
+    entity_id: input_boolean.fan
+    state: 'off'
+  - repeat:
+      count: 2
+      sequence:
+      - service: button.press
+        data: {}
+        target:
+          entity_id: button.fanon_button
+      - delay:
+          hours: 0
+          minutes: 0
+          seconds: 3
+          milliseconds: 0
+  - service: input_boolean.turn_on
+    data: {}
+    target:
+      entity_id: input_boolean.fan
+  mode: single
+  icon: mdi:fan
+turn_off_fan:
+  alias: Turn Off Fan
+  sequence:
+  - condition: state
+    entity_id: input_boolean.fan
+    state: 'on'
+  - repeat:
+      count: '6'
+      sequence:
+      - service: button.press
+        data: {}
+        target:
+          entity_id:
+          - button.fanoff_button
+      - delay:
+          hours: 0
+          minutes: 0
+          seconds: 2
+          milliseconds: 0
+  - service: input_boolean.turn_off
+    data: {}
+    target:
+      entity_id: input_boolean.fan
+  mode: single
+  icon: mdi:fan-off
+turn_on_air_conditioner:
+  alias: Turn On Air Conditioner
+  sequence:
+  - condition: state
+    entity_id: input_boolean.air_conditioner
+    state: 'off'
+  - service: rest_command.control_ac
+    data:
+      temperature: '{{state_attr(''climate.air_conditioner'', ''temperature'')}}'
+      fan_speed: "{% if states('input_number.air_conditioner_fan_speed') | int >=\
+        \ 33 and states('input_number.air_conditioner_fan_speed') | int < 66  -%}\n\
+        \  2\n{%- elif states('input_number.air_conditioner_fan_speed') | int >= 66\
+        \ and states('input_number.air_conditioner_fan_speed') | int < 100 -%}\n \
+        \ 3\n{%- elif states('input_number.air_conditioner_fan_speed') | int == 100\
+        \ -%}\n  4\n{%- else -%}\n  1\n{%- endif %}"
+      state: 'on'
+  - service: input_boolean.turn_on
+    data: {}
+    target:
+      entity_id: input_boolean.air_conditioner
+  - service: climate.turn_on
+    data: {}
+    target:
+      entity_id: climate.air_conditioner
+  mode: single
+  icon: mdi:hvac
+hibernate_laptop:
+  alias: Hibernate Laptop
+  sequence:
+  - condition: state
+    entity_id: switch.sonoff_1000332281
+    state: 'on'
+  - service: mqtt.publish
+    data:
+      topic: iotlink/netlogistik/0529gaguilar/commands/hibernate
+      payload: ''
+      qos: '1'
+  - wait_for_trigger:
+    - platform: numeric_state
+      entity_id: sensor.sonoff_1000332281_power
+      below: '10'
+    continue_on_timeout: false
+  - service: switch.turn_off
+    data: {}
+    target:
+      entity_id: switch.sonoff_1000332281
+  - delay:
+      hours: 0
+      minutes: 0
+      seconds: 5
+      milliseconds: 0
+  mode: single
+  icon: mdi:laptop-off
+hibernate_pc:
+  alias: Hibernate PC
+  sequence:
+  - condition: state
+    entity_id: switch.sonoff_1000331d93
+    state: 'on'
+  - service: mqtt.publish
+    data:
+      topic: iotlink/workgroup/pc-escritori/commands/hibernate
+      payload: ''
+      qos: '1'
+  - wait_for_trigger:
+    - platform: numeric_state
+      entity_id: sensor.sonoff_1000331d93_power
+      below: '10'
+  - service: switch.turn_off
+    data: {}
+    target:
+      entity_id: switch.sonoff_1000331d93
+  - delay:
+      hours: 0
+      minutes: 0
+      seconds: 5
+      milliseconds: 0
+  mode: single
+  icon: mdi:laptop-off
+'null':
+  alias: 'Null'
+  sequence:
+  - delay:
+      hours: 0
+      minutes: 0
+      seconds: 0
+      milliseconds: 1
+  mode: single
+  icon: mdi:null
+expand_monitors:
+  alias: Principal Monitor
+  sequence:
+  - condition: state
+    entity_id: input_boolean.pc_extended_screen
+    state: 'on'
+  - service: mqtt.publish
+    data:
+      topic: iotlink/workgroup/pc-escritori/commands/run
+      payload: '{ "command": "C:\\Windows\\System32\\DisplaySwitch.exe", "args": "/internal",
+        "visible": false, "fallback": true }'
+  - service: input_boolean.turn_off
+    data: {}
+    target:
+      entity_id: input_boolean.pc_extended_screen
+  mode: single
+  icon: mdi:monitor-screenshot
+change_tv_to_ps5:
+  alias: Change TV to PS5
+  sequence:
+  - service: media_player.select_source
+    data:
+      source: HDMI 3
+    target:
+      entity_id: media_player.lg_webos_smart_tv
+  mode: single
+  icon: mdi:sony-playstation
+change_days_for_braava_water:
+  alias: Change Days for Braava Water
+  sequence:
+  - choose:
+    - conditions:
+      - condition: numeric_state
+        entity_id: counter.day_to_change_braava_water
+        above: '4'
+      sequence:
+      - service: counter.reset
+        data: {}
+        target:
+          entity_id: counter.day_to_change_braava_water
+      - service: notify.mobile_app_cristian_geovannis_iphone
+        data:
+          message: Change Water
+          title: Change Water to Braava
+    default:
+    - service: counter.increment
+      data: {}
+      target:
+        entity_id: counter.day_to_change_braava_water
+  mode: single
+  icon: mdi:water
+send_walle_to_clean:
+  alias: Send WallE to Clean
+  sequence:
+  - service: light.turn_on
+    data:
+      brightness_pct: 100
+      rgb_color:
+      - 255
+      - 255
+      - 255
+    target:
+      entity_id:
+      - light.luz_escritorio
+      - light.cama
+  - service: rest_command.vacuum_action
+    data:
+      command: start
+  mode: single
+  icon: kuf:scene_robo_vac_cleaner_active
+send_eva_to_clean:
+  alias: Send Eva to Clean
+  sequence:
+  - service: light.turn_on
+    data:
+      brightness_pct: 100
+      rgb_color:
+      - 255
+      - 255
+      - 255
+    target:
+      entity_id:
+      - light.luz_escritorio
+      - light.cama
+  - service: rest_command.mop_action
+    data:
+      command: start
+  mode: single
+  icon: kuf:scene_robo_vac_cleaner_active
+dock_robot:
+  alias: Dock Robot
+  sequence:
+  - service: light.turn_off
+    data: {}
+    target:
+      entity_id:
+      - light.luz_escritorio
+      - light.cama
+  - service: script.set_air_purifier_at_4
+    data: {}
+  mode: single
+  icon: kuf:scene_robo_vac_cleaner_paused
+turn_off_everything:
+  alias: Turn Off Everything
+  sequence:
+  - service: script.hibernate_pc
+    data: {}
+  - service: script.turn_off_monitor
+    data: {}
+  - service: script.turn_off_right_monitor
+    data: {}
+  - service: script.turn_off_air_conditioner
+    data: {}
+  mode: single
+  icon: mdi:home-circle-outline
+pc_extend_screen:
+  alias: PC Extend Screen
+  sequence:
+  - condition: state
+    entity_id: input_boolean.pc_extended_screen
+    state: 'off'
+  - service: mqtt.publish
+    data:
+      topic: iotlink/workgroup/pc-escritori/commands/run
+      payload: '{ "command": "C:\\Windows\\System32\\DisplaySwitch.exe", "args": "/extend",
+        "visible": false, "fallback": true }'
+      qos: '1'
+  - service: input_boolean.turn_on
+    data: {}
+    target:
+      entity_id: input_boolean.pc_extended_screen
+  mode: single
+  icon: mdi:fit-to-screen
+turn_on_rgb:
+  alias: Turn On RGB
+  sequence:
+  - service: mqtt.publish
+    data:
+      topic: iotlink/workgroup/pc-escritori/commands/run
+      payload: '{ "command": "C:\\HomeAssistant\\RESTART-PC.bat", "args": "", "path":
+        "C:\\HomeAssistant\\", "user": "", "visible": false, "fallback": true}'
+  mode: single
+  icon: mdi:lightbulb-fluorescent-tube
+desk_up:
+  alias: Desk Up
+  sequence:
+  - condition: numeric_state
+    entity_id: cover.standup_desk
+    attribute: current_position
+    below: '90'
+  - service: mqtt.publish
+    data:
+      topic: switchbot/nodemcuesp32/setHold
+      payload_template: '{"id":"DeskUp", "hold":"{{((100 - states(''input_number.desk_heigth'')
+        | int) / 7.14) | int }}"}'
+  - service: button.press
+    data: {}
+    target:
+      entity_id: button.deskup_button
+  - service: input_boolean.turn_on
+    data: {}
+    target:
+      entity_id: input_boolean.desk_up
+  - service: input_number.set_value
+    data:
+      value: '{{(100 - states(''input_number.desk_heigth'') | int)}}'
+    target:
+      entity_id: input_number.desk_heigth
+  mode: single
+  icon: mdi:desk
+desk_down:
+  alias: Desk Down
+  sequence:
+  - condition: state
+    entity_id: cover.standup_desk
+    state: open
+  - service: mqtt.publish
+    data:
+      topic: switchbot/nodemcuesp32/setHold
+      payload_template: '{"id":"DeskDown", "hold":"{{((states(''input_number.desk_heigth'')
+        | int) / 8.33) | int }}"}'
+  - service: button.press
+    data: {}
+    target:
+      entity_id: button.deskdown_button
+  - service: input_boolean.turn_off
+    data: {}
+    target:
+      entity_id: input_boolean.desk_up
+  - service: input_number.set_value
+    data:
+      value: 0
+    target:
+      entity_id: input_number.desk_heigth
+  mode: single
+  icon: mdi:table-furniture
+set_desk_height:
+  alias: Set Desk Height
+  sequence:
+  - choose:
+    - conditions:
+      - condition: template
+        value_template: '{{states(''input_number.desk_heigth'') | int > position}}'
+      sequence:
+      - service: mqtt.publish
+        data:
+          topic: switchbot/nodemcuesp32/setHold
+          payload_template: '{"id":"DeskDown", "hold":"{{((states(''input_number.desk_heigth'')
+            | int - position) / 7.69) | int }}"}'
+      - service: button.press
+        data: {}
+        target:
+          entity_id: button.deskdown_button
+      - condition: template
+        value_template: '{{position == 0}}'
+      - service: input_boolean.turn_off
+        data: {}
+        target:
+          entity_id: input_boolean.desk_up
+    - conditions:
+      - condition: template
+        value_template: '{{states(''input_number.desk_heigth'') | int < position}}'
+      sequence:
+      - service: mqtt.publish
+        data:
+          topic: switchbot/nodemcuesp32/setHold
+          payload_template: '{"id":"DeskUp", "hold":"{{((position - states(''input_number.desk_heigth'')
+            | int) / 7.69) | int }}"}'
+      - service: button.press
+        data: {}
+        target:
+          entity_id: button.deskup_button
+      - service: input_boolean.turn_on
+        data: {}
+        target:
+          entity_id: input_boolean.desk_up
+    default:
+    - service: script.null
+      data: {}
+  - service: input_number.set_value
+    data:
+      value: '{{position}}'
+    target:
+      entity_id: input_number.desk_heigth
+  mode: single
+  icon: mdi:desk
+laptop_extend_screen:
+  alias: Laptop Extend Screen
+  sequence:
+  - condition: state
+    entity_id: input_boolean.laptop_extended_screen
+    state: 'off'
+  - service: mqtt.publish
+    data:
+      topic: iotlink/netlogistik/0529gaguilar/commands/run
+      payload: '{ "command": "C:\\Windows\\System32\\DisplaySwitch.exe", "args": "/extend",
+        "visible": false, "fallback": true }'
+  - service: input_boolean.turn_on
+    data: {}
+    target:
+      entity_id:
+      - input_boolean.laptop_extended_screen
+  mode: single
+  icon: mdi:fit-to-screen
+laptop_principal_monitor:
+  alias: Laptop Principal Monitor
+  sequence:
+  - condition: state
+    entity_id: input_boolean.laptop_extended_screen
+    state: 'on'
+  - service: mqtt.publish
+    data:
+      topic: iotlink/netlogistik/0529gaguilar/commands/run
+      payload: '{ "command": "C:\\Windows\\System32\\DisplaySwitch.exe", "args": "/internal",
+        "visible": false, "fallback": true }'
+  - service: input_boolean.turn_off
+    data: {}
+    target:
+      entity_id:
+      - input_boolean.laptop_extended_screen
+  mode: single
+  icon: mdi:monitor-screenshot
+turn_off_rgb:
+  alias: Turn Off RGB
+  sequence:
+  - service: mqtt.publish
+    data:
+      topic: iotlink/workgroup/pc-escritori/commands/run
+      payload: '{ "command": "C:\\OpenRGB\\OpenRGB.exe", "args": "-c 000000 -m direct",
+        "path": "C:\\OpenRGB\\", "user": "", "visible": true, "fallback": true}'
+  - service: mqtt.publish
+    data:
+      topic: iotlink/workgroup/pc-escritori/commands/run
+      payload: '{ "command": "C:\\HomeAssistant\\RGBOFF.bat", "args": "", "path":
+        "C:\\HomeAssistant\\", "user": "", "visible": false, "fallback": true}'
+  mode: single
+  icon: mdi:lightbulb-fluorescent-tube
+set_rgb_color:
+  alias: Set RGB Color
+  sequence:
+  - service: mqtt.publish
+    data:
+      topic: iotlink/workgroup/pc-escritori/commands/run
+      payload: '{ "command": "C:\\OpenRGB\\OpenRGB.exe", "args": "-c {{ ''%02x%02x%02x''
+        | format(rgb_color[0], rgb_color[1], rgb_color[2])}} -m direct", "path": "C:\\OpenRGB\\",
+        "user":"", "visible": true, "fallback": true}'
+  mode: single
+  icon: mdi:color-helper
+change_air_conditioner_fan_speed:
+  alias: Change Air Conditioner Fan Speed
+  sequence:
+  - condition: state
+    entity_id: input_boolean.air_conditioner
+    state: 'on'
+  - service: rest_command.control_ac
+    data:
+      temperature: '{{state_attr(''climate.air_conditioner'', ''temperature'')}}'
+      fan_speed: "{% if speed[1:2] | int == 0  -%}\n  1\n{%- elif speed[1:2] | int\
+        \ == 1 -%}\n  2\n{%- elif speed[1:2] | int == 2 -%}\n  3\n{%- else -%}\n \
+        \ 4\n{%- endif %}"
+      state: '{{states(''input_boolean.air_conditioner'')}}'
+  - service: input_number.set_value
+    data:
+      value: '{{((speed[1:2] | int) * 33) + 1 }}'
+    target:
+      entity_id: input_number.air_conditioner_fan_speed
+  - delay:
+      hours: 0
+      minutes: 0
+      seconds: 5
+      milliseconds: 0
+  fields:
+    temperature:
+      description: Temperature to change
+      example: '23'
+  mode: restart
+  icon: mdi:fan
+set_hue_sync_box_brightness:
+  alias: Set Hue Sync Box Brightness
+  sequence:
+  - service: script.null
+    data: {}
+  mode: queued
+  icon: hue:sync-box-alt
+lock_laptop:
+  alias: Lock Laptop
+  sequence:
+  - condition: state
+    entity_id: switch.sonoff_1000332281
+    state: 'on'
+  - service: mqtt.publish
+    data:
+      topic: iotlink/netlogistik/0529gaguilar/commands/lock
+      payload: ''
+      qos: '1'
+  - delay:
+      hours: 0
+      minutes: 0
+      seconds: 5
+      milliseconds: 0
+  mode: single
+  icon: mdi:laptop-off
+empty_room_turn_off:
+  alias: Empty Room Turn Off
+  sequence:
+  - service: scene.create
+    data:
+      scene_id: before
+      snapshot_entities:
+      - switch.sonoff_1000332281
+      - switch.sonoff_1000331d93
+      - switch.left_monitor
+      - switch.right_monitor
+      - climate.air_conditioner
+  - choose:
+    - conditions:
+      - condition: state
+        entity_id: switch.sonoff_1000332281
+        state: 'on'
+      - condition: not
+        conditions:
+        - condition: state
+          entity_id: sensor.0529gaguilar_system_idle_time
+          state: unavailable
+      sequence:
+      - wait_template: '{{states(''sensor.laptop_time_no_volume'') | int >= 450 and
+          states(''sensor.0529gaguilar_system_idle_time'') | int >= 450}}'
+    default:
+    - condition: state
+      entity_id: switch.sonoff_1000331d93
+      state: 'on'
+  - choose:
+    - conditions:
+      - condition: state
+        entity_id: switch.sonoff_1000331d93
+        state: 'on'
+      - condition: not
+        conditions:
+        - condition: state
+          entity_id: sensor.pc_escritori_system_idle_time
+          state: unavailable
+      sequence:
+      - wait_template: '{{states(''sensor.pc_time_no_volume'') | int >= 450 and states(''sensor.pc_escritori_system_idle_time'')
+          | int >= 450}}'
+    default:
+    - condition: state
+      entity_id: switch.sonoff_1000332281
+      state: 'on'
+  - choose:
+    - conditions:
+      - condition: numeric_state
+        entity_id: sensor.laptop_time_inactive
+        below: '1'
+      - condition: numeric_state
+        entity_id: sensor.pc_time_inactive
+        below: '1'
+      sequence:
+      - service: scene.turn_on
+        data: {}
+        target:
+          entity_id: scene.before
+    default:
+    - service: script.turn_off_monitor
+      data: {}
+  - choose:
+    - conditions:
+      - condition: numeric_state
+        entity_id: sensor.pc_time_inactive
+        below: '1'
+      - condition: numeric_state
+        entity_id: sensor.laptop_time_inactive
+        below: '1'
+      sequence:
+      - service: scene.turn_on
+        data: {}
+        target:
+          entity_id: scene.before
+    default:
+    - choose:
+      - conditions:
+        - condition: time
+          before: '19:00:00'
+          after: 09:00:00
+          weekday:
+          - mon
+          - tue
+          - wed
+          - thu
+          - fri
+          - sat
+          - sun
+        - condition: state
+          entity_id: binary_sensor.workday_sensor
+          state: 'on'
+        sequence:
+        - service: script.lock_laptop
+          data: {}
+      default:
+      - service: script.hibernate_laptop
+        data: {}
+  - choose:
+    - conditions:
+      - condition: numeric_state
+        entity_id: sensor.laptop_time_inactive
+        below: '1'
+      - condition: numeric_state
+        entity_id: sensor.pc_time_inactive
+        below: '1'
+      sequence:
+      - service: scene.turn_on
+        data: {}
+        target:
+          entity_id: scene.before
+    default:
+    - service: script.turn_off_right_monitor
+      data: {}
+  - choose:
+    - conditions:
+      - condition: numeric_state
+        entity_id: sensor.laptop_time_inactive
+        below: '1'
+      - condition: numeric_state
+        entity_id: sensor.pc_time_inactive
+        below: '1'
+      sequence:
+      - service: scene.turn_on
+        data: {}
+        target:
+          entity_id: scene.before
+    default:
+    - service: script.hibernate_pc
+      data: {}
+  - choose:
+    - conditions:
+      - condition: numeric_state
+        entity_id: sensor.laptop_time_inactive
+        below: '1'
+      - condition: numeric_state
+        entity_id: sensor.pc_time_inactive
+        below: '1'
+      sequence:
+      - service: scene.turn_on
+        data: {}
+        target:
+          entity_id: scene.before
+    default:
+    - service: script.turn_off_air_conditioner
+      data: {}
+  mode: restart
+  icon: mdi:account-off

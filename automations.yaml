@@ -1,0 +1,2094 @@
+- id: a940d1eb-0d48-4ec7-926d-e1e02681aa2e
+  alias: Hue Sync Mode
+  trigger:
+  - platform: state
+    entity_id: input_number.hue_sync_brightness
+  - platform: state
+    entity_id: input_select.hue_sync_mode
+  - platform: state
+    entity_id: input_select.hue_sync_intensity
+  - platform: state
+    entity_id: input_select.hue_sync_input
+  action:
+  - choose:
+    - conditions:
+      - condition: or
+        conditions:
+        - condition: state
+          entity_id: input_select.hue_sync_mode
+          state: Movie
+        - condition: state
+          entity_id: input_select.hue_sync_mode
+          attribute: ' '
+          state: Music
+        - condition: state
+          entity_id: input_select.hue_sync_mode
+          state: Game
+        - condition: state
+          entity_id: input_select.hue_sync_mode
+          state: Ambient
+      sequence:
+      - service: rest_command.syncbox_mode
+        data:
+          brightness: '{{states(''input_number.hue_sync_brightness'') | int }}'
+          intensity: "{% if is_state(\"input_select.hue_sync_intensity\", \"Subtle\"\
+            ) -%}\n  subtle\n{%- elif is_state(\"input_select.hue_sync_intensity\"\
+            , \"Moderate\") -%}\n  moderate\n{%- elif is_state(\"input_select.hue_sync_intensity\"\
+            , \"High\") -%}\n  high\n{%- else -%}\n  intense\n{%- endif %}\n"
+          hdmiSource: "{% if is_state(\"input_select.hue_sync_input\", \"Switch\"\
+            ) -%}\n  input1\n{%- elif is_state(\"input_select.hue_sync_input\", \"\
+            FireTV\") -%}\n  input2\n{%- elif is_state(\"input_select.hue_sync_input\"\
+            , \"PS3\") -%}\n  input3\n{%- else -%}\n  input4\n{%- endif %}\n"
+          mode: "{% if is_state(\"input_select.hue_sync_mode\", \"Movie\") -%}\n \
+            \ video\n{%- elif is_state(\"input_select.hue_sync_mode\", \"Music\")\
+            \ -%}\n  music\n{%- elif is_state(\"input_select.hue_sync_mode\", \"Game\"\
+            ) -%}\n  game\n{%- elif is_state(\"input_select.hue_sync_mode\", \"Ambient\"\
+            ) -%}\n  ambient\n{%- elif is_state(\"input_select.hue_sync_mode\", \"\
+            Passthrough\") -%}\n  passthrough\n{%- else -%}\n  powersave\n{%- endif\
+            \ %}\n"
+    default:
+    - service: rest_command.syncbox_mode_off
+      data:
+        mode: "{% if is_state(\"input_select.hue_sync_mode\", \"Movie\") -%}\n  video\n\
+          {%- elif is_state(\"input_select.hue_sync_mode\", \"Music\") -%}\n  music\n\
+          {%- elif is_state(\"input_select.hue_sync_mode\", \"Game\") -%}\n  game\n\
+          {%- elif is_state(\"input_select.hue_sync_mode\", \"Ambient\") -%}\n  ambient\n\
+          {%- elif is_state(\"input_select.hue_sync_mode\", \"Passthrough\") -%}\n\
+          \  passthrough\n{%- else -%}\n  powersave\n{%- endif %}\n"
+- id: 3d2623e9-a70a-45ca-ba5a-403d704b00f2
+  alias: Fetch Hue Sync Mode
+  trigger:
+  - platform: template
+    value_template: '{% if is_state(''sensor.hue_sync_box_mode'', ''game'') %}true{%
+      endif %}'
+    id: game
+  - platform: template
+    value_template: '{% if is_state(''sensor.hue_sync_box_mode'', ''video'') %}true{%
+      endif %}'
+    id: video
+  - platform: template
+    value_template: '{% if is_state(''sensor.hue_sync_box_mode'', ''music'') %}true{%
+      endif %}'
+    id: music
+  - platform: template
+    value_template: '{% if is_state(''sensor.hue_sync_box_mode'', ''passthrough'')
+      %}true{% endif %}'
+    id: passthrough
+  - platform: template
+    value_template: '{% if is_state(''sensor.hue_sync_box_mode'', ''standby'') %}true{%
+      endif %}'
+    id: standby
+  action:
+  - choose:
+    - conditions:
+      - condition: trigger
+        id: game
+      sequence:
+      - service: input_select.select_option
+        data:
+          entity_id: input_select.hue_sync_mode
+          option: Game
+    - conditions:
+      - condition: trigger
+        id: video
+      sequence:
+      - service: input_select.select_option
+        data:
+          entity_id: input_select.hue_sync_mode
+          option: Movie
+    - conditions:
+      - condition: trigger
+        id: music
+      sequence:
+      - service: input_select.select_option
+        data:
+          entity_id: input_select.hue_sync_mode
+          option: Music
+    - conditions:
+      - condition: trigger
+        id: passthrough
+      sequence:
+      - service: input_select.select_option
+        data:
+          entity_id: input_select.hue_sync_mode
+          option: Passthrough
+    default:
+    - service: input_select.select_option
+      data:
+        entity_id: input_select.hue_sync_mode
+        option: Standby
+- id: 41e10bc2-f439-4bdd-bad8-338dfc266830
+  alias: Turn On Lights w/Movement
+  description: Turn on a light when motion is detected, depending on bed occupancy
+  trigger:
+  - platform: state
+    entity_id: binary_sensor.hue_motion_sensor_1_motion
+    from: 'off'
+    to: 'on'
+  - platform: state
+    entity_id: binary_sensor.hue_motion_sensor_2_motion
+    from: 'off'
+    to: 'on'
+  condition: []
+  action:
+  - choose:
+    - conditions:
+      - condition: or
+        conditions:
+        - condition: state
+          entity_id: binary_sensor.withings_in_bed_geovanni
+          state: unavailable
+        - condition: state
+          entity_id: binary_sensor.withings_in_bed_geovanni
+          state: 'off'
+      sequence:
+      - service: light.turn_on
+        data:
+          brightness_pct: 80
+          rgb_color:
+          - 255
+          - 255
+          - 255
+        target:
+          entity_id: light.luz
+      - wait_for_trigger:
+        - platform: state
+          entity_id: binary_sensor.hue_motion_sensor_1_motion
+          from: 'on'
+          to: 'off'
+        - platform: state
+          entity_id: binary_sensor.hue_motion_sensor_2_motion
+          from: 'on'
+          to: 'off'
+        continue_on_timeout: false
+      - delay:
+          hours: 0
+          minutes: 1
+          seconds: 0
+          milliseconds: 0
+      - service: light.turn_off
+        data: {}
+        target:
+          entity_id: light.luz
+    default:
+    - service: light.turn_on
+      data:
+        rgb_color:
+        - 255
+        - 255
+        - 255
+        brightness_pct: 20
+      target:
+        entity_id: light.cama
+    - wait_for_trigger:
+      - platform: state
+        entity_id: binary_sensor.hue_motion_sensor_1_motion
+        from: 'on'
+        to: 'off'
+      - platform: state
+        entity_id: binary_sensor.hue_motion_sensor_2_motion
+        from: 'on'
+        to: 'off'
+      continue_on_timeout: false
+    - delay:
+        hours: 0
+        minutes: 1
+        seconds: 0
+        milliseconds: 0
+    - service: light.turn_off
+      data: {}
+      target:
+        entity_id: light.cama
+  mode: restart
+- id: '1649392489396'
+  alias: Notify Power Loss
+  description: ''
+  trigger:
+  - platform: state
+    entity_id: light.luz
+    from: 'on'
+    to: unavailable
+  - platform: state
+    entity_id: light.luz
+    from: 'off'
+    to: unavailable
+  condition:
+  - condition: or
+    conditions:
+    - condition: state
+      entity_id: light.cama
+      state: unavailable
+    - condition: state
+      entity_id: light.cama
+      state: unknown
+  action:
+  - service: notify.mobile_app_cristian_geovannis_iphone
+    data:
+      message: Power Loss
+      title: Power Loss
+  mode: single
+- id: '1649395520595'
+  alias: Change Temperature
+  description: ''
+  trigger:
+  - platform: state
+    entity_id: input_number.air_conditioner_temperature
+  condition:
+  - condition: state
+    entity_id: person.cristian_geovanni_aguilar_valencia
+    state: home
+  action:
+  - service: script.change_air_conditioner_temperature
+    data:
+      temperature: '{{states(''input_number.air_conditioner_temperature'') | int}}'
+  mode: single
+- id: '1649398137024'
+  alias: Sleep Routine
+  description: ''
+  trigger:
+  - platform: state
+    entity_id: binary_sensor.withings_in_bed_geovanni
+    to: 'on'
+  condition:
+  - condition: state
+    entity_id: person.cristian_geovanni_aguilar_valencia
+    state: home
+  - condition: template
+    value_template: '{{(as_timestamp(now()) / 60 - as_timestamp(states(''input_datetime.last_time_sleep_routine_ran''))
+      / 60) | int / 60 > 18}}'
+  - condition: time
+    before: 06:00:00
+    after: '22:00:00'
+    weekday:
+    - mon
+    - tue
+    - thu
+    - wed
+    - fri
+    - sat
+    - sun
+  action:
+  - service: script.turn_off_pc_2
+    data: {}
+  - service: script.turn_on_tv
+    data: {}
+  - service: script.change_tv_sound_output
+    data: {}
+  - service: script.open_youtube_in_tv
+    data: {}
+  - service: script.turn_off_monitor
+    data: {}
+  - service: script.turn_off_right_monitor
+    data: {}
+  - service: script.set_air_purifier_at_0
+    data: {}
+  - service: input_datetime.set_datetime
+    data:
+      timestamp: '{{as_timestamp(now())}}'
+    target:
+      entity_id: input_datetime.last_time_sleep_routine_ran
+  mode: single
+- id: '1649398246785'
+  alias: Turn Off TV at Night
+  description: ''
+  trigger:
+  - platform: state
+    entity_id: media_player.lg_webos_smart_tv
+    to: 'on'
+    for:
+      hours: 3
+      minutes: 0
+      seconds: 0
+  - platform: state
+    entity_id: binary_sensor.withings_in_bed_geovanni
+    to: 'on'
+    for:
+      hours: 3
+      minutes: 0
+      seconds: 0
+  - platform: state
+    entity_id: media_player.lg_cx
+    to: 'on'
+    for:
+      hours: 3
+      minutes: 0
+      seconds: 0
+  condition:
+  - condition: time
+    before: 07:00:00
+    weekday:
+    - mon
+    - tue
+    - wed
+    - sat
+    - fri
+    - thu
+    - sun
+    after: 00:00:00
+  action:
+  - service: script.turn_on_fan
+    data: {}
+  - service: script.turn_off_air_conditioner
+    data: {}
+  - service: script.turn_off_tv
+    data: {}
+  - delay:
+      hours: 0
+      minutes: 1
+      seconds: 30
+      milliseconds: 0
+  - condition: state
+    entity_id: media_player.lg_webos_smart_tv
+    state: 'on'
+  - service: script.turn_off_tv
+    data: {}
+  mode: single
+- id: '1649436007983'
+  alias: Morning Routine Workday
+  description: ''
+  trigger:
+  - platform: state
+    entity_id: binary_sensor.withings_in_bed_geovanni
+    from: 'on'
+    to: 'off'
+  condition:
+  - condition: state
+    entity_id: binary_sensor.workday_sensor
+    state: 'on'
+  - condition: template
+    value_template: '{{((as_timestamp(now())) / 60 / 60 | int - as_timestamp(states(''input_datetime.last_time_morning_routine_ran''))
+      / 60 / 60 | int) > 18}}'
+  - condition: state
+    entity_id: person.cristian_geovanni_aguilar_valencia
+    state: home
+  - condition: time
+    before: '14:00:00'
+    after: 07:00:00
+    weekday:
+    - mon
+    - tue
+    - wed
+    - thu
+    - fri
+    - sat
+    - sun
+  action:
+  - service: script.turn_on_pc
+    data: {}
+  - choose:
+    - conditions:
+      - condition: state
+        entity_id: binary_sensor.withings_in_bed_geovanni
+        state: 'on'
+      sequence:
+      - service: script.turn_off
+        data: {}
+        target:
+          entity_id: script.turn_on_pc
+      - delay:
+          hours: 0
+          minutes: 0
+          seconds: 15
+          milliseconds: 0
+      - service: script.turn_off_pc_2
+        data: {}
+    default:
+    - service: script.turn_on_right_monitor
+      data: {}
+  - choose:
+    - conditions:
+      - condition: state
+        entity_id: binary_sensor.withings_in_bed_geovanni
+        state: 'on'
+      sequence:
+      - service: script.turn_off
+        data: {}
+        target:
+          entity_id:
+          - script.turn_on_pc
+          - script.turn_on_right_monitor
+      - service: script.turn_off_right_monitor
+        data: {}
+      - delay:
+          hours: 0
+          minutes: 0
+          seconds: 15
+          milliseconds: 0
+      - service: script.turn_off_pc_2
+        data: {}
+    default:
+    - service: script.turn_on_laptop
+      data: {}
+  - choose:
+    - conditions:
+      - condition: state
+        entity_id: binary_sensor.withings_in_bed_geovanni
+        state: 'on'
+      sequence:
+      - service: script.turn_off
+        data: {}
+        target:
+          entity_id:
+          - script.turn_on_pc
+          - script.turn_on_laptop
+          - script.turn_on_right_monitor
+      - service: script.turn_off_right_monitor
+        data: {}
+      - delay:
+          hours: 0
+          minutes: 0
+          seconds: 15
+          milliseconds: 0
+      - service: script.turn_off_pc_2
+        data: {}
+    default:
+    - service: script.turn_on_left_monitor
+      data: {}
+  - choose:
+    - conditions:
+      - condition: state
+        entity_id: binary_sensor.withings_in_bed_geovanni
+        state: 'on'
+      sequence:
+      - service: script.turn_off
+        data: {}
+        target:
+          entity_id:
+          - script.turn_on_pc
+          - script.turn_on_right_monitor
+          - script.turn_on_laptop
+          - script.turn_on_right_monitor
+          - script.turn_on_left_monitor
+      - service: script.turn_off_right_monitor
+        data: {}
+      - delay:
+          hours: 0
+          minutes: 0
+          seconds: 15
+          milliseconds: 0
+      - service: script.turn_off_pc_2
+        data: {}
+      - service: script.turn_off_monitor
+        data: {}
+    default:
+    - service: script.turn_off_fan
+      data: {}
+  - choose:
+    - conditions:
+      - condition: state
+        entity_id: binary_sensor.withings_in_bed_geovanni
+        state: 'on'
+      sequence:
+      - service: script.turn_off
+        data: {}
+        target:
+          entity_id:
+          - script.turn_on_pc
+          - script.turn_on_right_monitor
+          - script.turn_on_laptop
+          - script.turn_on_right_monitor
+          - script.turn_off_fan
+          - script.turn_on_left_monitor
+      - service: script.turn_off_right_monitor
+        data: {}
+      - delay:
+          hours: 0
+          minutes: 0
+          seconds: 15
+          milliseconds: 0
+      - service: script.turn_off_pc_2
+        data: {}
+      - service: script.turn_off_monitor
+        data: {}
+      - service: script.turn_on_fan
+        data: {}
+    default:
+    - service: script.turn_on_air_conditioner
+      data: {}
+  - choose:
+    - conditions:
+      - condition: state
+        entity_id: binary_sensor.withings_in_bed_geovanni
+        state: 'on'
+      sequence:
+      - service: script.turn_off
+        data: {}
+        target:
+          entity_id:
+          - script.turn_on_pc
+          - script.turn_on_right_monitor
+          - script.turn_on_laptop
+          - script.turn_on_right_monitor
+          - script.turn_off_fan
+          - script.turn_on_air_conditioner
+          - script.turn_on_left_monitor
+      - service: script.turn_off_right_monitor
+        data: {}
+      - delay:
+          hours: 0
+          minutes: 0
+          seconds: 15
+          milliseconds: 0
+      - service: script.turn_off_pc_2
+        data: {}
+      - service: script.turn_off_monitor
+        data: {}
+      - service: script.turn_on_fan
+        data: {}
+      - service: script.turn_off_air_conditioner
+        data: {}
+    default:
+    - service: script.set_air_purifier_at_4
+      data: {}
+  - choose:
+    - conditions:
+      - condition: state
+        entity_id: binary_sensor.withings_in_bed_geovanni
+        state: 'on'
+      sequence:
+      - service: script.turn_off
+        data: {}
+        target:
+          entity_id:
+          - script.turn_on_pc
+          - script.turn_on_right_monitor
+          - script.turn_on_laptop
+          - script.turn_on_right_monitor
+          - script.turn_off_fan
+          - script.turn_on_air_conditioner
+          - script.set_air_purifier_at_4
+          - script.turn_on_left_monitor
+      - service: script.turn_off_right_monitor
+        data: {}
+      - delay:
+          hours: 0
+          minutes: 0
+          seconds: 15
+          milliseconds: 0
+      - service: script.turn_off_pc_2
+        data: {}
+      - service: script.turn_off_monitor
+        data: {}
+      - service: script.turn_on_fan
+        data: {}
+      - service: script.turn_off_air_conditioner
+        data: {}
+      - service: script.set_air_purifier_at_0
+        data: {}
+    default:
+    - service: input_datetime.set_datetime
+      data:
+        timestamp: '{{as_timestamp(now())}}'
+      target:
+        entity_id: input_datetime.last_time_morning_routine_ran
+  - choose:
+    - conditions:
+      - condition: state
+        entity_id: binary_sensor.withings_in_bed_geovanni
+        state: 'on'
+      sequence:
+      - service: script.turn_off
+        data: {}
+        target:
+          entity_id:
+          - script.turn_on_pc
+          - script.turn_on_right_monitor
+          - script.turn_on_laptop
+          - script.turn_on_right_monitor
+          - script.turn_off_fan
+          - script.turn_on_air_conditioner
+          - script.set_air_purifier_at_4
+      - service: script.turn_off_right_monitor
+        data: {}
+      - delay:
+          hours: 0
+          minutes: 0
+          seconds: 15
+          milliseconds: 0
+      - service: script.turn_off_pc_2
+        data: {}
+      - service: script.turn_off_monitor
+        data: {}
+      - service: script.turn_on_fan
+        data: {}
+      - service: script.turn_off_air_conditioner
+        data: {}
+      - service: script.set_air_purifier_at_0
+        data: {}
+      - service: input_datetime.set_datetime
+        data:
+          timestamp: '{{as_timestamp(now()) - 86500}}'
+        target:
+          entity_id: input_datetime.last_time_morning_routine_ran
+    default:
+    - service: script.alexa_whats_on_my_calendar
+      data: {}
+    - delay:
+        hours: 0
+        minutes: 0
+        seconds: 15
+        milliseconds: 0
+    - service: script.alexa_tell_me_the_weather
+      data: {}
+  - wait_for_trigger:
+    - platform: state
+      entity_id: binary_sensor.withings_in_bed_geovanni
+      to: 'on'
+    timeout: 00:15:00
+    continue_on_timeout: false
+  - service: script.turn_off_pc_2
+    data: {}
+  - service: script.turn_off_right_monitor
+    data: {}
+  - service: script.turn_off_monitor
+    data: {}
+  - service: script.turn_on_fan
+    data: {}
+  - service: script.turn_off_air_conditioner
+    data: {}
+  - service: script.set_air_purifier_at_0
+    data: {}
+  - service: input_datetime.set_datetime
+    data:
+      timestamp: '{{as_timestamp(now()) - 86500}}'
+    target:
+      entity_id: input_datetime.last_time_morning_routine_ran
+  mode: restart
+- id: '1649442506084'
+  alias: Morning Routine Weekends
+  description: ''
+  trigger:
+  - platform: state
+    entity_id: binary_sensor.withings_in_bed_geovanni
+    from: 'on'
+    to: 'off'
+  condition:
+  - condition: state
+    entity_id: binary_sensor.workday_sensor
+    state: 'off'
+  - condition: template
+    value_template: '{{((as_timestamp(now())) / 60 / 60 | int - as_timestamp(states(''input_datetime.last_time_morning_routine_ran''))
+      / 60 / 60 | int) > 18}}'
+  - condition: state
+    entity_id: person.cristian_geovanni_aguilar_valencia
+    state: home
+  - condition: time
+    before: '14:30:00'
+    after: 07:00:00
+    weekday:
+    - tue
+    - thu
+    - fri
+    - sun
+    - mon
+    - wed
+    - sat
+  action:
+  - service: script.turn_on_pc
+    data: {}
+  - choose:
+    - conditions:
+      - condition: state
+        entity_id: binary_sensor.withings_in_bed_geovanni
+        state: 'on'
+      sequence:
+      - service: script.turn_off
+        data: {}
+        target:
+          entity_id: script.turn_on_pc
+      - delay:
+          hours: 0
+          minutes: 0
+          seconds: 15
+          milliseconds: 0
+      - service: script.turn_off_pc_2
+        data: {}
+    default:
+    - service: script.turn_on_right_monitor
+      data: {}
+  - choose:
+    - conditions:
+      - condition: state
+        entity_id: binary_sensor.withings_in_bed_geovanni
+        state: 'on'
+      sequence:
+      - service: script.turn_off
+        data: {}
+        target:
+          entity_id:
+          - script.turn_on_pc
+          - script.turn_on_right_monitor
+      - service: script.turn_off_right_monitor
+        data: {}
+      - delay:
+          hours: 0
+          minutes: 0
+          seconds: 15
+          milliseconds: 0
+      - service: script.turn_off_pc_2
+        data: {}
+    default:
+    - service: script.turn_on_left_monitor
+      data: {}
+  - choose:
+    - conditions:
+      - condition: state
+        entity_id: binary_sensor.withings_in_bed_geovanni
+        state: 'on'
+      sequence:
+      - service: script.turn_off
+        data: {}
+        target:
+          entity_id:
+          - script.turn_on_pc
+          - script.turn_on_right_monitor
+          - script.turn_on_right_monitor
+          - script.turn_on_left_monitor
+      - service: script.turn_off_right_monitor
+        data: {}
+      - delay:
+          hours: 0
+          minutes: 0
+          seconds: 15
+          milliseconds: 0
+      - service: script.turn_off_pc_2
+        data: {}
+      - service: script.turn_off_monitor
+        data: {}
+    default:
+    - service: script.turn_off_fan
+      data: {}
+  - choose:
+    - conditions:
+      - condition: state
+        entity_id: binary_sensor.withings_in_bed_geovanni
+        state: 'on'
+      sequence:
+      - service: script.turn_off
+        data: {}
+        target:
+          entity_id:
+          - script.turn_on_pc
+          - script.turn_on_right_monitor
+          - script.turn_on_right_monitor
+          - script.turn_off_fan
+          - script.turn_on_left_monitor
+      - service: script.turn_off_right_monitor
+        data: {}
+      - delay:
+          hours: 0
+          minutes: 0
+          seconds: 15
+          milliseconds: 0
+      - service: script.turn_off_pc_2
+        data: {}
+      - service: script.turn_off_monitor
+        data: {}
+      - service: script.turn_on_fan
+        data: {}
+    default:
+    - service: script.turn_on_air_conditioner
+      data: {}
+  - choose:
+    - conditions:
+      - condition: state
+        entity_id: binary_sensor.withings_in_bed_geovanni
+        state: 'on'
+      sequence:
+      - service: script.turn_off
+        data: {}
+        target:
+          entity_id:
+          - script.turn_on_pc
+          - script.turn_on_right_monitor
+          - script.turn_on_right_monitor
+          - script.turn_off_fan
+          - script.turn_on_air_conditioner
+          - script.turn_on_left_monitor
+      - service: script.turn_off_right_monitor
+        data: {}
+      - delay:
+          hours: 0
+          minutes: 0
+          seconds: 15
+          milliseconds: 0
+      - service: script.turn_off_pc_2
+        data: {}
+      - service: script.turn_off_monitor
+        data: {}
+      - service: script.turn_on_fan
+        data: {}
+      - service: script.turn_off_air_conditioner
+        data: {}
+    default:
+    - service: script.set_air_purifier_at_4
+      data: {}
+  - choose:
+    - conditions:
+      - condition: state
+        entity_id: binary_sensor.withings_in_bed_geovanni
+        state: 'on'
+      sequence:
+      - service: script.turn_off
+        data: {}
+        target:
+          entity_id:
+          - script.turn_on_pc
+          - script.turn_on_right_monitor
+          - script.turn_on_right_monitor
+          - script.turn_off_fan
+          - script.turn_on_air_conditioner
+          - script.set_air_purifier_at_4
+          - script.turn_on_left_monitor
+      - service: script.turn_off_right_monitor
+        data: {}
+      - delay:
+          hours: 0
+          minutes: 0
+          seconds: 15
+          milliseconds: 0
+      - service: script.turn_off_pc_2
+        data: {}
+      - service: script.turn_off_monitor
+        data: {}
+      - service: script.turn_on_fan
+        data: {}
+      - service: script.turn_off_air_conditioner
+        data: {}
+      - service: script.set_air_purifier_at_0
+        data: {}
+    default:
+    - service: input_datetime.set_datetime
+      data:
+        timestamp: '{{as_timestamp(now())}}'
+      target:
+        entity_id: input_datetime.last_time_morning_routine_ran
+  - choose:
+    - conditions:
+      - condition: state
+        entity_id: binary_sensor.withings_in_bed_geovanni
+        state: 'on'
+      sequence:
+      - service: script.turn_off
+        data: {}
+        target:
+          entity_id:
+          - script.turn_on_pc
+          - script.turn_on_right_monitor
+          - script.turn_on_right_monitor
+          - script.turn_off_fan
+          - script.turn_on_air_conditioner
+          - script.set_air_purifier_at_4
+      - service: script.turn_off_right_monitor
+        data: {}
+      - delay:
+          hours: 0
+          minutes: 0
+          seconds: 15
+          milliseconds: 0
+      - service: script.turn_off_pc_2
+        data: {}
+      - service: script.turn_off_monitor
+        data: {}
+      - service: script.turn_on_fan
+        data: {}
+      - service: script.turn_off_air_conditioner
+        data: {}
+      - service: script.set_air_purifier_at_0
+        data: {}
+      - service: input_datetime.set_datetime
+        data:
+          timestamp: '{{as_timestamp(now()) - 34000}}'
+        target:
+          entity_id: input_datetime.last_time_morning_routine_ran
+    default:
+    - service: script.alexa_whats_on_my_calendar
+      data: {}
+    - delay:
+        hours: 0
+        minutes: 0
+        seconds: 15
+        milliseconds: 0
+    - service: script.alexa_tell_me_the_weather
+      data: {}
+  - wait_for_trigger:
+    - platform: state
+      entity_id: binary_sensor.withings_in_bed_geovanni
+      to: 'on'
+    - platform: template
+      value_template: '{{states(''sensor.pc_escritori_system_idle_time'') | int >
+        600}}'
+    timeout: 00:15:00
+    continue_on_timeout: false
+  - service: script.turn_off_pc_2
+    data: {}
+  - service: script.turn_off_right_monitor
+    data: {}
+  - service: script.turn_off_monitor
+    data: {}
+  - service: script.turn_on_fan
+    data: {}
+  - service: script.turn_off_air_conditioner
+    data: {}
+  - service: script.set_air_purifier_at_0
+    data: {}
+  - service: input_datetime.set_datetime
+    data:
+      timestamp: '{{as_timestamp(now()) - 34000}}'
+    target:
+      entity_id: input_datetime.last_time_morning_routine_ran
+  mode: single
+- id: '1649453210790'
+  alias: Return to Bedroom
+  description: ''
+  trigger:
+  - platform: state
+    entity_id: binary_sensor.hue_motion_sensor_1_motion
+    from: 'off'
+    to: 'on'
+  - platform: state
+    entity_id: binary_sensor.hue_motion_sensor_2_motion
+    from: 'off'
+    to: 'on'
+  condition:
+  - condition: state
+    entity_id: person.cristian_geovanni_aguilar_valencia
+    state: home
+  - condition: or
+    conditions:
+    - condition: state
+      entity_id: binary_sensor.withings_in_bed_geovanni
+      state: 'off'
+    - condition: state
+      entity_id: binary_sensor.withings_in_bed_geovanni
+      state: unavailable
+  - condition: state
+    entity_id: input_boolean.iphone_bluetooth_connected
+    state: 'off'
+  - condition: state
+    entity_id: switch.sonoff_1000331d93
+    state: 'off'
+    for:
+      hours: 0
+      minutes: 1
+      seconds: 0
+  - condition: time
+    before: '23:59:00'
+    after: '10:00:00'
+    weekday:
+    - sun
+    - fri
+    - sat
+    - tue
+    - thu
+    - wed
+    - mon
+  action:
+  - wait_template: '{{states(''sensor.cristian_geovannis_iphone_bssid'') == ''c0:6:c3:4d:c0:8b''}}'
+    timeout: 00:01:00
+  - service: script.turn_on_pc
+    data: {}
+  - service: script.turn_on_left_monitor
+    data: {}
+  - service: script.turn_on_right_monitor
+    data: {}
+  - service: script.turn_on_air_conditioner
+    data: {}
+  - condition: state
+    entity_id: binary_sensor.workday_sensor
+    state: 'on'
+  - condition: time
+    before: '19:00:00'
+    after: 08:00:00
+    weekday:
+    - sun
+    - sat
+    - fri
+    - thu
+    - wed
+    - tue
+    - mon
+  - service: script.turn_on_laptop
+    data: {}
+  mode: single
+- id: '1649472190844'
+  alias: Play PS5
+  description: ''
+  trigger:
+  - platform: state
+    entity_id: binary_sensor.ps5
+    to: 'on'
+    from: 'off'
+  condition:
+  - condition: state
+    entity_id: person.cristian_geovanni_aguilar_valencia
+    state: home
+  action:
+  - choose:
+    - conditions:
+      - condition: state
+        entity_id: switch.sonoff_1000331d93
+        state: 'off'
+      sequence:
+      - service: script.turn_on_tv
+        data: {}
+      - service: script.switch_hdmi_to_tv
+        data: {}
+      - service: script.change_tv_to_ps5
+        data: {}
+      - service: script.change_tv_sound_output
+        data: {}
+    default:
+    - service: script.expand_monitors
+      data: {}
+    - service: script.switch_hdmi_to_pc
+      data: {}
+  mode: single
+- id: '1649473333533'
+  alias: Change to TV While Playing PS5
+  description: ''
+  trigger:
+  - platform: state
+    entity_id: binary_sensor.withings_in_bed_geovanni
+    to: 'on'
+  condition:
+  - condition: state
+    entity_id: binary_sensor.ps5
+    state: 'on'
+  - condition: state
+    entity_id: person.cristian_geovanni_aguilar_valencia
+    state: home
+  action:
+  - service: script.turn_off_pc_2
+    data: {}
+  - service: script.switch_hdmi_to_tv
+    data: {}
+  - service: script.turn_on_tv
+    data: {}
+  - service: script.change_tv_to_ps5
+    data: {}
+  - service: script.change_tv_sound_output
+    data: {}
+  mode: single
+- id: '1649473852071'
+  alias: Run Sleep Routine After PS5 Off
+  description: ''
+  trigger:
+  - platform: state
+    entity_id: binary_sensor.ps5
+    from: 'on'
+    to: 'off'
+    for:
+      hours: 0
+      minutes: 0
+      seconds: 10
+  condition:
+  - condition: state
+    entity_id: switch.sonoff_1000331d93
+    state: 'off'
+  - condition: time
+    before: 06:00:00
+    after: '22:00:00'
+    weekday:
+    - mon
+    - tue
+    - wed
+    - thu
+    - fri
+    - sat
+    - sun
+  - condition: state
+    entity_id: person.cristian_geovanni_aguilar_valencia
+    state: home
+  - condition: state
+    entity_id: binary_sensor.withings_in_bed_geovanni
+    state: 'on'
+  action:
+  - service: automation.trigger
+    data:
+      skip_condition: false
+    target:
+      entity_id: automation.sleep_routine_2
+  mode: single
+- id: '1649475330638'
+  alias: Change Cleaning Day
+  description: ''
+  trigger:
+  - platform: time
+    at: '18:00:00'
+  condition:
+  - condition: state
+    entity_id: person.cristian_geovanni_aguilar_valencia
+    state: home
+  action:
+  - service: input_boolean.toggle
+    data: {}
+    target:
+      entity_id: input_boolean.cleaning_day
+  - condition: state
+    entity_id: input_boolean.cleaning_day
+    state: 'on'
+  - service: script.change_days_for_braava_water
+    data: {}
+  mode: single
+- id: '1649476264655'
+  alias: Clean Bedroom
+  description: ''
+  trigger:
+  - platform: state
+    entity_id: input_boolean.iphone_bluetooth_connected
+    from: 'off'
+    to: 'on'
+  condition:
+  - condition: time
+    before: '22:00:00'
+    after: '18:00:00'
+    weekday:
+    - mon
+    - tue
+    - wed
+    - thu
+    - fri
+    - sat
+    - sun
+  - condition: state
+    entity_id: person.cristian_geovanni_aguilar_valencia
+    state: home
+  - condition: template
+    value_template: '{{((as_timestamp(now())) / 60 / 60 | int - as_timestamp(states(''input_datetime.last_time_bedroom_cleaned''))
+      / 60 / 60 | int) > 24}}'
+  action:
+  - service: script.turn_off_everything
+    data: {}
+  - condition: state
+    entity_id: input_boolean.cleaning_day
+    state: 'on'
+  - service: script.set_air_purifier_at_max
+    data: {}
+  - service: script.send_walle_to_clean
+    data: {}
+  - service: input_datetime.set_datetime
+    data:
+      datetime: '{{now()}}'
+    target:
+      entity_id: input_datetime.last_time_bedroom_cleaned
+  mode: single
+- id: '1649716655913'
+  alias: Changing Temperature
+  description: ''
+  trigger:
+  - platform: state
+    entity_id: climate.air_conditioner
+    attribute: temperature
+  condition:
+  - condition: state
+    entity_id: input_boolean.air_conditioner
+    state: 'on'
+  action:
+  - service: script.change_air_conditioner_temperature
+    data:
+      temperature: '{{state_attr(''climate.air_conditioner'',''temperature'') | int}}'
+  mode: single
+- id: '1649716659615'
+  alias: Changing Temperature
+  description: ''
+  trigger:
+  - platform: state
+    entity_id: climate.air_conditioner
+    attribute: temperature
+  condition: []
+  action: []
+  mode: single
+- id: '1649717218836'
+  alias: Air Conditioner On/Off
+  description: ''
+  trigger:
+  - platform: state
+    entity_id: climate.air_conditioner
+    from: 'off'
+    to: cool
+    id: climate_off_to_cool
+  - platform: state
+    entity_id: climate.air_conditioner
+    to: 'off'
+    from: cool
+  condition:
+  - condition: state
+    entity_id: person.cristian_geovanni_aguilar_valencia
+    state: home
+  action:
+  - choose:
+    - conditions:
+      - condition: trigger
+        id: climate_off_to_cool
+      sequence:
+      - service: script.turn_on_air_conditioner
+        data: {}
+    default:
+    - service: script.turn_off_air_conditioner
+      data: {}
+  mode: single
+- id: '1650138775466'
+  alias: Set Boot Times For Computers
+  description: ''
+  trigger:
+  - platform: state
+    entity_id: sensor.0529gaguilar_system_boot_time
+    id: laptop
+  - platform: state
+    entity_id: sensor.pc_escritori_system_boot_time
+    id: pc
+  condition: []
+  action:
+  - choose:
+    - conditions:
+      - condition: trigger
+        id: laptop
+      - condition: not
+        conditions:
+        - condition: state
+          entity_id: sensor.0529gaguilar_system_boot_time
+          state: unknown
+      - condition: not
+        conditions:
+        - condition: state
+          entity_id: sensor.0529gaguilar_system_boot_time
+          state: unavailable
+      sequence:
+      - service: input_datetime.set_datetime
+        data:
+          datetime: '{{states(''sensor.0529gaguilar_system_boot_time'')}}'
+        target:
+          entity_id: input_datetime.laptop_boot_time
+    - conditions:
+      - condition: trigger
+        id: pc
+      - condition: not
+        conditions:
+        - condition: state
+          entity_id: sensor.pc_escritori_system_boot_time
+          state: unknown
+      - condition: not
+        conditions:
+        - condition: state
+          entity_id: sensor.pc_escritori_system_boot_time
+          state: unavailable
+      sequence:
+      - service: input_datetime.set_datetime
+        data:
+          datetime: '{{states(''sensor.pc_escritori_system_boot_time'')}}'
+        target:
+          entity_id: input_datetime.pc_boot_time
+    default:
+    - service: script.null
+      data: {}
+  mode: single
+- id: '1650694673093'
+  alias: Empty Room With Scenes
+  description: ''
+  trigger:
+  - platform: state
+    entity_id: binary_sensor.hue_motion_sensor_1_motion
+    from: 'off'
+    to: 'on'
+  - platform: state
+    entity_id: binary_sensor.hue_motion_sensor_2_motion
+    from: 'off'
+    to: 'on'
+  - platform: numeric_state
+    entity_id: sensor.pc_escritori_system_idle_time
+    above: '30'
+  - platform: numeric_state
+    entity_id: sensor.0529gaguilar_system_idle_time
+    above: '30'
+  - platform: numeric_state
+    entity_id: sensor.pc_time_no_volume
+    above: '30'
+  - platform: numeric_state
+    entity_id: sensor.laptop_time_no_volume
+    above: '30'
+  - platform: state
+    entity_id: sensor.pc_inactive
+    to: 'on'
+  - platform: state
+    entity_id: sensor.laptop_inactive
+    to: 'on'
+  condition:
+  - condition: and
+    conditions:
+    - condition: or
+      conditions:
+      - condition: and
+        conditions:
+        - condition: state
+          entity_id: switch.sonoff_1000331d93
+          state: 'off'
+        - condition: state
+          entity_id: sensor.pc_volume
+          state: unavailable
+      - condition: numeric_state
+        entity_id: sensor.pc_volume
+        below: '1'
+    - condition: or
+      conditions:
+      - condition: and
+        conditions:
+        - condition: state
+          entity_id: switch.sonoff_1000332281
+          state: 'off'
+        - condition: state
+          entity_id: sensor.laptop_volume
+          state: unavailable
+      - condition: numeric_state
+        entity_id: sensor.laptop_volume
+        below: '1'
+  - condition: or
+    conditions:
+    - condition: state
+      entity_id: binary_sensor.laptop_webcam
+      state: 'off'
+    - condition: state
+      entity_id: binary_sensor.laptop_webcam
+      state: unknown
+    - condition: state
+      entity_id: binary_sensor.laptop_webcam
+      state: unavailable
+  - condition: or
+    conditions:
+    - condition: state
+      entity_id: binary_sensor.laptop_microphone
+      state: 'off'
+    - condition: state
+      entity_id: binary_sensor.laptop_microphone
+      state: unknown
+    - condition: state
+      entity_id: binary_sensor.laptop_microphone
+      state: unavailable
+  - condition: state
+    entity_id: binary_sensor.ps5
+    state: 'off'
+  - condition: state
+    entity_id: person.cristian_geovanni_aguilar_valencia
+    state: home
+  - condition: time
+    before: 00:00:00
+    after: 09:00:00
+    weekday:
+    - sun
+    - sat
+    - fri
+    - thu
+    - wed
+    - tue
+    - mon
+  - condition: not
+    conditions:
+    - condition: state
+      entity_id: binary_sensor.withings_in_bed_geovanni
+      state: 'on'
+  - condition: state
+    entity_id: media_player.lg_cx
+    state: 'off'
+  - condition: not
+    conditions:
+    - condition: state
+      entity_id: sensor.pc_escritori_system_idle_time
+      state: unknown
+      for:
+        hours: 0
+        minutes: 4
+        seconds: 0
+  - condition: not
+    conditions:
+    - condition: state
+      entity_id: sensor.pc_escritori_system_idle_time
+      state: unavailable
+      for:
+        hours: 0
+        minutes: 4
+        seconds: 0
+  action:
+  - service: script.empty_room_turn_off
+    data: {}
+  mode: restart
+- id: '1650695433982'
+  alias: Stop Empty Room
+  description: ''
+  trigger:
+  - platform: state
+    entity_id: binary_sensor.hue_motion_sensor_1_motion
+    to: 'on'
+  - platform: state
+    entity_id: binary_sensor.hue_motion_sensor_2_motion
+    to: 'on'
+  - platform: numeric_state
+    entity_id: sensor.pc_time_no_volume
+    below: '1'
+  - platform: numeric_state
+    entity_id: sensor.pc_time_inactive
+    below: '1'
+  - platform: numeric_state
+    entity_id: sensor.laptop_time_no_volume
+    below: '1'
+  - platform: numeric_state
+    entity_id: sensor.laptop_time_inactive
+    below: '1'
+  - platform: state
+    entity_id: sensor.0529gaguilar_system_idle_time
+    to: '0'
+  - platform: state
+    entity_id: sensor.pc_escritori_system_idle_time
+    to: '0'
+  condition:
+  - condition: state
+    entity_id: script.empty_room_turn_off
+    state: 'on'
+  - condition: state
+    entity_id: input_boolean.iphone_bluetooth_connected
+    state: 'off'
+  action:
+  - service: script.turn_off
+    data: {}
+    target:
+      entity_id: script.empty_room_turn_off
+  - service: scene.turn_on
+    data: {}
+    target:
+      entity_id: scene.before
+  mode: single
+- id: '1650765360765'
+  alias: Send Eva to Clean
+  description: ''
+  trigger:
+  - platform: state
+    entity_id: sensor.vacuum
+    to: Empty
+    attribute: phase
+  condition:
+  - condition: time
+    before: '22:00:00'
+    after: '18:00:00'
+    weekday:
+    - mon
+    - tue
+    - wed
+    - thu
+    - fri
+    - sat
+    - sun
+  - condition: state
+    entity_id: person.cristian_geovanni_aguilar_valencia
+    state: home
+  action:
+  - service: script.send_eva_to_clean
+    data: {}
+  mode: single
+- id: '1650765631240'
+  alias: Dock Eva
+  description: ''
+  trigger:
+  - platform: state
+    entity_id: sensor.mop
+    from: Not Ready
+    to: Ready
+  condition:
+  - condition: time
+    before: '22:00:00'
+    after: '18:00:00'
+    weekday:
+    - mon
+    - tue
+    - wed
+    - thu
+    - fri
+    - sat
+    - sun
+  - condition: state
+    entity_id: person.cristian_geovanni_aguilar_valencia
+    state: home
+  action:
+  - service: script.dock_robot
+    data: {}
+  mode: single
+- id: '1650773080073'
+  alias: Desk Up
+  description: ''
+  trigger:
+  - platform: state
+    entity_id: switch.sonoff_1000331d93
+    from: 'off'
+    to: 'on'
+    for:
+      hours: 0
+      minutes: 40
+      seconds: 0
+  - platform: state
+    entity_id: binary_sensor.ps5
+    for:
+      hours: 0
+      minutes: 40
+      seconds: 0
+    from: 'off'
+    to: 'on'
+  - platform: state
+    entity_id: switch.sonoff_1000332281
+    for:
+      hours: 0
+      minutes: 40
+      seconds: 0
+    from: 'off'
+    to: 'on'
+  - platform: template
+    value_template: '{{(as_timestamp(now()) | int - as_timestamp(states(''input_datetime.last_time_desk_up''))
+      | int) > 2400}}'
+  - platform: template
+    value_template: '{{((((as_timestamp(now()) | int - as_timestamp(states.switch.sonoff_1000331d93.last_changed)
+      | int) / 60) | int) % 40) == 0}}'
+  - platform: template
+    value_template: '{{((((as_timestamp(now()) | int - as_timestamp(states.switch.sonoff_1000332281.last_changed)
+      | int) / 60) | int) % 40) == 0}}'
+  - platform: template
+    value_template: '{{((((as_timestamp(now()) | int - as_timestamp(states.binary_sensor.ps5.last_changed)
+      | int) / 60) | int) % 40) == 0}}'
+  condition:
+  - condition: state
+    entity_id: person.cristian_geovanni_aguilar_valencia
+    state: home
+  - condition: state
+    entity_id: media_player.lg_cx
+    state: 'off'
+  - condition: template
+    value_template: '{{(as_timestamp(now()) | int - as_timestamp(states(''input_datetime.last_time_desk_up''))
+      | int) > 2399}}'
+  - condition: time
+    before: '23:00:01'
+    after: 09:00:00
+    weekday:
+    - sun
+    - sat
+    - fri
+    - thu
+    - wed
+    - tue
+    - mon
+  - condition: template
+    value_template: '{{(as_timestamp(now()) | int - as_timestamp(states(''input_datetime.last_time_morning_routine_ran''))
+      | int) > 1000}}'
+  - condition: not
+    conditions:
+    - condition: state
+      entity_id: binary_sensor.withings_in_bed_geovanni
+      state: 'on'
+  - condition: not
+    conditions:
+    - condition: state
+      entity_id: binary_sensor.laptop_webcam
+      state: 'on'
+  - condition: not
+    conditions:
+    - condition: state
+      entity_id: binary_sensor.laptop_microphone
+      state: 'on'
+  - condition: state
+    entity_id: switch.sonoff_1000331d93
+    state: 'on'
+    for:
+      hours: 0
+      minutes: 15
+      seconds: 0
+  action:
+  - service: cover.open_cover
+    data: {}
+    target:
+      entity_id: cover.standup_desk
+  - service: input_datetime.set_datetime
+    data:
+      datetime: '{{now()}}'
+    target:
+      entity_id: input_datetime.last_time_desk_up
+  mode: single
+- id: '1650773599159'
+  alias: Desk Down
+  description: ''
+  trigger:
+  - platform: state
+    entity_id: input_boolean.desk_up
+    to: 'on'
+    for:
+      hours: 0
+      minutes: 10
+      seconds: 0
+  - platform: template
+    value_template: '{{(as_timestamp(now()) | int - as_timestamp(states.automation.desk_up.attributes.last_triggered)
+      | int) > 600}}'
+  - platform: state
+    entity_id: cover.standup_desk
+    from: closed
+    to: open
+    for:
+      hours: 0
+      minutes: 10
+      seconds: 0
+  condition:
+  - condition: numeric_state
+    entity_id: cover.standup_desk
+    attribute: current_position
+    above: '99'
+  action:
+  - service: cover.close_cover
+    data: {}
+    target:
+      entity_id: cover.standup_desk
+  mode: single
+- id: '1650951445082'
+  alias: Play sleep sounds after 1 hour
+  description: ''
+  trigger:
+  - platform: state
+    entity_id: binary_sensor.withings_in_bed_geovanni
+    to: 'on'
+    for:
+      hours: 1
+      minutes: 0
+      seconds: 0
+  condition:
+  - condition: time
+    before: 07:00:00
+    after: '23:00:00'
+    weekday:
+    - mon
+    - wed
+    - tue
+    - thu
+    - fri
+    - sat
+    - sun
+  action:
+  - service: webostv.command
+    data:
+      entity_id: media_player.lg_webos_smart_tv
+      command: system.launcher/launch
+      payload:
+        id: youtube.leanback.v4
+        contentId: nEi2Udjc0lQ
+  mode: single
+- id: '1651017145887'
+  alias: Turn Off Laptop After Work
+  description: ''
+  trigger:
+  - platform: template
+    value_template: '{{states(''sensor.laptop_time_no_volume'') | int >= 600 and states(''sensor.0529gaguilar_system_idle_time'')
+      | int >= 600}}'
+  condition:
+  - condition: state
+    entity_id: person.cristian_geovanni_aguilar_valencia
+    state: home
+  - condition: time
+    before: 00:00:00
+    after: '19:00:00'
+    weekday:
+    - mon
+    - tue
+    - wed
+    - thu
+    - fri
+    - sat
+    - sun
+  - condition: state
+    entity_id: binary_sensor.workday_sensor
+    state: 'on'
+  - condition: not
+    conditions:
+    - condition: state
+      entity_id: binary_sensor.laptop_microphone
+      state: 'on'
+  - condition: not
+    conditions:
+    - condition: state
+      entity_id: binary_sensor.laptop_webcam
+      state: 'on'
+  - condition: state
+    entity_id: switch.sonoff_1000332281
+    state: 'on'
+    for:
+      hours: 1
+      minutes: 0
+      seconds: 0
+  action:
+  - service: script.turn_off_pc
+    data: {}
+  mode: single
+- id: '1651032345481'
+  alias: Play Youtube Video to Sleep
+  description: ''
+  trigger:
+  - platform: state
+    entity_id: media_player.lg_webos_smart_tv
+    from: 'off'
+    to: 'on'
+    for:
+      hours: 1
+      minutes: 0
+      seconds: 0
+  condition:
+  - condition: state
+    entity_id: person.cristian_geovanni_aguilar_valencia
+    state: home
+  - condition: state
+    entity_id: binary_sensor.withings_in_bed_geovanni
+    state: 'on'
+  - condition: time
+    before: 06:00:00
+    weekday:
+    - mon
+    - tue
+    - wed
+    - thu
+    - fri
+    - sat
+    - sun
+    after: 00:00:00
+  - condition: state
+    entity_id: input_boolean.marvel_day
+    state: 'off'
+  action:
+  - service: webostv.command
+    data:
+      entity_id: media_player.lg_webos_smart_tv
+      command: system.launcher/launch
+      payload:
+        id: youtube.leanback.v4
+        contentId: v=yMRoNNKWuqQ
+  - delay:
+      hours: 0
+      minutes: 0
+      seconds: 5
+      milliseconds: 0
+  - service: webostv.button
+    data:
+      button: ENTER
+      entity_id: media_player.lg_webos_smart_tv
+  mode: single
+- id: '1651034140031'
+  alias: Marvel Automation
+  description: ''
+  trigger:
+  - platform: time
+    at: 02:00:00
+  condition:
+  - condition: time
+    before: '14:01:00'
+    after: 01:59:59
+    weekday:
+    - wed
+  - condition: state
+    entity_id: input_boolean.marvel_day
+    state: 'on'
+  action:
+  - choose:
+    - conditions:
+      - condition: state
+        entity_id: media_player.lg_webos_smart_tv
+        state: 'on'
+      sequence:
+      - service: media_player.select_source
+        data:
+          source: Movie
+        target:
+          entity_id: media_player.hue_sync_box
+      - service: media_player.turn_on
+        data: {}
+        target:
+          entity_id: media_player.fire_tv_192_168_1_85
+      - service: media_player.play_media
+        data:
+          media_content_id: Play Last Episode Of Moon Knight on Disney Plus
+          media_content_type: custom
+        target:
+          entity_id:
+          - media_player.fire_tv_de_cristian
+    default:
+    - service: media_player.select_source
+      data:
+        source: Movie
+      target:
+        entity_id: media_player.hue_sync_box
+    - service: script.turn_on_tv
+      data: {}
+    - service: media_player.turn_on
+      data: {}
+      target:
+        entity_id: media_player.fire_tv_192_168_1_85
+    - service: media_player.play_media
+      data:
+        media_content_id: Play Last Episode Of Moon Knight on Disney Plus
+        media_content_type: custom
+      target:
+        entity_id:
+        - media_player.fire_tv_de_cristian
+  mode: single
+- id: '1651104618031'
+  alias: Control Temperature
+  description: ''
+  trigger:
+  - platform: state
+    entity_id: sensor.mean_temperature_int
+  condition:
+  - condition: state
+    entity_id: climate.air_conditioner
+    state: cool
+  - condition: state
+    entity_id: person.cristian_geovanni_aguilar_valencia
+    state: home
+  action:
+  - service: script.change_air_conditioner_temperature
+    data:
+      temperature: "{% if states('sensor.mean_temperature') | float > 24.0 and state_attr('climate.air_conditioner',\
+        \ 'temperature') | int > 17 -%}\n  {{state_attr('climate.air_conditioner',\
+        \ 'temperature') | int - 1}}\n{%- elif states('sensor.mean_temperature') |\
+        \ float < 24.0 and state_attr('climate.air_conditioner', 'temperature') |\
+        \ int < 30 -%}\n  {{state_attr('climate.air_conditioner', 'temperature') |\
+        \ int + 1}}\n{%- else -%}\n  {{state_attr('climate.air_conditioner', 'temperature')}}\n\
+        {%- endif %}\n"
+  mode: single
+- id: '1651197180710'
+  alias: Public IP Changed
+  description: ''
+  trigger:
+  - platform: state
+    entity_id: sensor.fg6122tm_external_ip
+  condition:
+  - condition: template
+    value_template: '{{ trigger.from_state }}'
+  action:
+  - service: notify.mobile_app_cristian_geovannis_iphone
+    data:
+      title: Public IP Change
+      message: Change Laptop IPs
+  - service: notify.persistent_notification
+    data:
+      message: Change Laptop IPs
+      title: Public IP Change
+  mode: single
+- id: '1651269694124'
+  alias: Notify HASS Sensors Unavailable
+  description: ''
+  trigger:
+  - platform: state
+    entity_id: binary_sensor.laptop_microphone
+    to: unknown
+    from: 'on'
+  - platform: state
+    entity_id: binary_sensor.laptop_webcam
+    to: unknown
+    from: 'on'
+  - platform: state
+    entity_id: sensor.laptop_volume
+    to: unknown
+  - platform: state
+    entity_id: binary_sensor.laptop_microphone
+    to: unknown
+    from: 'off'
+  - platform: state
+    entity_id: binary_sensor.laptop_webcam
+    to: unknown
+    from: 'off'
+  condition:
+  - condition: state
+    entity_id: switch.sonoff_1000332281
+    state: 'on'
+  - condition: not
+    conditions:
+    - condition: state
+      entity_id: sensor.0529gaguilar_system_idle_time
+      state: unavailable
+  - condition: not
+    conditions:
+    - condition: state
+      entity_id: sensor.0529gaguilar_system_idle_time
+      state: unknown
+  - condition: state
+    entity_id: script.turn_off_pc
+    state: 'off'
+  action:
+  - service: mqtt.publish
+    data:
+      topic: iotlink/netlogistik/0529gaguilar/commands/run
+      payload: '{ "command": "C:\\Users\\geovanni.aguilar\\Documents\\HA\\RESTARTHASS.bat",
+        "args": "", "path": "C:\\Users\\geovanni.aguilar\\Documents\\HA\\", "user":
+        "", "visible": false, "fallback": true}'
+  mode: single
+- id: '1651817525082'
+  alias: Refill Eva Water
+  description: ''
+  trigger:
+  - platform: time
+    at: '18:00:00'
+  condition:
+  - condition: state
+    entity_id: input_boolean.cleaning_day
+    state: 'on'
+  - condition: time
+    before: '19:00:00'
+    after: '18:00:00'
+    weekday:
+    - sun
+    - fri
+    - mon
+    - sat
+    - wed
+    - thu
+    - tue
+  - condition: state
+    entity_id: sensor.mop
+    attribute: tank
+    state: empty
+  - condition: state
+    entity_id: person.cristian_geovanni_aguilar_valencia
+    state: home
+  action:
+  - service: light.turn_on
+    data:
+      rgb_color:
+      - 235
+      - 77
+      - 61
+      brightness_pct: 26
+    target:
+      entity_id: light.cama
+  - repeat:
+      until:
+      - condition: state
+        entity_id: sensor.mop
+        attribute: tank
+        state: Ready
+      sequence:
+      - device_id: bad0b5042b55509c57201aa9d948dc7d
+        domain: light
+        entity_id: light.cama
+        type: flash
+      - delay:
+          hours: 0
+          minutes: 0
+          seconds: 7
+          milliseconds: 0
+  - type: turn_off
+    device_id: bad0b5042b55509c57201aa9d948dc7d
+    entity_id: light.cama
+    domain: light
+  mode: single
+- id: '1651817525903'
+  alias: Refill Eva Water
+  description: ''
+  trigger:
+  - platform: time
+    at: '18:00:00'
+  condition:
+  - condition: state
+    entity_id: input_boolean.cleaning_day
+    state: 'on'
+  - condition: time
+    before: '19:00:00'
+    after: '18:00:00'
+    weekday:
+    - sun
+    - fri
+    - mon
+    - sat
+    - wed
+    - thu
+    - tue
+  - condition: state
+    entity_id: sensor.mop
+    attribute: tank
+    state: empty
+  action:
+  - service: light.turn_on
+    data:
+      rgb_color:
+      - 235
+      - 77
+      - 61
+    target:
+      entity_id: light.cama
+  - repeat:
+      until:
+      - condition: state
+        entity_id: sensor.mop
+        attribute: tank
+        state: Ready
+      sequence:
+      - device_id: bad0b5042b55509c57201aa9d948dc7d
+        domain: light
+        entity_id: light.cama
+        type: flash
+      - delay:
+          hours: 0
+          minutes: 0
+          seconds: 7
+          milliseconds: 0
+  mode: single
+- id: '1651817527279'
+  alias: Refill Eva Water
+  description: ''
+  trigger:
+  - platform: time
+    at: '18:00:00'
+  condition:
+  - condition: state
+    entity_id: input_boolean.cleaning_day
+    state: 'on'
+  - condition: time
+    before: '19:00:00'
+    after: '18:00:00'
+    weekday:
+    - sun
+    - fri
+    - mon
+    - sat
+    - wed
+    - thu
+    - tue
+  - condition: state
+    entity_id: sensor.mop
+    attribute: tank
+    state: empty
+  action:
+  - service: light.turn_on
+    data:
+      rgb_color:
+      - 235
+      - 77
+      - 61
+    target:
+      entity_id: light.cama
+  - repeat:
+      until:
+      - condition: state
+        entity_id: sensor.mop
+        attribute: tank
+        state: Ready
+      sequence:
+      - device_id: bad0b5042b55509c57201aa9d948dc7d
+        domain: light
+        entity_id: light.cama
+        type: flash
+      - delay:
+          hours: 0
+          minutes: 0
+          seconds: 7
+          milliseconds: 0
+  mode: single
+- id: '1651873795719'
+  alias: HA Push to Git
+  description: ''
+  trigger:
+  - platform: time
+    at: 00:00:00
+  condition: []
+  action:
+  - service: hassio.addon_stdin
+    data:
+      addon: core_ssh
+      input: /config/ha_gitpush.sh
+  mode: single

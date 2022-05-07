@@ -1,0 +1,564 @@
+# Loads default set of integrations. Do not remove.
+default_config:
+
+homeassistant:
+  packages:
+    pack_1: !include vacuum.yaml
+    pack_2: !include mop.yaml
+  external_url: !secret external_url
+  customize_glob:
+    "cover.*":
+      assumed_state: true
+  customize: 
+    switch.right_monitor:
+      icon: |
+          [[[
+              var icon = 'mdi:monitor';
+              if (states['switch.right_monitor'].state === 'on'){
+                var icon = 'mdi:monitor';
+              } else {
+                var icon = 'mdi:monitor-off';
+              }
+              return icon ;
+          ]]]
+    switch.left_monitor:
+      icon: |
+          [[[
+              var icon = 'mdi:monitor';
+              if (states['switch.left_monitor'].state === 'on'){
+                var icon = 'mdi:monitor';
+              } else {
+                var icon = 'mdi:monitor-off';
+              }
+              return icon ;
+          ]]]
+    media_player.echo_de_cristian:
+      icon: |
+          [[[
+              var icon = 'phu:echo-dot-gen-4';
+              if (states['media_player.echo_de_cristian'].state === 'on'){
+                var icon = 'phu:echo-dot-gen-4';
+              } else {
+                var icon = 'phu:echo-dot-gen-4-clock';
+              }
+              return icon ;
+          ]]]
+    sensor.0529gaguilar_pc_sn520_nvme_wdc_512gb_load_used_space:
+      icon: 'phu:seagate-ssd'
+    sensor.pc_escritori_toshiba_mq01abd100_load_used_space:
+      icon: 'phu:seagate-ssd-m2'
+    sensor.pc_escritori_generic_hard_disk_load_used_space:
+      icon: 'phu:seagate-ssd'
+    sensor.pc_escritori_kingston_sa400s37480g_load_used_space:
+      icon: 'phu:seagate-ssd'
+    binary_sensor.withings_in_bed_geovanni:
+      icon: |
+          [[[
+              var icon = 'mdi:bed';
+              if (states['binary_sensor.withings_in_bed_geovanni'].state === 'on'){
+                var icon = 'mdi:bed';
+              } else {
+                var icon = 'mdi:bed-empty';
+              }
+              return icon ;
+          ]]]
+    device_tracker.wf_1000xm4:
+      icon: |
+          [[[
+              var icon = 'mdi:earbuds';
+              if (states['device_tracker.wf_1000xm4'].state === 'home'){
+                var icon = 'mdi:earbuds';
+              } else {
+                var icon = 'mdi:earbuds-off';
+              }
+              return icon ;
+          ]]]
+    input_boolean.air_conditioner:
+      icon: |
+          [[[
+              var icon = 'phu:air-conditioner';
+              if (states['input_boolean.air_conditioner'].state === 'on'){
+                var icon = 'phu:air-conditioner';
+              } else {
+                var icon = 'phu:lg-aircon';
+              }
+              return icon ;
+          ]]]
+    vacuum.wall_e:
+      icon: |
+          [[[
+              var icon = 'mdi:robot-vacuum';
+              if (states['vacuum.wall_e'].state === 'docked'){
+                var icon = 'mdi:robot-vacuum';
+              } else {
+                var icon = 'kuf:scene_robo_vac_cleaner_active';
+              }
+              return icon ;
+          ]]]
+    vacuum.eva:
+      icon: |
+          [[[
+              var icon = 'mdi:robot-vacuum-variant';
+              if (states['vacuum.eva'].state === 'docked'){
+                var icon = 'mdi:robot-vacuum-variant';
+              } else {
+                var icon = 'kuf:scene_robo_vac_cleaner_active';
+              }
+              return icon ;
+          ]]]
+    binary_sensor.workday_sensor: 
+      icon: |
+          [[[
+              var icon = 'hue:room-office';
+              if (states['binary_sensor.workday_sensor'].state === 'on'){
+                var icon = 'hue:room-office';
+              } else {
+                var icon = 'kuf:status_vacation';
+              }
+              return icon ;
+          ]]]
+    binary_sensor.ps5:
+      icon: |
+          [[[
+              var icon = 'mdi:sony-playstation';
+              if (states['binary_sensor.ps5'].state === 'on'){
+                var icon = 'mdi:sony-playstation';
+              } else {
+                var icon = 'mdi:microsoft-xbox-controller-off';
+              }
+              return icon ;
+          ]]]
+    sensor.pc_consumption:
+      icon: |
+          [[[
+              var icon = 'mdi:lightning-bolt';
+              if (states['switch.sonoff_1000331d93'].state === 'on'){
+                var icon = 'mdi:lightning-bolt';
+              } else {
+                var icon = 'mdi:lightning-bolt-outline';
+              }
+              return icon ;
+          ]]]
+    sensor.pc_inactive:
+      icon: |
+          [[[
+              var icon = 'mdi:desktop-mac';
+              if (states['sensor.pc_escritori_system_idle_time'].state === 'on'){
+                var icon = 'mdi:desktop-mac';
+              } else {
+                var icon = 'mdi:desktop-mac-dashboard';
+              }
+              return icon ;
+          ]]]
+    sensor.pc_ups_on:
+      icon: |
+          [[[
+              var icon = 'phu:apc-ups-upright';
+              if (states['sensor.ups_1500_status'].state === 'Online'){
+                var icon = 'phu:apc-ups-upright';
+              } else {
+                var icon = 'kuf:it_ups_attention';
+              }
+              return icon ;
+          ]]]
+    sensor.laptop_inactive:
+      icon: |
+          [[[
+              var icon = 'phu:laptop-windows-alt';
+              if (states['sensor.0529gaguilar_system_idle_time'].state === 'off'){
+                var icon = 'phu:laptop-windows-alt';
+              } else {
+                var icon = 'phu:laptop';
+              }
+              return icon ;
+          ]]]
+    sensor.pc_ups_watts:
+      icon: |
+          [[[
+              var icon = 'mdi:lightning-bolt';
+              if (((states['sensor.ups_1500_load'].state) / 100) * 1000  > 0){
+                var icon = 'mdi:lightning-bolt';
+              } else {
+                var icon = 'mdi:lightning-bolt-outline';
+              }
+              return icon ;
+          ]]]
+    sensor.pc_ups_runtime_minutes:
+      icon: |
+          [[[
+              var icon = 'mdi:battery-clock';
+              if (((states['sensor.ups_1500_battery_runtime'].state) / 60)  > 0){
+                var icon = 'mdi:battery-clock';
+              } else {
+                var icon = 'mdi:battery-remove';
+              }
+              return icon ;
+          ]]]
+    sensor.tv_ups_watts:
+      icon: |
+          [[[
+              var icon = 'mdi:lightning-bolt';
+              if (((states['sensor.ups_850_load'].state) / 100) * 1000  > 0){
+                var icon = 'mdi:lightning-bolt';
+              } else {
+                var icon = 'mdi:lightning-bolt-outline';
+              }
+              return icon ;
+          ]]]
+    sensor.tv_ups_runtime_minutes:
+      icon: |
+          [[[
+              var icon = 'mdi:battery-clock';
+              if (((states['sensor.ups_850_battery_runtime'].state) / 60)  > 0){
+                var icon = 'mdi:battery-clock';
+              } else {
+                var icon = 'mdi:battery-remove';
+              }
+              return icon ;
+          ]]]
+    sensor.walle_fan_speed:
+      icon: |
+          [[[
+              var icon = 'mdi:fan-auto';
+              if (states['vacuum.wall_e'].attributes.fan_speed === 'Automatic'){
+                var icon = 'mdi:fan-auto';
+              } else {
+                var icon = 'mdi:fan-speed-3';
+              }
+              return icon ;
+          ]]]
+    sensor.walle_status:
+      icon: |
+          [[[
+              var icon = 'mdi:battery-charging-100';
+              if (states['vacuum.wall_e'].attributes.status === 'Charging' && states['sensor.wall_e_battery_level'].state === 100){
+                var icon = 'mdi:battery-charging-100';
+              } else if(states['vacuum.wall_e'].attributes.status === 'Charging' && states['sensor.wall_e_battery_level'].state >= 90) {
+                var icon = 'mdi:battery-charging-90';
+              } else if(states['vacuum.wall_e'].attributes.status === 'Charging' && states['sensor.wall_e_battery_level'].state >= 80) {
+                var icon = 'mdi:battery-charging-80';
+              } else if(states['vacuum.wall_e'].attributes.status === 'Charging' && states['sensor.wall_e_battery_level'].state >= 70) {
+                var icon = 'mdi:battery-charging-70';
+              } else if(states['vacuum.wall_e'].attributes.status === 'Charging' && states['sensor.wall_e_battery_level'].state >= 60) {
+                var icon = 'mdi:battery-charging-60';
+              } else if(states['vacuum.wall_e'].attributes.status === 'Charging' && states['sensor.wall_e_battery_level'].state >= 50) {
+                var icon = 'mdi:battery-charging-50';
+              } else if(states['vacuum.wall_e'].attributes.status === 'Charging' && states['sensor.wall_e_battery_level'].state >= 40) {
+                var icon = 'mdi:battery-charging-40';
+              } else if(states['vacuum.wall_e'].attributes.status === 'Charging' && states['sensor.wall_e_battery_level'].state >= 30) {
+                var icon = 'mdi:battery-charging-30';
+              } else if(states['vacuum.wall_e'].attributes.status === 'Charging' && states['sensor.wall_e_battery_level'].state >= 20) {
+                var icon = 'mdi:battery-charging-20';
+              } else if(states['vacuum.wall_e'].attributes.status === 'Charging' && states['sensor.wall_e_battery_level'].state >= 10) {
+                var icon = 'mdi:battery-charging-10';
+              } else if(states['vacuum.wall_e'].attributes.status === 'Stopped') {
+                var icon = 'kuf:scene_robo_vac_cleaner_paused';
+              } else {
+                var icon = 'kuf:scene_robo_vac_cleaner_active';
+              }
+              return icon ;
+          ]]]
+        
+    sensor.walle_bin_present:
+      icon: |
+          [[[
+              var icon = 'mdi:delete-restore';
+              if (states['vacuum.wall_e'].attributes.bin_present === true){
+                var icon = 'mdi:delete-restore';
+              } else {
+                var icon = 'mdi:delete-forever';
+              }
+              return icon ;
+          ]]]
+    sensor.walle_bin_full:
+      icon: |
+          [[[
+              var icon = 'mdi:delete';
+              if (states['vacuum.wall_e'].attributes.bin_full === true){
+                var icon = 'mdi:delete';
+              } else {
+                var icon = 'mdi:delete-empty';
+              }
+              return icon ;
+          ]]]
+    sensor.walle_state:
+      icon: |
+          [[[
+              var icon = 'kuf:scene_robo_vac_cleaner_active';
+              if (states['vacuum.wall_e'].state === 'cleaning'){
+                var icon = 'kuf:scene_robo_vac_cleaner_active';
+              } else {
+                var icon = 'mdi:robot-vacuum';
+              }
+              return icon ;
+          ]]]
+    sensor.eva_fan_speed:
+      icon: |
+          [[[
+              var icon = 'mdi:water-opacity';
+              if (states['vacuum.wall_e'].attributes.fan_speed === 'Standard-1'){
+                var icon = 'mdi:water-opacity';
+              } else if(states['vacuum.wall_e'].attributes.fan_speed === 'Standard-2') {
+                var icon = 'mdi:water';
+              } else if(states['vacuum.wall_e'].attributes.fan_speed === 'Standard-3') {
+                var icon = 'mdi:water-plus';
+              } else if(states['vacuum.wall_e'].attributes.fan_speed === 'Deep-1') {
+                var icon = 'mdi:wave';
+              } else if(states['vacuum.wall_e'].attributes.fan_speed === 'Deep-2') {
+                var icon = 'mdi:waves-arrow-up';
+              } else if(states['vacuum.wall_e'].attributes.fan_speed === 'Deep-3') {
+                var icon = 'mdi:waves';
+              } else if(states['vacuum.wall_e'].attributes.fan_speed === 'Extended-1') {
+                var icon = 'mdi:wifi-strength-1';
+              } else if(states['vacuum.wall_e'].attributes.fan_speed === 'Extended-2') {
+                var icon = 'mdi:wifi-strength-2';
+              } else {
+                var icon = 'mdi:wifi-strength-4';
+              }
+              return icon ;
+          ]]]
+    sensor.eva_status:
+      icon: |
+          [[[
+              var icon = 'mdi:battery-charging-100';
+              if (states['vacuum.eva'].attributes.status === 'Charging' && states['sensor.eva_battery_level'].state === 100){
+                var icon = 'mdi:battery-charging-100';
+              } else if(states['vacuum.eva'].attributes.status === 'Charging' && states['sensor.eva_battery_level'].state >= 90) {
+                var icon = 'mdi:battery-charging-90';
+              } else if(states['vacuum.eva'].attributes.status === 'Charging' && states['sensor.eva_battery_level'].state >= 80) {
+                var icon = 'mdi:battery-charging-80';
+              } else if(states['vacuum.eva'].attributes.status === 'Charging' && states['sensor.eva_battery_level'].state >= 70) {
+                var icon = 'mdi:battery-charging-70';
+              } else if(states['vacuum.eva'].attributes.status === 'Charging' && states['sensor.eva_battery_level'].state >= 60) {
+                var icon = 'mdi:battery-charging-60';
+              } else if(states['vacuum.eva'].attributes.status === 'Charging' && states['sensor.eva_battery_level'].state >= 50) {
+                var icon = 'mdi:battery-charging-50';
+              } else if(states['vacuum.eva'].attributes.status === 'Charging' && states['sensor.eva_battery_level'].state >= 40) {
+                var icon = 'mdi:battery-charging-40';
+              } else if(states['vacuum.eva'].attributes.status === 'Charging' && states['sensor.eva_battery_level'].state >= 30) {
+                var icon = 'mdi:battery-charging-30';
+              } else if(states['vacuum.eva'].attributes.status === 'Charging' && states['sensor.eva_battery_level'].state >= 20) {
+                var icon = 'mdi:battery-charging-20';
+              } else if(states['vacuum.eva'].attributes.status === 'Charging' && states['sensor.eva_battery_level'].state >= 10) {
+                var icon = 'mdi:battery-charging-10';
+              } else if(states['vacuum.eva'].attributes.status === 'Stopped') {
+                var icon = 'kuf:scene_robo_vac_cleaner_paused';
+              } else {
+                var icon = 'kuf:scene_robo_vac_cleaner_active';
+              }
+              return icon ;
+          ]]]
+    sensor.eva_lid_closed:
+      icon: |
+          [[[
+              var icon = 'mdi:lock-open-check';
+              if (states['vacuum.eva'].attributes.lid_closed === true){
+                var icon = 'mdi:lock-open-check';
+              } else {
+                var icon = 'mdi:lock-remove';
+              }
+              return icon ;
+          ]]]
+    sensor.eva_tank_level:
+      icon: |
+          [[[
+              var icon = 'mdi:water-check';
+              if (states['vacuum.eva'].attributes.tank_level === 100){
+                var icon = 'mdi:water-check';
+              } else {
+                var icon = 'mdi:water-remove';
+              }
+              return icon ;
+          ]]]
+    sensor.eva_state:
+      icon: |
+          [[[
+              var icon = 'kuf:scene_robo_vac_cleaner_active';
+              if (states['vacuum.eva'].state === 'cleaning'){
+                var icon = 'kuf:scene_robo_vac_cleaner_active';
+              } else {
+                var icon = 'mdi:robot-vacuum-variant';
+              }
+              return icon ;
+          ]]]
+    sensor.air_temperature:
+      icon: |
+          [[[
+              var icon = 'phu:air-conditioner';
+              if (states['climate.air_conditioner'].state === 'cool'){
+                var icon = 'phu:air-conditioner';
+              } else {
+                var icon = 'phu:lg-aircon';
+              }
+              return icon ;
+          ]]]
+    media_player.lg_cx:
+      icon: |
+          [[[
+              var icon = 'mdi:television-off';
+              if (states['media_player.lg_cx'].state === 'off'){
+                var icon = 'mdi:television-off';
+              } else {
+                var icon = 'mdi:television';
+              }
+              return icon ;
+          ]]]
+    media_player.hue_sync_box:
+      icon: |
+          [[[
+              var icon = 'hue:sync-box';
+              if (states['climate.air_conditioner'].state === 'off'){
+                var icon = 'hue:sync-box';
+              } else {
+                var icon = 'hue:sync-box-alt';
+              }
+              return icon ;
+          ]]]
+    sensor.tv_ups_on:
+      icon: |
+          [[[
+              var icon = 'phu:apc-ups-upright';
+              if (states['sensor.tv_ups_on'].state === 'on'){
+                var icon = 'phu:apc-ups-upright';
+              } else {
+                var icon = 'kuf:it_ups_attention';
+              }
+              return icon ;
+          ]]]
+
+
+browser_mod:
+
+http:
+  trusted_proxies: 
+    - 127.0.0.1
+    - 172.30.32.2
+  use_x_forwarded_for: true
+  ip_ban_enabled: true
+  login_attempts_threshold: 5
+  server_port: 8123
+  ssl_certificate: /ssl/fullchain.pem
+  ssl_key: /ssl/privkey.pem
+
+#Enable WOL
+wake_on_lan: # enables `wake_on_lan` integration
+
+device_tracker:
+  - platform: bluetooth_tracker
+  - platform: bluetooth_le_tracker
+
+# Withings
+withings:
+  client_id: !secret client_id
+  client_secret: !secret client_secret
+  use_webhook: true
+
+
+frontend:
+  themes: !include_dir_merge_named themes
+  extra_module_url:
+    - /hacsfiles/lovelace-card-mod/card-mod.js
+    - /hacsfiles/my-cards/my-cards.js
+
+#Desk
+cover:
+  - platform: template
+    covers:
+      standup_desk:
+        friendly_name: "Desk"
+        position_template: "{{ states('input_number.desk_heigth') }}"
+        value_template: "{{is_state('sensor.cover_group', 'open')}}"
+        open_cover:
+          service: script.desk_up
+          data:
+            entity_id: input_boolean.desk_up
+        close_cover:
+          service: script.desk_down
+          data:
+            entity_id: input_boolean.desk_up
+        set_cover_position:
+          service: script.set_desk_height
+          data:
+            position: "{{position}}"
+
+# Air Conditioner
+climate:
+  - platform: generic_thermostat
+    unique_id: 44c108fd-8322-43c1-b6ec-ece2e98d53c4
+    name: Air Conditioner
+    min_temp: 17
+    max_temp: 30
+    heater: input_boolean.ac_helper
+    target_sensor: sensor.mean_temperature_int
+    ac_mode: true
+    target_temp: 27
+    cold_tolerance: 0.3
+    hot_tolerance: 0
+    min_cycle_duration:
+      seconds: 900
+    initial_hvac_mode: "cool"
+    away_temp: 27
+    precision: 1.0
+    comfort_temp: 29
+    home_temp: 27
+    sleep_temp: 23
+
+  
+fan:
+  - platform: template
+    fans:
+      ac_fan:
+        friendly_name: "AC Fan"
+        value_template: "{{ states('input_boolean.air_conditioner') }}"
+        percentage_template: "{{ states('input_number.air_conditioner_fan_speed') }}"
+        preset_mode_template: "{{ states('input_select.ac_fan_mode') }}"
+        oscillating_template: "{{ states('input_select.ac_fan_mode') }}"
+        turn_on:
+          service: script.null
+        turn_off:
+          service: script.null
+        set_percentage:
+          service: script.change_air_conditioner_fan_speed
+          data:
+            speed: >-
+                "{% if percentage >= 33 and percentage < 66  -%}
+                  1
+                {%- elif percentage >= 66 and percentage < 100 -%}
+                  2
+                {%- elif percentage == 100 -%}
+                  3
+                {%- else -%}
+                  0
+                {%- endif %}"
+        speed_count: 3
+        preset_modes:
+          - 'auto'
+          - 'off'
+          - '1'
+          - '2'
+          - '3'
+        set_oscillating:
+          service: script.null
+          data:
+            oscillating: "{{ oscillating }}"
+
+# Sonoff Integration
+sonoff:
+  username: !secret username
+  password: !secret password
+
+# Text to speech
+tts:
+  - platform: google_translate
+
+automation: !include automations.yaml
+script: !include scripts.yaml
+scene: !include scenes.yaml
+binary_sensor: !include binary_sensors.yaml
+input_select: !include_dir_merge_named custom_configs/devices/input_selects/
+rest_command: !include_dir_merge_named custom_configs/devices/rest_commands/
+sensor: !include_dir_merge_list custom_configs/devices/sensors/
+group: !include groups.yaml
+lovelace: !include lovelace.yaml
+light: !include lights.yaml
+media_player: !include media_player.yaml

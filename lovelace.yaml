@@ -1,0 +1,77 @@
+mode: storage
+dashboards:
+  lovelace-minimalist-2:
+    mode: yaml
+    title: Desk
+    icon: mdi:desk
+    show_in_sidebar: true
+    filename: ui_lovelace_minimalist/dashboard/desk-dashboard.yaml
+  lovelace-minimalist-3:
+    mode: yaml
+    title: PC
+    icon: mdi:desktop-tower
+    show_in_sidebar: true
+    filename: ui_lovelace_minimalist/dashboard/pc-dashboard.yaml
+  lovelace-minimalist-4:
+    mode: yaml
+    title: Laptop
+    icon: mdi:laptop
+    show_in_sidebar: true
+    filename: ui_lovelace_minimalist/dashboard/laptop-dashboard.yaml
+  lovelace-minimalist-5:
+    mode: yaml
+    title: Bed
+    icon: mdi:bed-double
+    show_in_sidebar: true
+    filename: ui_lovelace_minimalist/dashboard/bed-dashboard.yaml
+  lovelace-minimalist-7:
+    mode: yaml
+    title: Air
+    icon: mdi:home-thermometer
+    show_in_sidebar: true
+    filename: ui_lovelace_minimalist/dashboard/air-dashboard.yaml
+  lovelace-minimalist-12:
+    mode: yaml
+    title: Air Conditioner
+    icon: mdi:hvac
+    show_in_sidebar: true
+    filename: ui_lovelace_minimalist/dashboard/ac-dashboard.yaml
+  lovelace-minimalist-13:
+    mode: yaml
+    title: Fan
+    icon: mdi:fan
+    show_in_sidebar: true
+    filename: ui_lovelace_minimalist/dashboard/fan-dashboard.yaml
+  lovelace-minimalist-8:
+    mode: yaml
+    title: Air Purifier
+    icon: mdi:air-purifier
+    show_in_sidebar: true
+    filename: ui_lovelace_minimalist/dashboard/purifier-dashboard.yaml
+  lovelace-minimalist-9:
+    mode: yaml
+    title: Wall E
+    icon: mdi:robot-vacuum
+    show_in_sidebar: true
+    filename: ui_lovelace_minimalist/dashboard/walle-dashboard.yaml
+  lovelace-minimalist-10:
+    mode: yaml
+    title: Eva
+    icon: mdi:robot-vacuum-variant
+    show_in_sidebar: true
+    filename: ui_lovelace_minimalist/dashboard/eva-dashboard.yaml
+  lovelace-minimalist-11:
+    mode: yaml
+    title: TV
+    icon: mdi:television
+    show_in_sidebar: true
+    filename: ui_lovelace_minimalist/dashboard/tv-dashboard.yaml
+  lovelace-minimalist-14:
+    mode: yaml
+    title: test
+    icon: mdi:test-tube
+    show_in_sidebar: true
+    filename: ui_lovelace_minimalist/dashboard/test-dashboard.yaml
+resources:
+  - url: /browser_mod.js
+    type: module
