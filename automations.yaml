@@ -1156,7 +1156,7 @@
     state: home
   - condition: template
     value_template: '{{((as_timestamp(now())) / 60 / 60 | int - as_timestamp(states(''input_datetime.last_time_bedroom_cleaned''))
-      / 60 / 60 | int) > 24}}'
+      / 60 / 60 | int) > 20}}'
   action:
   - service: script.turn_off_everything
     data: {}
@@ -1408,6 +1408,8 @@
         minutes: 4
         seconds: 0
   action:
+  - wait_template: '{{(as_timestamp(now()) | int - as_timestamp(state_attr(''automation.return_to_bedroom'',
+      ''last_triggered'')) | int) > 420}}'
   - service: script.empty_room_turn_off
     data: {}
   mode: restart
