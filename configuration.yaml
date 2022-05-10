@@ -133,7 +133,7 @@ homeassistant:
       icon: |
         [[[
             var icon = 'mdi:lightning-bolt';
-            if (states['switch.sonoff_1000331d93'].state === 'on'){
+            if (states['switch.computer'].state === 'on'){
               var icon = 'mdi:lightning-bolt';
             } else {
               var icon = 'mdi:lightning-bolt-outline';
@@ -544,6 +544,44 @@ fan:
 sonoff:
   username: !secret username
   password: !secret password
+
+switch:
+  - platform: template
+    switches:
+      computer:
+        value_template: >
+          {% if states('sensor.pc_escritori_system_idle_time') != 'unavailable' and states('switch.sonoff_1000331d93') == 'on' and states('sensor.sonoff_1000331d93_power') | int > 10 -%}
+            on
+          {%- else -%}
+            off
+          {%- endif %}
+        turn_on:
+          service: script.turn_on_pc
+        turn_off:
+          service: script.turn_off_pc_2
+        icon_template: >
+          {% if states('sensor.0529gaguilar_system_idle_time') != 'unavailable' and states('switch.laptop') == 'on' and states('sensor.sonoff_1000332281_power') | int > 10 -%}
+            mdi:desktop-tower-monitor
+          {%- else -%}
+            mdi:desktop-tower
+          {%- endif %}
+      laptop:
+        value_template: >
+          {% if states('sensor.0529gaguilar_system_idle_time') != 'unavailable' and states('switch.laptop') == 'on' and states('sensor.sonoff_1000332281_power') | int > 10 -%}
+            on
+          {%- else -%}
+            off
+          {%- endif %}
+        turn_on:
+          service: script.turn_on_laptop
+        turn_off:
+          service: script.turn_off_pc
+        icon_template: >
+          {% if states('sensor.0529gaguilar_system_idle_time') != 'unavailable' and states('switch.laptop') == 'on' and states('sensor.sonoff_1000332281_power') | int > 10 -%}
+            mdi:laptop
+          {%- else -%}
+            mdi:laptop-off
+          {%- endif %}
 
 # Text to speech
 tts:

@@ -205,23 +205,31 @@
   description: ''
   trigger:
   - platform: state
-    entity_id: light.luz
-    from: 'on'
-    to: unavailable
+    entity_id: sensor.ups_1500_status
+    to: On Battery Battery Discharging
   - platform: state
-    entity_id: light.luz
-    from: 'off'
-    to: unavailable
+    entity_id: sensor.ups_850_status
+    to: On Battery Battery Discharging
   condition:
-  - condition: or
-    conditions:
-    - condition: state
-      entity_id: light.cama
-      state: unavailable
-    - condition: state
-      entity_id: light.cama
-      state: unknown
+  - condition: state
+    entity_id: sensor.ups_1500_status
+    state: Discharging
+  - condition: state
+    entity_id: sensor.ups_850_status
+    state: Discharging
   action:
+  - service: scene.create
+    data:
+      scene_id: power_loss
+      snapshot_entities:
+      - light.luz_escritorio
+      - light.luz
+      - light.hue_play_right
+      - light.hue_play_left
+      - light.hue_play_gradient_lightstrip
+      - light.hue_play_center
+      - light.cama
+      - light.bed_light
   - service: notify.mobile_app_cristian_geovannis_iphone
     data:
       message: Power Loss
@@ -966,7 +974,7 @@
     entity_id: input_boolean.iphone_bluetooth_connected
     state: 'off'
   - condition: state
-    entity_id: switch.sonoff_1000331d93
+    entity_id: switch.computer
     state: 'off'
     for:
       hours: 0
@@ -1027,7 +1035,7 @@
   - choose:
     - conditions:
       - condition: state
-        entity_id: switch.sonoff_1000331d93
+        entity_id: switch.computer
         state: 'off'
       sequence:
       - service: script.turn_on_tv
@@ -1084,7 +1092,7 @@
       seconds: 10
   condition:
   - condition: state
-    entity_id: switch.sonoff_1000331d93
+    entity_id: switch.computer
     state: 'off'
   - condition: time
     before: 06:00:00
@@ -1321,7 +1329,7 @@
       - condition: and
         conditions:
         - condition: state
-          entity_id: switch.sonoff_1000331d93
+          entity_id: switch.computer
           state: 'off'
         - condition: state
           entity_id: sensor.pc_volume
@@ -1334,7 +1342,7 @@
       - condition: and
         conditions:
         - condition: state
-          entity_id: switch.sonoff_1000332281
+          entity_id: switch.laptop
           state: 'off'
         - condition: state
           entity_id: sensor.laptop_volume
@@ -1517,7 +1525,7 @@
   description: ''
   trigger:
   - platform: state
-    entity_id: switch.sonoff_1000331d93
+    entity_id: switch.computer
     from: 'off'
     to: 'on'
     for:
@@ -1533,7 +1541,7 @@
     from: 'off'
     to: 'on'
   - platform: state
-    entity_id: switch.sonoff_1000332281
+    entity_id: switch.laptop
     for:
       hours: 0
       minutes: 40
@@ -1544,10 +1552,10 @@
     value_template: '{{(as_timestamp(now()) | int - as_timestamp(states(''input_datetime.last_time_desk_up''))
       | int) > 2400}}'
   - platform: template
-    value_template: '{{((((as_timestamp(now()) | int - as_timestamp(states.switch.sonoff_1000331d93.last_changed)
+    value_template: '{{((((as_timestamp(now()) | int - as_timestamp(states.switch.computer.last_changed)
       | int) / 60) | int) % 40) == 0}}'
   - platform: template
-    value_template: '{{((((as_timestamp(now()) | int - as_timestamp(states.switch.sonoff_1000332281.last_changed)
+    value_template: '{{((((as_timestamp(now()) | int - as_timestamp(states.switch.laptop.last_changed)
       | int) / 60) | int) % 40) == 0}}'
   - platform: template
     value_template: '{{((((as_timestamp(now()) | int - as_timestamp(states.binary_sensor.ps5.last_changed)
@@ -1592,7 +1600,7 @@
       entity_id: binary_sensor.laptop_microphone
       state: 'on'
   - condition: state
-    entity_id: switch.sonoff_1000331d93
+    entity_id: switch.computer
     state: 'on'
     for:
       hours: 0
@@ -1710,7 +1718,7 @@
       entity_id: binary_sensor.laptop_webcam
       state: 'on'
   - condition: state
-    entity_id: switch.sonoff_1000332281
+    entity_id: switch.laptop
     state: 'on'
     for:
       hours: 1
@@ -1897,7 +1905,7 @@
     from: 'off'
   condition:
   - condition: state
-    entity_id: switch.sonoff_1000332281
+    entity_id: switch.laptop
     state: 'on'
   - condition: not
     conditions:
@@ -2095,4 +2103,23 @@
       input: /config/ha_gitpush.sh
   - service: shell_command.git_push
     data: {}
+  mode: single
+- id: '1652153441271'
+  alias: Recover From Power Loss
+  description: ''
+  trigger:
+  - platform: state
+    entity_id: sensor.ups_1500_status
+    from: On Battery Battery Discharging
+    to: Online Battery Charging
+  - platform: state
+    entity_id: sensor.ups_850_status
+    to: Online Battery Charging
+    from: On Battery Battery Discharging
+  condition: []
+  action:
+  - service: scene.turn_on
+    data: {}
+    target:
+      entity_id: scene.power_loss
   mode: single

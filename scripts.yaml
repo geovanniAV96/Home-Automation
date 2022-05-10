@@ -53,7 +53,7 @@ turn_on_pc:
   alias: Turn On PC
   sequence:
   - condition: state
-    entity_id: switch.sonoff_1000331d93
+    entity_id: switch.computer
     state: 'off'
   - service: switch.turn_on
     data: {}
@@ -72,7 +72,7 @@ turn_on_laptop:
   alias: Turn On Laptop
   sequence:
   - condition: state
-    entity_id: switch.sonoff_1000332281
+    entity_id: switch.laptop
     state: 'off'
   - service: switch.turn_on
     data: {}
@@ -108,7 +108,7 @@ turn_off_pc:
   alias: Turn Off Laptop
   sequence:
   - condition: state
-    entity_id: switch.sonoff_1000332281
+    entity_id: switch.laptop
     state: 'on'
   - service: mqtt.publish
     data:
@@ -135,7 +135,7 @@ turn_off_pc_2:
   alias: Turn Off PC
   sequence:
   - condition: state
-    entity_id: switch.sonoff_1000331d93
+    entity_id: switch.computer
     state: 'on'
   - service: mqtt.publish
     data:
@@ -647,7 +647,7 @@ hibernate_laptop:
   alias: Hibernate Laptop
   sequence:
   - condition: state
-    entity_id: switch.sonoff_1000332281
+    entity_id: switch.laptop
     state: 'on'
   - service: mqtt.publish
     data:
@@ -674,7 +674,7 @@ hibernate_pc:
   alias: Hibernate PC
   sequence:
   - condition: state
-    entity_id: switch.sonoff_1000331d93
+    entity_id: switch.computer
     state: 'on'
   - service: mqtt.publish
     data:
@@ -1054,7 +1054,7 @@ lock_laptop:
   alias: Lock Laptop
   sequence:
   - condition: state
-    entity_id: switch.sonoff_1000332281
+    entity_id: switch.laptop
     state: 'on'
   - service: mqtt.publish
     data:
@@ -1075,15 +1075,15 @@ empty_room_turn_off:
     data:
       scene_id: before
       snapshot_entities:
-      - switch.sonoff_1000332281
-      - switch.sonoff_1000331d93
+      - switch.laptop
+      - switch.computer
       - switch.left_monitor
       - switch.right_monitor
       - climate.air_conditioner
   - choose:
     - conditions:
       - condition: state
-        entity_id: switch.sonoff_1000332281
+        entity_id: switch.laptop
         state: 'on'
       - condition: not
         conditions:
@@ -1095,12 +1095,12 @@ empty_room_turn_off:
           states(''sensor.0529gaguilar_system_idle_time'') | int >= 450}}'
     default:
     - condition: state
-      entity_id: switch.sonoff_1000331d93
+      entity_id: switch.computer
       state: 'on'
   - choose:
     - conditions:
       - condition: state
-        entity_id: switch.sonoff_1000331d93
+        entity_id: switch.computer
         state: 'on'
       - condition: not
         conditions:
@@ -1112,7 +1112,7 @@ empty_room_turn_off:
           | int >= 450}}'
     default:
     - condition: state
-      entity_id: switch.sonoff_1000332281
+      entity_id: switch.laptop
       state: 'on'
   - choose:
     - conditions:
