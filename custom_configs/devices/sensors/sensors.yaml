@@ -1,8 +1,11 @@
 #custom_sensors
 - platform: scrape
-  resource: 'https://www.youtube.com/feeds/videos.xml?channel_id=UCYJPby9DRCteedh5tfxVbrw'
+  resource: https://www.youtube.com/feeds/videos.xml?channel_id=UCYJPby9DRCteedh5tfxVbrw
   name: smosh_pit
-  value_template: '{{ value }}'
+  select: 'yt:videoId'
+- platform: scrape
+  resource: 'https://www.youtube.com/feeds/videos.xml?channel_id=UCYJPby9DRCteedh5tfxVbrw'
+  name: smosh
   select: yt\:videoid
 - platform: template
   sensors:

@@ -2097,12 +2097,12 @@
     at: 00:00:00
   condition: []
   action:
+  - service: shell_command.git_push
+    data: {}
   - service: hassio.addon_stdin
     data:
       addon: core_ssh
       input: /config/ha_gitpush.sh
-  - service: shell_command.git_push
-    data: {}
   mode: single
 - id: '1652153441271'
   alias: Recover From Power Loss

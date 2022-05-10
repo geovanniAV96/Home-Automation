@@ -543,6 +543,22 @@ open_youtube_in_tv:
       source: YouTube
     target:
       entity_id: media_player.lg_webos_smart_tv
+  - service: webostv.command
+    data:
+      entity_id: media_player.lg_webos_smart_tv
+      command: system.launcher/launch
+      payload:
+        id: youtube.leanback.v4
+        contentId: v={{states('sensor.smosh')}}
+  - delay:
+      hours: 0
+      minutes: 0
+      seconds: 5
+      milliseconds: 0
+  - service: webostv.button
+    data:
+      button: ENTER
+      entity_id: media_player.lg_webos_smart_tv
   mode: single
   icon: mdi:youtube
 turn_off_air_conditioner:
