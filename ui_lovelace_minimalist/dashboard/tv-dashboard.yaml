@@ -1,0 +1,331 @@
+---
+button_card_templates: !include_dir_merge_named "../../custom_components/ui_lovelace_minimalist/__ui_minimalist__/ulm_templates/"
+
+title: "TV"
+background: "var(--background-image)"
+# views: !include_dir_merge_list "views/"
+views:
+  - title: "Example View"
+    path: tv
+    icon: mdi:monitor-eye'
+    cards:
+      - type: "custom:button-card"
+        template: "custom_card_welcome_scenes_menus"
+        #triggers_update: input_boolean.<Your_boolean>
+        entity: input_boolean.collapse_menu
+        variables:
+          ulm_card_welcome_scenes_collapse: input_boolean.collapse_menu #OPTIONAl --> uncomment also entity or triggers_update
+          ulm_weather: "weather.home"
+          entity_1:
+            entity_id: "sun.sun"
+            icon: |
+                [[[
+                    var icon = 'mdi:monitor';
+                    if (states['switch.computer'].state === 'on' || states['switch.laptop'].state === 'on'){
+                      var icon = 'mdi:monitor';
+                    } else {
+                      var icon = 'mdi:monitor-off';
+                    }
+                    return icon ;
+                ]]]
+            name: "Desk"
+            color: |
+                [[[
+                    var color = 'pink';
+                    if (states['switch.computer'].state === 'on' || states['switch.laptop'].state === 'on'){
+                      var color = 'pink';
+                    } else {
+                      var color = 'brown';
+                    }
+                    return color ;
+                ]]]
+            tap_action:
+              action: navigate
+              navigation_path: "/lovelace-minimalist-2/desk"
+          entity_2:
+            entity_id: "sun.sun"
+            icon: |
+                [[[
+                    var icon = 'mdi:hvac';
+                    if (states['climate.air_conditioner'].state === 'cool'){
+                      var icon = 'mdi:hvac';
+                    } else {
+                      var icon = 'mdi:hvac-off';
+                    }
+                    return icon ;
+                ]]]
+            name: "Air" 
+            color: |
+                [[[
+                    var color = 'blue';
+                    if (states['climate.air_conditioner'].state === 'cool'){
+                      var color = 'blue';
+                    } else {
+                      var color = 'brown';
+                    }
+                    return color ;
+                ]]]
+          entity_3:
+            entity_id: "script.empty_room_turn_off"
+            icon: "mdi:home"
+            name: "Home" 
+            color: "brown"
+          entity_4:
+            entity_id: "binary_sensor.withings_in_bed_geovanni"
+            icon: |
+                [[[
+                    var icon = 'mdi:bed';
+                    if (states['binary_sensor.withings_in_bed_geovanni'].state === 'on'){
+                      var icon = 'mdi:bed';
+                    } else {
+                      var icon = 'mdi:bed-empty';
+                    }
+                    return icon ;
+                ]]]
+            name: "Bed" 
+            color: |
+                [[[
+                    var color = 'green';
+                    if (states['binary_sensor.withings_in_bed_geovanni'].state === 'on'){
+                      var color = 'green';
+                    } else {
+                      var color = 'brown';
+                    }
+                    return color ;
+                ]]]
+          entity_5:
+            entity_id: "sun.sun"
+            icon: |
+                [[[
+                    var icon = 'mdi:television';
+                    if (states['media_player.lg_cx'].state === 'on'){
+                      var icon = 'mdi:television';
+                    } else {
+                      var icon = 'mdi:television-off';
+                    }
+                    return icon ;
+                ]]]
+            name: "TV" 
+            color: |
+                [[[
+                    var color = 'yellow';
+                    if (states['media_player.lg_cx'].state === 'on'){
+                      var color = 'yellow';
+                    } else {
+                      var color = 'brown';
+                    }
+                    return color ;
+                ]]]
+      #----------------- Start ------------------------
+      - type: custom:button-card
+        aspect_ratio: 1/1
+        extra_styles: |
+          @keyframes bgswap1 {
+            0% {
+              background-image: url("/local/Youtube.png");
+            }
+            25% {
+              background-image: url("/local/Netflix.png");
+            }
+            50% {
+              background-image: url("/local/Disney.png");
+            }
+            75% {
+              background-image: url("/local/HBO.png");
+            }
+            100% {
+              background-image: url("/local/Youtube.png");
+            }
+        styles:
+          card:
+            - animation: bgswap1 15s linear infinite
+            - background-size: cover
+          name:
+            - color: white
+      - type: custom:mushroom-title-card
+        title: Controls
+      - type: custom:mini-media-player
+        entity: media_player.lg_cx
+        name: TV
+        icon: mdi:television
+        group: false
+        volume_stateless: false
+        artwork: material
+        toggle_power: false
+        source: full
+        info: scroll
+        replace_mute: play_pause
+      - type: custom:mini-media-player
+        entity: media_player.hue_sync_box
+        name: Sync Box
+        icon: hue:sync-box-alt
+        group: false
+        volume_stateless: false
+        artwork: material
+        toggle_power: true
+        source: full
+        info: scroll
+        replace_mute: play_pause
+      - type: conditional
+        conditions:
+          - entity: media_player.hue_sync_box
+            state_not: 'off'
+        card:
+          type: custom:select-list-card
+          entity: input_select.hue_sync_intensity
+          icon: 'mdi:television-ambient-light'
+          truncate: false
+          show_toggle: true
+          scroll_to_selected: false
+          max_options: 1
+          title: Intensity
+      - type: conditional
+        conditions:
+          - entity: media_player.hue_sync_box
+            state_not: 'off'
+        card:
+          type: custom:select-list-card
+          entity: input_select.hue_sync_input
+          icon: 'mdi:import'
+          truncate: false
+          show_toggle: true
+          scroll_to_selected: false
+          max_options: 1
+          title: Input
+      - type: "horizontal-stack"
+        cards:
+        - type: 'custom:button-card'
+          template: card_script
+          variables:
+            ulm_card_script_title: HDMI to TV
+            ulm_card_script_icon: 'mdi:video-input-hdmi'
+          tap_action:
+            action: call-service
+            service: script.turn_on
+            service_data:
+              entity_id: script.switch_hdmi_to_tv
+        - type: 'custom:button-card'
+          template: card_input_boolean
+          entity: input_boolean.hdmi_on_tv
+          name: HDMI
+      #-------------UPS Start-------------------------
+      - type: custom:mushroom-title-card
+        title: UPS Stats
+      - type: "horizontal-stack"
+        cards:
+        - type: "custom:button-card"
+          template: card_input_boolean
+          entity: sensor.tv_ups_on
+          name: UPS
+          icon: |
+                [[[
+                    var icon = 'mdi:lightning-bolt';
+                    if (states['sensor.tv_ups_on'].state === 'on'){
+                      var icon = 'mdi:lightning-bolt';
+                    } else {
+                      var icon = 'mdi:lightning-bolt-outline';
+                    }
+                    return icon ;
+                ]]]
+        - type: "custom:button-card"
+          template: card_battery
+          entity: sensor.ups_850_battery_charge
+          variables:
+            ulm_card_battery_charger_type_entity_id: sensor.ups_850_battery_charge
+            ulm_card_battery_battery_level_danger: 15
+            ulm_card_battery_battery_level_warning: 50
+          name: UPS
+      - type: "horizontal-stack"
+        cards:
+        - type: "custom:button-card"
+          template: card_graph
+          variables:
+            ulm_card_graph_color: "var(--google-blue)"
+            ulm_card_graph_name: UPS Watts Output
+            ulm_card_graph_entity: sensor.tv_ups_watts
+            ulm_card_graph_type: fill
+            ulm_card_graph_hours: 12
+        - type: "custom:button-card"
+          template: card_graph
+          variables:
+            ulm_card_graph_color: "var(--google-blue)"
+            ulm_card_graph_name: UPS Runtime
+            ulm_card_graph_entity: sensor.tv_ups_runtime_minutes
+            ulm_card_graph_type: fill
+            ulm_card_graph_hours: 12
+      #-------------UPS End---------------------------
+      #-------------Lights Start----------------------
+      - type: custom:mushroom-title-card
+        title: Lights
+      - type: "horizontal-stack"
+        cards:
+        - type: "custom:button-card"
+          template: card_light
+          entity: light.hue_play_gradient_lightstrip
+          variables:
+            ulm_card_light_enable_collapse: true
+            ulm_card_light_enable_slider: true
+            ulm_card_light_enable_color: true
+            ulm_card_light_name: Gradient Lightstrip
+            ulm_card_light_enable_popup: true
+        
+      - type: "horizontal-stack"
+        cards:
+        - type: "custom:button-card"
+          template: card_light
+          entity: light.hue_play_left
+          variables:
+            ulm_card_light_enable_collapse: true
+            ulm_card_light_enable_slider: true
+            ulm_card_light_enable_color: true
+            ulm_card_light_name: Left
+            ulm_card_light_enable_popup: true
+        - type: "custom:button-card"
+          template: card_light
+          entity: light.hue_play_center
+          variables:
+            ulm_card_light_enable_collapse: true
+            ulm_card_light_enable_slider: true
+            ulm_card_light_enable_color: true
+            ulm_card_light_name: Center
+            ulm_card_light_enable_popup: true
+        - type: "custom:button-card"
+          template: card_light
+          entity: light.hue_play_right
+          variables:
+            ulm_card_light_enable_collapse: true
+            ulm_card_light_enable_slider: true
+            ulm_card_light_enable_color: true
+            ulm_card_light_name: Right
+            ulm_card_light_enable_popup: true
+      #-------------Lights End------------------------
+      #-------------SwitchBot Start-------------------
+      - type: custom:mushroom-title-card
+        title: SwitchBot
+      - type: "horizontal-stack"
+        cards:
+        - type: "custom:button-card"
+          template: card_battery
+          entity: sensor.hdmiswitch_battery
+          variables:
+            ulm_card_battery_charger_type_entity_id: sensor.hdmiswitch_battery
+            ulm_card_battery_battery_level_danger: 15
+            ulm_card_battery_battery_level_warning: 50
+        - type: "custom:button-card"
+          template: "custom_card_eraycetinay_elapsed_time"
+          entity: button.hdmiswitch_button
+          name: "Up Last Used"
+      - type: "horizontal-stack"
+        cards:
+        - type: 'custom:button-card'
+          template: card_generic
+          entity: sensor.hdmiswitch_holdsecs
+        - type: 'custom:button-card'
+          template: card_graph
+          variables:
+            ulm_card_graph_color: "var(--google-blue)"
+            ulm_card_graph_name: Signal Up
+            ulm_card_graph_entity: sensor.hdmiswitch_linkquality
+            ulm_card_graph_type: fill
+            ulm_card_graph_hours: 1
+      #-------------SwitchBot End---------------------

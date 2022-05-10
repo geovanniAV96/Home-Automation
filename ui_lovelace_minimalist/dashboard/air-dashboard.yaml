@@ -1,0 +1,301 @@
+---
+button_card_templates: !include_dir_merge_named "../../custom_components/ui_lovelace_minimalist/__ui_minimalist__/ulm_templates/"
+
+title: "Air"
+background: "var(--background-image)"
+# views: !include_dir_merge_list "views/"
+views:
+  - title: "Example View"
+    path: air
+    icon: mdi:monitor-eye'
+    cards:
+      - type: "custom:button-card"
+        template: "custom_card_welcome_scenes_menus"
+        #triggers_update: input_boolean.<Your_boolean>
+        entity: input_boolean.collapse_menu
+        variables:
+          ulm_card_welcome_scenes_collapse: input_boolean.collapse_menu #OPTIONAl --> uncomment also entity or triggers_update
+          ulm_weather: "weather.home"
+          entity_1:
+            entity_id: "sun.sun"
+            icon: |
+                [[[
+                    var icon = 'mdi:monitor';
+                    if (states['switch.computer'].state === 'on' || states['switch.laptop'].state === 'on'){
+                      var icon = 'mdi:monitor';
+                    } else {
+                      var icon = 'mdi:monitor-off';
+                    }
+                    return icon ;
+                ]]]
+            name: "Desk"
+            color: |
+                [[[
+                    var color = 'pink';
+                    if (states['switch.computer'].state === 'on' || states['switch.laptop'].state === 'on'){
+                      var color = 'pink';
+                    } else {
+                      var color = 'brown';
+                    }
+                    return color ;
+                ]]]
+            tap_action:
+              action: navigate
+              navigation_path: "/lovelace-minimalist-2/desk"
+          entity_2:
+            entity_id: "sun.sun"
+            icon: |
+                [[[
+                    var icon = 'mdi:hvac';
+                    if (states['climate.air_conditioner'].state === 'cool'){
+                      var icon = 'mdi:hvac';
+                    } else {
+                      var icon = 'mdi:hvac-off';
+                    }
+                    return icon ;
+                ]]]
+            name: "Air" 
+            color: |
+                [[[
+                    var color = 'blue';
+                    if (states['climate.air_conditioner'].state === 'cool'){
+                      var color = 'blue';
+                    } else {
+                      var color = 'brown';
+                    }
+                    return color ;
+                ]]]
+          entity_3:
+            entity_id: "script.empty_room_turn_off"
+            icon: "mdi:home"
+            name: "Home" 
+            color: "brown"
+          entity_4:
+            entity_id: "binary_sensor.withings_in_bed_geovanni"
+            icon: |
+                [[[
+                    var icon = 'mdi:bed';
+                    if (states['binary_sensor.withings_in_bed_geovanni'].state === 'on'){
+                      var icon = 'mdi:bed';
+                    } else {
+                      var icon = 'mdi:bed-empty';
+                    }
+                    return icon ;
+                ]]]
+            name: "Bed" 
+            color: |
+                [[[
+                    var color = 'green';
+                    if (states['binary_sensor.withings_in_bed_geovanni'].state === 'on'){
+                      var color = 'green';
+                    } else {
+                      var color = 'brown';
+                    }
+                    return color ;
+                ]]]
+          entity_5:
+            entity_id: "sun.sun"
+            icon: |
+                [[[
+                    var icon = 'mdi:television';
+                    if (states['media_player.lg_cx'].state === 'on'){
+                      var icon = 'mdi:television';
+                    } else {
+                      var icon = 'mdi:television-off';
+                    }
+                    return icon ;
+                ]]]
+            name: "TV" 
+            color: |
+                [[[
+                    var color = 'yellow';
+                    if (states['media_player.lg_cx'].state === 'on'){
+                      var color = 'yellow';
+                    } else {
+                      var color = 'brown';
+                    }
+                    return color ;
+                ]]]
+      #-------------Devices Start---------------------
+      - type: custom:mushroom-title-card
+        title: Devices
+      - type: "horizontal-stack"
+        cards:
+        - type: "custom:button-card"
+          template:
+            - card_room
+            - blue_no_state
+          name: Air Purifier
+          entity: counter.air_purifier
+          icon: mdi:air-purifier
+          tap_action:
+            action: navigate
+            navigation_path: "/lovelace-minimalist-8/purifier"
+          variables:
+            label_use_temperature: false
+            label_use_brightness: false
+            entity_1:
+              entity_id: script.set_air_purifier_at_0
+              templates:
+                - yellow_on
+              tap_action:
+                action: call-service
+                service: script.set_air_purifier_at_0
+            entity_2:
+              entity_id: script.set_air_purifier_at_4
+              templates:
+                - blue_on
+              tap_action:
+                action: call-service
+                service: script.set_air_purifier_at_4
+            entity_3:
+              entity_id: script.set_air_purifier_at_max
+              templates:
+                - green_on
+              tap_action:
+                action: call-service
+                service: script.set_air_purifier_at_max
+            entity_4:
+              entity_id: button.airpurifier_button
+              templates:
+                - pink_on
+              tap_action:
+                action: press
+        - type: "custom:button-card"
+          template:
+            - custom_card_room
+            - blue_on
+            - grey_off
+          name: Air Conditioner
+          entity: input_boolean.air_conditioner
+          icon: mdi:hvac
+          tap_action:
+            action: navigate
+            navigation_path: "/lovelace-minimalist-12/ac"
+          variables:
+            label_use_temperature: false
+            label_use_brightness: false
+            variable_entity_temperature: sensor.air_temperature
+            entity_1:
+              entity_id: climate.air_conditioner
+              templates:
+                - custom_blue_on_air
+              tap_action:
+                action: toggle
+            entity_2:
+              entity_id: script.turn_on_air_conditioner
+              templates:
+                - green_no_state
+              tap_action:
+                action: call-service
+                service: script.turn_on_air_conditioner
+            entity_3:
+              entity_id: script.turn_off_air_conditioner
+              templates:
+                - red_no_state
+              tap_action:
+                action: call-service
+                service: script.turn_off_air_conditioner
+            entity_4:
+              entity_id: input_boolean.air_conditioner
+              templates:
+                - yellow_on
+              tap_action: none
+      - type: "horizontal-stack"
+        cards:
+        - type: "custom:button-card"
+          template: 
+            - card_room
+            - custom_blue_vacuum_on
+            - grey_off
+          name: Wall E
+          entity: sensor.vacuum
+          tap_action:
+            action: navigate
+            navigation_path: "/lovelace-minimalist-9/walle"
+          variables:
+            label_use_temperature: false
+            label_use_brightness: false
+            entity_1:
+              entity_id: sensor.vacuum
+              templates:
+                - custom_red_off_robot
+            entity_2:
+              entity_id: sensor.vacuum
+              templates:
+                - custom_red_on_robot
+            entity_3:
+              entity_id: sensor.vacuum
+              templates:
+                - custom_green_on
+              tap_action:
+                action: none
+            entity_4:
+              entity_id: sensor.vacuum
+              templates:
+                - pink_on
+                - custom_pink_off
+              tap_action:
+                action: none
+        - type: "custom:button-card"
+          template:
+            - card_room
+            - custom_blue_vacuum_on
+            - grey_off
+          name: Eva
+          entity: sensor.mop
+          tap_action:
+            action: navigate
+            navigation_path: "/lovelace-minimalist-10/eva"
+          variables:
+            label_use_temperature: false
+            label_use_brightness: false
+            entity_1:
+              entity_id: sensor.mop
+              templates:
+                - custom_red_off_robot
+            entity_2:
+              entity_id: sensor.mop
+              templates:
+                - custom_red_on_robot
+            entity_3:
+              entity_id: sensor.mop
+              templates:
+                - custom_green_off
+              tap_action:
+                action: none
+            entity_4:
+              entity_id: sensor.mop
+              templates:
+                - custom_blue_on_water
+              tap_action:
+                action: none
+      - type: "custom:button-card"
+        template:
+          - card_room
+          - custom_blue_on
+          - grey_off
+        name: Fan
+        entity: input_boolean.fan
+        icon: mdi:fan
+        tap_action:
+          action: navigate
+          navigation_path: "/lovelace-minimalist-13/fan"
+        variables:
+          label_use_temperature: false
+          label_use_brightness: false
+          entity_1:
+            entity_id: input_boolean.fan
+            templates:
+              - custom_blue_off_icon
+            tap_action:
+              action: call-service
+              service: script.turn_on_fan
+          entity_2:
+            entity_id: input_boolean.fan
+            templates:
+              - yellow_on
+            tap_action:
+              action: call-service
+              service: script.turn_off_fan
+      #-------------Devices End---------------------

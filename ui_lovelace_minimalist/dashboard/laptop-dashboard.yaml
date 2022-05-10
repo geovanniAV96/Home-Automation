@@ -1,0 +1,350 @@
+---
+button_card_templates: !include_dir_merge_named "../../custom_components/ui_lovelace_minimalist/__ui_minimalist__/ulm_templates/"
+
+title: "Laptop"
+background: "var(--background-image)"
+# views: !include_dir_merge_list "views/"
+views:
+  - title: "Laptop"
+    path: laptop
+    icon: mdi:monitor-eye'
+    cards:
+      - type: "custom:button-card"
+        template: "custom_card_welcome_scenes_menus"
+        #triggers_update: input_boolean.<Your_boolean>
+        entity: input_boolean.collapse_menu
+        variables:
+          ulm_card_welcome_scenes_collapse: input_boolean.collapse_menu #OPTIONAl --> uncomment also entity or triggers_update
+          ulm_weather: "weather.home"
+          entity_1:
+            entity_id: "sun.sun"
+            icon: |
+                [[[
+                    var icon = 'mdi:monitor';
+                    if (states['switch.computer'].state === 'on' || states['switch.laptop'].state === 'on'){
+                      var icon = 'mdi:monitor';
+                    } else {
+                      var icon = 'mdi:monitor-off';
+                    }
+                    return icon ;
+                ]]]
+            name: "Desk"
+            color: |
+                [[[
+                    var color = 'pink';
+                    if (states['switch.computer'].state === 'on' || states['switch.laptop'].state === 'on'){
+                      var color = 'pink';
+                    } else {
+                      var color = 'brown';
+                    }
+                    return color ;
+                ]]]
+            tap_action:
+              action: navigate
+              navigation_path: "/lovelace-minimalist-2/desk"
+          entity_2:
+            entity_id: "sun.sun"
+            icon: |
+                [[[
+                    var icon = 'mdi:hvac';
+                    if (states['climate.air_conditioner'].state === 'cool'){
+                      var icon = 'mdi:hvac';
+                    } else {
+                      var icon = 'mdi:hvac-off';
+                    }
+                    return icon ;
+                ]]]
+            name: "Air" 
+            color: |
+                [[[
+                    var color = 'blue';
+                    if (states['climate.air_conditioner'].state === 'cool'){
+                      var color = 'blue';
+                    } else {
+                      var color = 'brown';
+                    }
+                    return color ;
+                ]]]
+          entity_3:
+            entity_id: "script.empty_room_turn_off"
+            icon: "mdi:home"
+            name: "Home" 
+            color: "brown"
+          entity_4:
+            entity_id: "binary_sensor.withings_in_bed_geovanni"
+            icon: |
+                [[[
+                    var icon = 'mdi:bed';
+                    if (states['binary_sensor.withings_in_bed_geovanni'].state === 'on'){
+                      var icon = 'mdi:bed';
+                    } else {
+                      var icon = 'mdi:bed-empty';
+                    }
+                    return icon ;
+                ]]]
+            name: "Bed" 
+            color: |
+                [[[
+                    var color = 'green';
+                    if (states['binary_sensor.withings_in_bed_geovanni'].state === 'on'){
+                      var color = 'green';
+                    } else {
+                      var color = 'brown';
+                    }
+                    return color ;
+                ]]]
+          entity_5:
+            entity_id: "sun.sun"
+            icon: |
+                [[[
+                    var icon = 'mdi:television';
+                    if (states['media_player.lg_cx'].state === 'on'){
+                      var icon = 'mdi:television';
+                    } else {
+                      var icon = 'mdi:television-off';
+                    }
+                    return icon ;
+                ]]]
+            name: "TV" 
+            color: |
+                [[[
+                    var color = 'yellow';
+                    if (states['media_player.lg_cx'].state === 'on'){
+                      var color = 'yellow';
+                    } else {
+                      var color = 'brown';
+                    }
+                    return color ;
+                ]]]
+      #---------------Scripts Start---------------------
+      - type: custom:mushroom-title-card
+        title: Scripts
+      - type: "horizontal-stack"
+        cards:
+        - type: 'custom:button-card'
+          template: card_script
+          variables:
+            ulm_card_script_title: Turn On
+            ulm_card_script_icon: 'mdi:power'
+          tap_action:
+            action: call-service
+            service: script.turn_on
+            service_data:
+              entity_id: script.turn_on_laptop
+        - type: 'custom:button-card'
+          template: card_script
+          variables:
+            ulm_card_script_title: Turn Off
+            ulm_card_script_icon: 'mdi:monitor-off'
+          tap_action:
+            action: call-service
+            service: script.turn_on
+            service_data:
+              entity_id: script.turn_off_pc
+      - type: "horizontal-stack"
+        cards:
+          - type: 'custom:button-card'
+            template: card_script
+            variables:
+              ulm_card_script_title: Hibernate
+              ulm_card_script_icon: 'mdi:clock-time-three'
+            tap_action:
+              action: call-service
+              service: script.turn_on
+              service_data:
+                entity_id: script.hibernate_laptop
+          - type: 'custom:button-card'
+            template: card_input_boolean
+            entity: sensor.laptop_inactive
+            name: Inactive
+      - type: "horizontal-stack"
+        cards:
+          - type: 'custom:button-card'
+            template: card_script
+            variables:
+              ulm_card_script_title: Extend Screen
+              ulm_card_script_icon: 'mdi:fit-to-screen'
+            tap_action:
+              action: call-service
+              service: script.turn_on
+              service_data:
+                entity_id: script.laptop_extend_screen
+          - type: 'custom:button-card'
+            template: card_script
+            variables:
+              ulm_card_script_title: Principal Screen
+              ulm_card_script_icon: 'mdi:monitor-screenshot'
+            tap_action:
+              action: call-service
+              service: script.turn_on
+              service_data:
+                entity_id: script.laptop_principal_monitor
+      #---------------Scripts End---------------------
+      #---------------Graphics Start------------------
+      - type: custom:mushroom-title-card
+        title: Stats
+      - type: "horizontal-stack"
+        cards:
+          - type: "custom:button-card"
+            template: "custom_card_apexcharts"
+            variables:
+              chart_type: "radialBar"
+              graph_span: "1h"
+              entity_1:
+                entity_id: "sensor.0529gaguilar_cpu_usage"
+                icon: 'mdi:cpu-64-bit'
+                name: "CPU"
+                color: "red"
+                max_value: 100
+              entity_2:
+                entity_id: "sensor.0529gaguilar_memory_usage"
+                icon: 'mdi:memory'
+                name: "RAM"
+                color: "yellow"
+                max_value: 100
+              entity_3:
+                entity_id: "sensor.0529gaguilar_intel_core_i7_8665u_load_cpu_core_4"
+                icon: 'mdi:expansion-card'
+                name: "GPU"
+                color: "blue"
+                max_value: 100
+      - type: "horizontal-stack"
+        cards:
+        - type: 'custom:button-card'
+          template: custom_card_bar_card
+          variables:
+            ulm_custom_card_bar_card_entity: sensor.0529gaguilar_pc_sn520_nvme_wdc_512gb_load_used_space
+            ulm_custom_card_bar_card_name: SSD
+            ulm_custom_card_bar_card_value: true
+            ulm_custom_card_bar_card_indicator: true
+            ulm_custom_card_bar_card_color: "var(--google-blue)"
+            ulm_custom_card_bar_card_min: 10
+            ulm_custom_card_bar_card_max: 100
+        - type: "custom:button-card"
+          template: card_battery
+          entity: sensor.0529gaguilar_battery_remaining
+          variables:
+            ulm_card_battery_charger_type_entity_id: sensor.0529gaguilar_battery_remaining
+            ulm_card_battery_battery_level_danger: 15
+            ulm_card_battery_battery_level_warning: 50
+      - type: "horizontal-stack"
+        cards:
+        - type: 'custom:button-card'
+          template: card_graph
+          variables:
+            ulm_card_graph_color: "var(--google-blue)"
+            ulm_card_graph_name: CPU Temp
+            ulm_card_graph_entity: sensor.0529gaguilar_intel_core_i7_8665u_temperatures_cpu_package
+            ulm_card_graph_type: fill
+            ulm_card_graph_hours: 6
+        - type: 'custom:button-card'
+          template: card_graph
+          variables:
+            ulm_card_graph_color: "var(--google-blue)"
+            ulm_card_graph_name: SSD Temp
+            ulm_card_graph_entity: sensor.0529gaguilar_pc_sn520_nvme_wdc_512gb_temperatures_temperature
+            ulm_card_graph_type: fill
+            ulm_card_graph_hours: 6
+      - type: "horizontal-stack"
+        cards:
+        - type: "custom:button-card"
+          template: custom_card_damix48_power_details
+          variables:
+            ulm_card_power_details_name: Power In Use
+            ulm_card_power_details_entity: sensor.laptop_consumption
+            ulm_card_power_details_hours: 24
+            ulm_card_power_details_24hour: true
+            ulm_card_power_details_height: 150
+            ulm_card_power_details_thresholds:
+              - value: 0
+                color: "#43A047"
+              - value: 300
+                color: "#FFA600"
+              - value: 500
+                color: "#DB4437"
+        - type: "custom:button-card"
+          template: custom_card_damix48_power_details
+          variables:
+            ulm_card_power_details_name: Power Used
+            ulm_card_power_details_entity: sensor.laptop_consumed_energy
+            ulm_card_power_details_hours: 24
+            ulm_card_power_details_24hour: true
+            ulm_card_power_details_height: 150
+            ulm_card_power_details_thresholds:
+              - value: 0
+                color: "#43A047"
+              - value: 1
+                color: "#FFA600"
+              - value: 2
+                color: "#DB4437"
+      - type: horizontal-stack
+        cards:
+          - hours_to_show: 1
+            graph: line
+            type: sensor
+            entity: sensor.0529gaguilar_system_idle_time
+            detail: 2
+            name: Idle Time
+            unit: Seconds
+          - hours_to_show: 1
+            graph: line
+            type: sensor
+            entity: sensor.laptop_volume
+            name: Volume
+            detail: 2
+      #---------------Graphics End--------------------
+      - type: "horizontal-stack"
+        cards:
+        - type: 'custom:button-card'
+          template: card_input_boolean
+          entity: binary_sensor.laptop_microphone
+          name: Microphone
+        - type: 'custom:button-card'
+          template: card_input_boolean
+          entity: binary_sensor.laptop_webcam
+          name: Webcam
+      - type: "horizontal-stack"
+        cards:
+        - type: "custom:button-card"
+          template: "custom_card_eraycetinay_elapsed_time"
+          entity: input_datetime.laptop_boot_time
+          name: "Boot Time"
+        - type: 'custom:button-card'
+          template: card_input_boolean
+          entity: input_boolean.laptop_extended_screen
+          name: Screen Extended
+      #---------------Screens Start-------------------
+      - type: conditional
+        conditions:
+          - entity: camera.0529gaguilar_screen_0
+            state: 'idle'
+          - entity: switch.sonoff_1000332281
+            state: 'on'
+        card:
+          show_name: true
+          camera_view: auto
+          type: picture-entity
+          entity: camera.0529gaguilar_screen_0
+          image: https://demo.home-assistant.io/stub_config/bedroom.png
+          name: Left Screen
+          camera_image: camera.0529gaguilar_screen_0
+      - type: conditional
+        conditions:
+          - entity: camera.0529gaguilar_screen_1
+            state: 'idle'
+          - entity: switch.left_monitor
+            state: 'on'
+          - entity: input_boolean.pc_extended_screen
+            state: 'off'
+          - entity: input_boolean.laptop_extended_screen
+            state: 'on'
+        card:
+          show_state: true
+          show_name: true
+          camera_view: auto
+          type: picture-entity
+          entity: camera.0529gaguilar_screen_1
+          image: https://demo.home-assistant.io/stub_config/bedroom.png
+          name: Right Screen
+          camera_image: camera.0529gaguilar_screen_1
+      #---------------Screen End----------------------

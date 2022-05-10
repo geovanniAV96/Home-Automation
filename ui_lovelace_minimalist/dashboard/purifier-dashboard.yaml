@@ -1,0 +1,208 @@
+---
+button_card_templates: !include_dir_merge_named "../../custom_components/ui_lovelace_minimalist/__ui_minimalist__/ulm_templates/"
+
+title: "Purifier"
+background: "var(--background-image)"
+# views: !include_dir_merge_list "views/"
+views:
+  - title: "Purifier"
+    path: purifier
+    icon: mdi:monitor-eye'
+    cards:
+      - type: "custom:button-card"
+        template: "custom_card_welcome_scenes_menus"
+        #triggers_update: input_boolean.<Your_boolean>
+        entity: input_boolean.collapse_menu
+        variables:
+          ulm_card_welcome_scenes_collapse: input_boolean.collapse_menu #OPTIONAl --> uncomment also entity or triggers_update
+          ulm_weather: "weather.home"
+          entity_1:
+            entity_id: "sun.sun"
+            icon: |
+                [[[
+                    var icon = 'mdi:monitor';
+                    if (states['switch.computer'].state === 'on' || states['switch.laptop'].state === 'on'){
+                      var icon = 'mdi:monitor';
+                    } else {
+                      var icon = 'mdi:monitor-off';
+                    }
+                    return icon ;
+                ]]]
+            name: "Desk"
+            color: |
+                [[[
+                    var color = 'pink';
+                    if (states['switch.computer'].state === 'on' || states['switch.laptop'].state === 'on'){
+                      var color = 'pink';
+                    } else {
+                      var color = 'brown';
+                    }
+                    return color ;
+                ]]]
+            tap_action:
+              action: navigate
+              navigation_path: "/lovelace-minimalist-2/desk"
+          entity_2:
+            entity_id: "sun.sun"
+            icon: |
+                [[[
+                    var icon = 'mdi:hvac';
+                    if (states['climate.air_conditioner'].state === 'cool'){
+                      var icon = 'mdi:hvac';
+                    } else {
+                      var icon = 'mdi:hvac-off';
+                    }
+                    return icon ;
+                ]]]
+            name: "Air" 
+            color: |
+                [[[
+                    var color = 'blue';
+                    if (states['climate.air_conditioner'].state === 'cool'){
+                      var color = 'blue';
+                    } else {
+                      var color = 'brown';
+                    }
+                    return color ;
+                ]]]
+          entity_3:
+            entity_id: "script.empty_room_turn_off"
+            icon: "mdi:home"
+            name: "Home" 
+            color: "brown"
+          entity_4:
+            entity_id: "binary_sensor.withings_in_bed_geovanni"
+            icon: |
+                [[[
+                    var icon = 'mdi:bed';
+                    if (states['binary_sensor.withings_in_bed_geovanni'].state === 'on'){
+                      var icon = 'mdi:bed';
+                    } else {
+                      var icon = 'mdi:bed-empty';
+                    }
+                    return icon ;
+                ]]]
+            name: "Bed" 
+            color: |
+                [[[
+                    var color = 'green';
+                    if (states['binary_sensor.withings_in_bed_geovanni'].state === 'on'){
+                      var color = 'green';
+                    } else {
+                      var color = 'brown';
+                    }
+                    return color ;
+                ]]]
+          entity_5:
+            entity_id: "sun.sun"
+            icon: |
+                [[[
+                    var icon = 'mdi:television';
+                    if (states['media_player.lg_cx'].state === 'on'){
+                      var icon = 'mdi:television';
+                    } else {
+                      var icon = 'mdi:television-off';
+                    }
+                    return icon ;
+                ]]]
+            name: "TV" 
+            color: |
+                [[[
+                    var color = 'yellow';
+                    if (states['media_player.lg_cx'].state === 'on'){
+                      var color = 'yellow';
+                    } else {
+                      var color = 'brown';
+                    }
+                    return color ;
+                ]]]
+      #---------------Scripts Start---------------------
+      - type: gauge
+        entity: counter.air_purifier
+        needle: false
+        theme: minimalist-mobile
+        min: 0
+        max: 5
+      - type: custom:mushroom-title-card
+        title: Scripts
+      - type: "horizontal-stack"
+        cards:
+        - type: 'custom:button-card'
+          template: card_script
+          variables:
+            ulm_card_script_title: Set At 0
+            ulm_card_script_icon: 'mdi:air-purifier'
+          tap_action:
+            action: call-service
+            service: script.turn_on
+            service_data:
+              entity_id: script.set_air_purifier_at_0
+        - type: 'custom:button-card'
+          template: card_script
+          variables:
+            ulm_card_script_title: Set At 4
+            ulm_card_script_icon: 'mdi:air-purifier'
+          tap_action:
+            action: call-service
+            service: script.turn_on
+            service_data:
+              entity_id: script.set_air_purifier_at_4
+      - type: "horizontal-stack"
+        cards:
+        - show_name: true
+          show_icon: true
+          type: button
+          entity: button.airpurifier_button
+          icon: mdi:air-purifier
+          name: Air Purifier
+          show_state: false
+          icon_height: 25px
+          hold_action:
+            action: none
+        - type: 'custom:button-card'
+          template: card_script
+          variables:
+            ulm_card_script_title: Set At Max
+            ulm_card_script_icon: 'mdi:air-purifier'
+          tap_action:
+            action: call-service
+            service: script.turn_on
+            service_data:
+              entity_id: script.set_air_purifier_at_max
+      #---------------Scripts End-----------------------
+      #---------------Sensors Start---------------------
+      - type: custom:mushroom-title-card
+        title: Sensors
+      - type: "horizontal-stack"
+        cards:
+        - type: "custom:button-card"
+          template: card_battery
+          entity: sensor.airpurifier_battery
+          variables:
+            ulm_card_battery_charger_type_entity_id: sensor.airpurifier_battery
+            ulm_card_battery_battery_level_danger: 15
+            ulm_card_battery_battery_level_warning: 50
+        - type: 'custom:button-card'
+          template: card_generic
+          entity: sensor.airpurifier_holdsecs
+          icon: mdi:gesture-tap-hold
+      #---------------Sensors End-----------------------
+      #---------------Graphs Start----------------------
+      - type: custom:mushroom-title-card
+        title: Graphs
+      - type: "horizontal-stack"
+        cards:
+        - type: 'custom:button-card'
+          template: card_graph
+          variables:
+            ulm_card_graph_color: "var(--google-blue)"
+            ulm_card_graph_name: Signal
+            ulm_card_graph_entity: sensor.airpurifier_linkquality
+            ulm_card_graph_type: fill
+            ulm_card_graph_hours: 1
+        - type: "custom:button-card"
+          template: "custom_card_eraycetinay_elapsed_time"
+          entity: button.airpurifier_button
+          name: "Last Used"
+          icon: mdi:update
+      #---------------Graphs End------------------------

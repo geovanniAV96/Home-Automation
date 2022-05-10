@@ -1,0 +1,421 @@
+---
+button_card_templates: !include_dir_merge_named "../../custom_components/ui_lovelace_minimalist/__ui_minimalist__/ulm_templates/"
+
+title: "Main Menu"
+background: "var(--background-image)"
+# views: !include_dir_merge_list "views/"
+views:
+  - title: "Main"
+    path: home
+    icon: "mdi:menu"
+    cards:
+      - type: "horizontal-stack"
+        cards:
+          - type: "custom:button-card"
+            template: "custom_card_welcome_scenes"
+            #triggers_update: input_boolean.<Your_boolean>
+            entity: input_boolean.main_menu_toggle
+            variables:
+              ulm_card_welcome_scenes_collapse: input_boolean.main_menu_toggle #OPTIONAl --> uncomment also entity or triggers_update
+              ulm_weather: "weather.home"
+              entity_1:
+                entity_id: "sun.sun"
+                icon: |
+                    [[[
+                        var icon = 'mdi:monitor';
+                        if (states['switch.computer'].state === 'on' || states['switch.laptop'].state === 'on'){
+                          var icon = 'mdi:monitor';
+                        } else {
+                          var icon = 'mdi:monitor-off';
+                        }
+                        return icon ;
+                    ]]]
+                name: "Desk"
+                color: "pink"
+              entity_2:
+                entity_id: "sun.sun"
+                icon: |
+                    [[[
+                        var icon = 'mdi:hvac';
+                        if (states['climate.air_conditioner'].state === 'cool'){
+                          var icon = 'mdi:hvac';
+                        } else {
+                          var icon = 'mdi:hvac-off';
+                        }
+                        return icon ;
+                    ]]]
+                name: "Air" 
+                color: "blue"
+              entity_3:
+                entity_id: "script.empty_room_turn_off"
+                icon: "mdi:home"
+                name: "Home" 
+                color: "green"
+              entity_4:
+                entity_id: "binary_sensor.withings_in_bed_geovanni"
+                icon: |
+                    [[[
+                        var icon = 'mdi:bed';
+                        if (states['binary_sensor.withings_in_bed_geovanni'].state === 'on'){
+                          var icon = 'mdi:bed';
+                        } else {
+                          var icon = 'mdi:bed-empty';
+                        }
+                        return icon ;
+                    ]]]
+                name: "Bed" 
+                color: "brown"
+              entity_5:
+                entity_id: "sun.sun"
+                icon: |
+                    [[[
+                        var icon = 'mdi:television';
+                        if (states['media_player.lg_cx'].state === 'on'){
+                          var icon = 'mdi:television-off';
+                        } else {
+                          var icon = 'mdi:television-off';
+                        }
+                        return icon ;
+                    ]]]
+                name: "TV" 
+                color: "yellow"
+      - type: 'custom:button-card'
+        template: card_person
+        variables:
+          ulm_card_person_entity: person.cristian_geovanni_aguilar_valencia
+          ulm_card_person_use_entity_picture: true
+      - type: "horizontal-stack"
+        cards:
+        - type: "custom:button-card"
+          template: custom_card_yagrasdemonde_lights_count
+          entity: sensor.lights_on
+          variables:
+            ulm_custom_card_yagrasdemonde_lights_count_type: "light"
+            ulm_custom_card_yagrasdemonde_lights_count_icon_on: "hue:bulb-group-sultan-lightstrip"
+            ulm_custom_card_yagrasdemonde_lights_count_icon_off: "hue:bulb-group-sultan-lightstrip-off"
+            ulm_custom_card_yagrasdemonde_lights_count_color: "yellow"
+            ulm_custom_card_yagrasdemonde_lights_count_force_background_color: false
+        - type: "custom:button-card"
+          template: custom_card_yagrasdemonde_lights_count
+          entity: sensor.covers_open
+          variables:
+            ulm_custom_card_yagrasdemonde_lights_count_type: "cover"
+            ulm_custom_card_yagrasdemonde_lights_count_icon_on: "mdi:window-shutter-open"
+            ulm_custom_card_yagrasdemonde_lights_count_icon_off: "mdi:table-furniture"
+            ulm_custom_card_yagrasdemonde_lights_count_color: "blue"
+            ulm_custom_card_yagrasdemonde_lights_count_force_background_color: false
+      - type: "custom:button-card"
+        template: card_weather
+        entity: weather.home
+        variables:
+          ulm_card_weather_primary_info:
+            - humidity
+          ulm_card_weather_secondary_info:
+            - wind_speed
+          ulm_card_weather_backdrop:
+            day: "var(--primary-color)"
+            night: "#40445a"
+      - type: custom:mushroom-title-card
+        title: Zones
+      - type: "horizontal-stack"
+        cards:
+        - type: "custom:button-card"
+          template:
+            - custom_card_room
+            - custom_blue_on_desk
+            - grey_off
+          name: Desk
+          entity: cover.standup_desk
+          icon: kuf:light_office_desk
+          tap_action:
+            action: navigate
+            navigation_path: "/lovelace-minimalist-2/desk"
+          variables:
+            label_use_temperature: false
+            label_use_brightness: false
+            variable_entity_temperature: cover.standup_desk
+            entity_1:
+              entity_id: light.luz_escritorio
+              templates:
+                - yellow_on
+              tap_action:
+                action: toggle
+            entity_2:
+              entity_id: input_boolean.desk_up
+              templates:
+                - green_on
+              tap_action:
+                action: none
+            entity_3:
+              entity_id: binary_sensor.ps5
+              templates:
+                - blue_on
+              tap_action:
+                action: none
+            entity_4:
+              entity_id: sensor.pc_ups_on
+              templates:
+                - pink_on
+              tap_action:
+                action: none
+        - type: "custom:button-card"
+          template:
+            - custom_card_room
+            - blue_on
+          name: Bed
+          entity: binary_sensor.withings_in_bed_geovanni
+          icon: mdi:bed-double
+          tap_action:
+            action: navigate
+            navigation_path: "/lovelace-minimalist-5/bed"
+          variables:
+            label_use_temperature: true
+            label_use_brightness: false
+            variable_entity_temperature: sensor.hue_motion_sensor_2_temperature
+            entity_1:
+              entity_id: light.cama
+              templates:
+                - yellow_on
+              tap_action:
+                action: toggle
+            entity_2:
+              entity_id: binary_sensor.withings_in_bed_geovanni
+              templates:
+                - blue_on
+              tap_action:
+                action: none
+            entity_3:
+              entity_id: device_tracker.wf_1000xm4
+              templates:
+                - custom_blue_on_earphones
+              tap_action:
+                action: none
+            entity_4:
+              entity_id: light.bed_light
+              templates:
+                - yellow_on
+              tap_action:
+                action: toggle
+      - type: "horizontal-stack"
+        cards:
+        - type: "custom:button-card"
+          template:
+            - custom_card_room
+            - blue_on
+            - grey_off
+          name: Air
+          entity: sensor.air_state
+          icon: |
+                    [[[
+                        var icon = 'mdi:home-thermometer';
+                        if (states['sensor.air_state'].state === 'on'){
+                          var icon = 'mdi:home-thermometer';
+                        } else {
+                          var icon = 'mdi:home-thermometer-outline';
+                        }
+                        return icon ;
+                    ]]]
+          tap_action:
+            action: navigate
+            navigation_path: "/lovelace-minimalist-7/air"
+          variables:
+            label_use_temperature: true
+            label_use_brightness: false
+            variable_entity_temperature: sensor.air_temperature
+            entity_1:
+              entity_id: input_boolean.air_conditioner
+              templates:
+                - yellow_on
+              tap_action:
+                action: none
+            entity_2:
+              entity_id: input_boolean.fan
+              templates:
+                - custom_green_rotate_on
+              tap_action:
+                action: none
+            entity_3:
+              entity_id: sensor.vacuum
+              templates:
+                - custom_blue_on_robot
+              tap_action:
+                action: none
+            entity_4:
+              entity_id: sensor.mop
+              templates:
+                - custom_blue_on_robot
+              tap_action:
+                action: none
+        - type: "custom:button-card"
+          template:
+            - card_room
+            - blue_on
+          name: TV
+          entity: media_player.lg_cx
+          icon: |
+                    [[[
+                        var icon = 'mdi:television';
+                        if (states['media_player.lg_cx'].state === 'on'){
+                          var icon = 'mdi:television-off';
+                        } else {
+                          var icon = 'mdi:television-off';
+                        }
+                        return icon ;
+                    ]]]
+          tap_action:
+            action: navigate
+            navigation_path: "/lovelace-minimalist-11/tv"
+          variables:
+            label_use_temperature: false
+            label_use_brightness: false
+            entity_1:
+              entity_id: light.hue_play_gradient_lightstrip
+              templates:
+                - yellow_on
+              tap_action:
+                action: toggle
+            entity_2:
+              entity_id: media_player.lg_cx
+              templates:
+                - blue_on
+              tap_action:
+                action: none
+            entity_3:
+              entity_id: media_player.hue_sync_box
+              templates:
+                - pink_on
+              tap_action:
+                action: none
+            entity_4:
+              entity_id: sensor.tv_ups_on
+              templates:
+                - green_on
+              tap_action:
+                action: toggle
+      - type: custom:mushroom-title-card
+        title: Sensors
+      - type: "horizontal-stack"
+        cards:
+        - type: "custom:button-card"
+          template: card_light
+          entity: light.luz
+          variables:
+            ulm_card_light_enable_collapse: true
+            ulm_card_light_enable_slider: true
+            ulm_card_light_enable_color: true
+            ulm_card_light_name: Ceiling Light
+            ulm_card_light_enable_popup: true
+        - type: 'custom:button-card'
+          template: card_input_boolean
+          entity: binary_sensor.workday_sensor
+          name: Work Day
+      - type: "horizontal-stack"
+        cards:
+          - type: "custom:button-card"
+            template: card_input_boolean
+            entity: input_boolean.cleaning_day
+            name: Cleaning Day
+          - type: "custom:button-card"
+            template: card_input_boolean
+            entity: input_boolean.iphone_bluetooth_connected
+            name: Iphone Bluetooth
+      - type: "horizontal-stack"
+        cards:
+        - type: "custom:button-card"
+          template: "custom_card_eraycetinay_elapsed_time"
+          entity: input_datetime.last_time_sleep_routine_ran
+          name: "Sleep Routine"
+        - type: "custom:button-card"
+          template: "custom_card_eraycetinay_elapsed_time"
+          entity: input_datetime.last_time_morning_routine_ran
+          name: "Morning Routine"
+      - type: custom:mushroom-title-card
+        title: Network
+      - type: 'custom:button-card'
+        template: custom_card_bar_card
+        variables:
+          ulm_custom_card_bar_card_entity: sensor.speedtest_download
+          ulm_custom_card_bar_card_name: Download
+          ulm_custom_card_bar_card_value: true
+          ulm_custom_card_bar_card_indicator: true
+          ulm_custom_card_bar_card_color: "var(--google-green)"
+          ulm_custom_card_bar_card_min: 0
+          ulm_custom_card_bar_card_max: 550
+      - type: 'custom:button-card'
+        template: custom_card_bar_card
+        variables:
+          ulm_custom_card_bar_card_entity: sensor.speedtest_ping
+          ulm_custom_card_bar_card_name: Ping
+          ulm_custom_card_bar_card_value: true
+          ulm_custom_card_bar_card_indicator: true
+          ulm_custom_card_bar_card_color: "var(--google-red)"
+          ulm_custom_card_bar_card_min: 0
+          ulm_custom_card_bar_card_max: 100
+      - type: 'custom:button-card'
+        template: custom_card_bar_card
+        variables:
+          ulm_custom_card_bar_card_entity: sensor.speedtest_upload
+          ulm_custom_card_bar_card_name: Upload
+          ulm_custom_card_bar_card_value: true
+          ulm_custom_card_bar_card_indicator: true
+          ulm_custom_card_bar_card_color: "var(--google-blue)"
+          ulm_custom_card_bar_card_min: 0
+          ulm_custom_card_bar_card_max: 120
+      - type: "horizontal-stack"
+        cards:
+        - type: "custom:button-card"
+          template: 
+            - custom_card_input_boolean_network
+            - custom_blue_on_norotate
+          entity: binary_sensor.fg6122tm_wan_status
+          name: Network
+      - type: custom:mushroom-title-card
+        title: Home Assistant
+      - type: "custom:button-card"
+        template: card_homeassistant_updates
+        variables:
+          ulm_card_homeassistant_entity: "binary_sensor.updates"
+          ulm_card_homeassistant_core: "sensor.core_updates"
+          ulm_card_homeassistant_supervisor: "sensor.supervisor_updates"
+          ulm_card_homeassistant_os: "sensor.os_updates"
+      - type: "horizontal-stack"
+        cards:
+        - type: "custom:button-card"
+          template: 
+            - custom_card_input_boolean
+            - custom_blue_on_norotate
+          entity: binary_sensor.backups_stale
+          name: Backups State
+        - type: custom:button-card
+          template: card_navigate
+          variables:
+            ulm_card_navigate_path: /../developer-tools
+            ulm_card_navigate_title: Developers Tools
+            ulm_card_navigate_icon: mdi:hammer
+      - type: 'custom:button-card'
+        template: card_generic
+        entity: sensor.hacs
+      - type: custom:mushroom-title-card
+        title: Automations
+      - type: "horizontal-stack"
+        cards:
+        - type: 'custom:button-card'
+          template: card_script
+          variables:
+            ulm_card_script_title: Return to Bedroom
+            ulm_card_script_icon: 'mdi:home-import-outline'
+          tap_action:
+            action: call-service
+            service: automation.trigger
+            service_data:
+              entity_id: automation.return_to_bedroom
+        - type: 'custom:button-card'
+          template: card_script
+          variables:
+            ulm_card_script_title: Leaving Bedroom
+            ulm_card_script_icon: 'mdi:home-export-outline'
+          tap_action:
+            action: call-service
+            service: automation.trigger
+            service_data:
+              entity_id: automation.empty_room

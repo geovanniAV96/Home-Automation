@@ -1,0 +1,365 @@
+---
+button_card_templates: !include_dir_merge_named "../../custom_components/ui_lovelace_minimalist/__ui_minimalist__/ulm_templates/"
+
+title: "Wall E"
+background: "var(--background-image)"
+# views: !include_dir_merge_list "views/"
+views:
+  - title: "Wall E"
+    path: walle
+    icon: mdi:monitor-eye'
+    cards:
+      - type: "custom:button-card"
+        template: "custom_card_welcome_scenes_menus"
+        #triggers_update: input_boolean.<Your_boolean>
+        entity: input_boolean.collapse_menu
+        variables:
+          ulm_card_welcome_scenes_collapse: input_boolean.collapse_menu #OPTIONAl --> uncomment also entity or triggers_update
+          ulm_weather: "weather.home"
+          entity_1:
+            entity_id: "weather.home"
+            icon: |
+                [[[
+                    var icon = 'mdi:monitor';
+                    if (states['switch.computer'].state === 'on' || states['switch.laptop'].state === 'on'){
+                      var icon = 'mdi:monitor';
+                    } else {
+                      var icon = 'mdi:monitor-off';
+                    }
+                    return icon ;
+                ]]]
+            name: "Desk"
+            color: |
+                [[[
+                    var color = 'pink';
+                    if (states['switch.computer'].state === 'on' || states['switch.laptop'].state === 'on'){
+                      var color = 'pink';
+                    } else {
+                      var color = 'brown';
+                    }
+                    return color ;
+                ]]]
+            tap_action:
+              action: navigate
+              navigation_path: "/lovelace-minimalist-2/desk"
+          entity_2:
+            entity_id: "sun.sun"
+            icon: |
+                [[[
+                    var icon = 'mdi:hvac';
+                    if (states['climate.air_conditioner'].state === 'cool'){
+                      var icon = 'mdi:hvac';
+                    } else {
+                      var icon = 'mdi:hvac-off';
+                    }
+                    return icon ;
+                ]]]
+            name: "Air" 
+            color: |
+                [[[
+                    var color = 'blue';
+                    if (states['climate.air_conditioner'].state === 'cool'){
+                      var color = 'blue';
+                    } else {
+                      var color = 'brown';
+                    }
+                    return color ;
+                ]]]
+          entity_3:
+            entity_id: "script.empty_room_turn_off"
+            icon: "mdi:home"
+            name: "Home" 
+            color: "brown"
+          entity_4:
+            entity_id: "binary_sensor.withings_in_bed_geovanni"
+            icon: |
+                [[[
+                    var icon = 'mdi:bed';
+                    if (states['binary_sensor.withings_in_bed_geovanni'].state === 'on'){
+                      var icon = 'mdi:bed';
+                    } else {
+                      var icon = 'mdi:bed-empty';
+                    }
+                    return icon ;
+                ]]]
+            name: "Bed" 
+            color: |
+                [[[
+                    var color = 'green';
+                    if (states['binary_sensor.withings_in_bed_geovanni'].state === 'on'){
+                      var color = 'green';
+                    } else {
+                      var color = 'brown';
+                    }
+                    return color ;
+                ]]]
+          entity_5:
+            entity_id: "sun.sun"
+            icon: |
+                [[[
+                    var icon = 'mdi:television';
+                    if (states['media_player.lg_cx'].state === 'on'){
+                      var icon = 'mdi:television';
+                    } else {
+                      var icon = 'mdi:television-off';
+                    }
+                    return icon ;
+                ]]]
+            name: "TV" 
+            color: |
+                [[[
+                    var color = 'yellow';
+                    if (states['media_player.lg_cx'].state === 'on'){
+                      var color = 'yellow';
+                    } else {
+                      var color = 'brown';
+                    }
+                    return color ;
+                ]]]
+      #-------------Controls Start-----------------
+      - type: custom:mushroom-title-card
+        title: Controls
+      - type: vertical-stack
+        cards:
+        - entity: sensor.vacuum
+          type: custom:roomba-vacuum-card
+        - type: entities
+          entities:
+            - entities:
+                - input_boolean.vacuum_clean_bedroom
+                - entity: automation.vacuum_clean_rooms
+                  lock:
+                    enabled: |-
+                      [[[
+                        if ((states['group.vacuum_rooms'].state == "on") && (states['sensor.vacuum'].state == "Ready"))
+                          return false;
+                        return true;
+                      ]]]
+                    exemptions: []
+                  name: Clean Rooms
+                  styles:
+                    card:
+                      - height: 50px
+                  tap_action:
+                    action: call-service
+                    service: automation.trigger
+                    service_data:
+                      entity_id: automation.vacuum_clean_rooms
+                  type: custom:button-card
+              head:
+                label: Selective Room Cleaning
+                type: section
+              type: custom:fold-entity-row
+            - entities:
+                - style: |-
+                    .text-divider {
+                      padding: 0em;
+                      margin: 0em;
+                    } h2 {
+                      font-size: 1em;
+                      margin-block-start: 0em;
+                      margin-block-end: 0em;
+                    }
+                  text: Clean
+                  type: custom:text-divider-row
+                - color: '#40bf6a'
+                  due: true
+                  entity: sensor.vacuum_maint_clean_brushes
+                  locale: en-au
+                  severity:
+                    - color: '#bfb540'
+                      value: 0 days
+                    - color: '#bf4060'
+                      value: '-1 days'
+                  style: |
+                    ha-card {
+                      padding: 2px;
+                      --ha-card-box-shadow: 'none';
+                      --paper-card-background-color: rgba(0, 0, 0, 0);
+                    }
+                  timeout: 10 days
+                  title: Brushes
+                  type: custom:check-button-card
+                - color: '#40bf6a'
+                  due: true
+                  entity: sensor.vacuum_maint_clean_contacts
+                  locale: en-au
+                  severity:
+                    - color: '#bfb540'
+                      value: 0 days
+                    - color: '#bf4060'
+                      value: '-3 days'
+                  style: |
+                    ha-card {
+                      padding: 2px;
+                      --ha-card-box-shadow: 'none';
+                      --paper-card-background-color: rgba(0, 0, 0, 0);
+                    }
+                  timeout: 18 days
+                  title: Contacts
+                  type: custom:check-button-card
+                - color: '#40bf6a'
+                  due: true
+                  entity: sensor.vacuum_maint_clean_filter
+                  locale: en-au
+                  severity:
+                    - color: '#bfb540'
+                      value: 0 days
+                    - color: '#bf4060'
+                      value: '-10 days'
+                  style: |
+                    ha-card {
+                      padding: 2px;
+                      --ha-card-box-shadow: 'none';
+                      --paper-card-background-color: rgba(0, 0, 0, 0);
+                    }
+                  timeout: 10 days
+                  title: Filter
+                  type: custom:check-button-card
+                - color: '#40bf6a'
+                  due: true
+                  entity: sensor.vacuum_maint_clean_wheel
+                  locale: en-au
+                  severity:
+                    - color: '#bfb540'
+                      value: 0 days
+                    - color: '#bf4060'
+                      value: '-3 days'
+                  style: |
+                    ha-card {
+                      padding: 2px;
+                      --ha-card-box-shadow: 'none';
+                      --paper-card-background-color: rgba(0, 0, 0, 0);
+                    }
+                  timeout: 18 days
+                  title: Wheel
+                  type: custom:check-button-card
+                - color: '#40bf6a'
+                  due: true
+                  entity: sensor.vacuum_maint_clean_bin
+                  locale: en-au
+                  severity:
+                    - color: '#bfb540'
+                      value: 1 day
+                    - color: '#bf4060'
+                      value: '-2 days'
+                  style: |
+                    ha-card {
+                      padding: 2px;
+                      --ha-card-box-shadow: 'none';
+                      --paper-card-background-color: rgba(0, 0, 0, 0);
+                    }
+                  timeout: 3 weeks
+                  title: Bin
+                  type: custom:check-button-card
+                - style: |-
+                    .text-divider {
+                      padding: 0em;
+                      margin: 0em;
+                    } h2 {
+                      font-size: 1em;
+                      margin-block-start: 0em;
+                      margin-block-end: 0em;
+                    }
+                  text: Replace
+                  type: custom:text-divider-row
+                - color: '#40bf6a'
+                  due: true
+                  entity: sensor.vacuum_maint_replace_brushes
+                  locale: en-au
+                  severity:
+                    - color: '#bfb540'
+                      value: 0 months
+                    - color: '#bf4060'
+                      value: '-4 months'
+                  style: |
+                    ha-card {
+                      padding: 2px;
+                      --ha-card-box-shadow: 'none';
+                      --paper-card-background-color: rgba(0, 0, 0, 0);
+                    }
+                  timeout: 8 months
+                  title: Brushes
+                  type: custom:check-button-card
+                - color: '#40bf6a'
+                  due: true
+                  entity: sensor.vacuum_maint_replace_filter
+                  locale: en-au
+                  severity:
+                    - color: '#bfb540'
+                      value: 0 months
+                    - color: '#bf4060'
+                      value: '-1 months'
+                  style: |
+                    ha-card {
+                      padding: 2px;
+                      --ha-card-box-shadow: 'none';
+                      --paper-card-background-color: rgba(0, 0, 0, 0);
+                    }
+                  timeout: 3 months
+                  title: Filter
+                  type: custom:check-button-card
+                - color: '#40bf6a'
+                  due: true
+                  entity: sensor.vacuum_maint_replace_wheel
+                  locale: en-au
+                  severity:
+                    - color: '#bfb540'
+                      value: 0 months
+                    - color: '#bf4060'
+                      value: '-4 months'
+                  style: |
+                    ha-card {
+                      padding: 2px;
+                      --ha-card-box-shadow: 'none';
+                      --paper-card-background-color: rgba(0, 0, 0, 0);
+                    }
+                  timeout: 2 years
+                  title: Wheel
+                  type: custom:check-button-card
+              head:
+                label: Maintenance
+                type: section
+              type: custom:fold-entity-row
+      #-------------Controls End-------------------
+      #-------------Scripts Start------------------
+      - type: custom:mushroom-title-card
+        title: Scripts
+      - type: "horizontal-stack"
+        cards:
+        - type: 'custom:button-card'
+          template: card_script
+          variables:
+            ulm_card_script_title: Clean
+            ulm_card_script_icon: 'mdi:robot-vacuum'
+          tap_action:
+            action: call-service
+            service: script.turn_on
+            service_data:
+              entity_id: script.send_walle_to_clean
+        - type: 'custom:button-card'
+          template: card_script
+          variables:
+            ulm_card_script_title: Dock
+            ulm_card_script_icon: 'mdi:ev-station'
+          tap_action:
+            action: call-service
+            service: script.turn_on
+            service_data:
+              entity_id: script.dock_robot
+      #-------------Scripts End-------------------
+      - type: 'custom:button-card'
+        template: card_battery
+        entity: sensor.wall_e_battery_level_2
+        variables:
+            ulm_card_battery_charger_type_entity_id: sensor.wall_e_battery_level_2
+            ulm_card_battery_battery_level_danger: 30
+            ulm_card_battery_battery_level_warning: 80
+        name: Battery
+
+    ### PICTURE GLANCE CARD ###
+      - type: picture-glance
+        aspect_ratio: 0%
+        camera_image: camera.roomba
+        entities: []
+
