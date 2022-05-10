@@ -8,6 +8,9 @@
 !*.md
 !*.sh
 !*.js*
+!custom_configs/input_selects/
+!custom_configs/rest_commands/
+!custom_configs/sensors/
 !ui_lovelace_minimalist/custom_cards/
 !ui_lovelace_minimalist/custom_cards/custom_card_welcome_scenes/
 !ui_lovelace_minimalist/custom_cards/custom_card_welcome_scenes_menus/
@@ -15,9 +18,8 @@
 !ui_lovelace_minimalist/
 !sensors/
 !custom_configs/input_selects/
-!custom_configs/rest_commands
-!custom_configs/sensors
-!custom_configs/
+!custom_configs/rest_commands/
+!custom_configs/sensors/
 
 # Comment these 2 lines if you don't want to include your SSH keys
 #!.ssh/
