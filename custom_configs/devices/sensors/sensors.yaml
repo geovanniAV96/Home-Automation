@@ -1,0 +1,345 @@
+#custom_sensors
+- platform: scrape
+  resource: 'https://www.youtube.com/feeds/videos.xml?channel_id=UCYJPby9DRCteedh5tfxVbrw'
+  name: smosh_pit
+  value_template: '{{ value }}'
+  select: yt\:videoid
+- platform: template
+  sensors:
+    weather_home:
+      value_template: "{{ state_attr('weather.home', 'temperature') }}"
+- platform: template
+  sensors:
+    current_time:
+      value_template: "{{now()}}"
+- platform: template
+  sensors:
+    internet:
+      value_template: >-
+              {% if is_state("sensor.fg6122tm_wan_status", "Connected") -%}
+                on
+              {%- else -%}
+                off
+              {%- endif %}
+- platform: template
+  sensors:
+    mean_temperature_int: 
+      value_template: "{{states('sensor.mean_temperature') | int}}"
+
+- platform: template
+  sensors:
+    lights_on:
+      value_template: >-
+              {% set lights = [
+                          states.light.luz,
+                          states.light.bed_light,
+                          states.light.cama,
+                          states.light.hue_play_gradient_lightstrip,
+                          states.light.hue_play_right,
+                          states.light.hue_play_center,
+                          states.light.hue_play_left,
+                          states.light.luz_escritorio,
+                          states.light.pc_rgb,
+                          ] %}
+              {{ lights | selectattr('state','eq','on') | list | count}}
+- platform: template
+  sensors:
+    covers_open:
+      value_template: >-
+              {% set covers = [
+                          states.cover.standup_desk,
+                          ] %}
+              {{ covers | selectattr('state','eq','open') | list | count}}
+- platform: template
+  sensors:
+    emprty_room_running:
+      value_template: >-
+              {% if is_state("script.lock_laptop", "on") or is_state("script.hibernate_laptop", "on") or is_state("script.hibernate_pc", "on") or is_state("script.turn_off_monitor", "on") or is_state("script.turn_off_right_monitor", "on") or is_state("script.turn_off_air_conditioner", "on") -%}
+                on
+              {%- else -%}
+                off
+              {%- endif %}
+
+# HA Updates
+- platform: command_line
+  name: core_updates
+  command: 'curl http://supervisor/core/info -H "Authorization: Bearer $(printenv SUPERVISOR_TOKEN)" | jq ''{"latest_version":.data.version_latest,"installed_version":.data.version,"update_available":.data.update_available}'''
+  value_template: "{{ value_json.update_available }}"
+  scan_interval: 600
+  json_attributes:
+    - update_available
+    - latest_version
+    - installed_version
+- platform: command_line
+  name: supervisor_updates
+  command: 'curl http://supervisor/supervisor/info -H "Authorization: Bearer $(printenv SUPERVISOR_TOKEN)" | jq ''{"latest_version":.data.version_latest,"installed_version":.data.version,"update_available":.data.update_available}'''
+  value_template: "{{ value_json.update_available }}"
+  scan_interval: 600
+  json_attributes:
+    - update_available
+    - latest_version
+    - installed_version
+- platform: command_line
+  name: os_updates
+  command: 'curl http://supervisor/os/info -H "Authorization: Bearer $(printenv SUPERVISOR_TOKEN)" | jq ''{"latest_version":.data.version_latest,"installed_version":.data.version,"update_available":.data.update_available}'''
+  value_template: "{{ value_json.update_available }}"
+  scan_interval: 600
+  json_attributes:
+    - update_available
+    - latest_version
+    - installed_version
+- platform: command_line
+  name: addons_updates
+  command: 'curl http://supervisor/addons -H "Authorization: Bearer $(printenv SUPERVISOR_TOKEN)" | jq ''{"addons":[.data.addons[] | select(.update_available)]}'''
+  value_template: '{{ value_json.addons | length }}'
+  scan_interval: 600
+  unit_of_measurement: pending update(s)
+  json_attributes:
+    - addons
+- platform: template
+  sensors:
+    air_state: 
+      value_template: >-
+        {% if is_state('sensor.walle_state', 'on') or is_state('input_boolean.air_conditioner', 'on') or is_state('sensor.eva_state', 'on') or is_state('input_boolean.fan', 'on') -%}
+          on
+        {%- else -%}
+          off
+        {%- endif %}
+# Desk
+- platform: template
+  sensors:
+    cover_group:
+      value_template: >-
+        {% if is_state('input_boolean.desk_up', 'on') %}
+          open
+        {% else %}
+          closed
+        {% endif %}
+#PC
+- platform: template
+  sensors:
+    pc_consumption:
+      value_template: "{{states('sensor.sonoff_1000331d93_power')}}"
+- platform: integration
+  source: sensor.pc_consumption
+  name: energy_spent_pc
+  unit_prefix: k
+  round: 2
+  method: left
+- platform: template
+  sensors:
+    pc_inactive:
+      friendly_name: PC inactive
+      value_template: >-
+        {% if (states('sensor.pc_escritori_system_idle_time') | int) >= 300 -%}
+          on
+        {%- else -%}
+          off
+        {%- endif %}
+- platform: openhardwaremonitor
+  host: 192.168.1.67
+  port: 8580
+- platform: template
+  sensors:
+    using_pc:
+      friendly_name: Using PC
+      value_template: "{{is_state('sensor.pc_escritori_system_idle_time', '0')}}"
+- platform: template
+  sensors:
+    pc_time_inactive:
+      friendly_name: PC Time inactive
+      value_template: >-
+        {% if is_state("sensor.using_pc", "True") -%}
+          0
+        {%- else -%}
+          {{as_timestamp(now()) | int - as_timestamp(states.sensor.using_pc.last_changed) | int}}
+        {%- endif %}
+- platform: template
+  sensors:
+    pc_time_no_volume:
+      friendly_name: PC Time With No Volume
+      value_template: >-
+        {% if (not is_state("sensor.pc_volume", "unavailable") and is_state("sensor.pc_volume", "0")) or (is_state("switch.computer", "off") and is_state("sensor.pc_escritori_system_idle_time", "unavailable"))-%}
+          {{as_timestamp(now()) | int - as_timestamp(states.sensor.pc_volume.last_changed) | int}}
+        {%- else -%}
+          0
+        {%- endif %}
+
+#Laptop
+- platform: template
+  sensors:
+    laptop_consumption:
+      value_template: "{{states('sensor.sonoff_1000332281_power')}}"
+- platform: integration
+  source: sensor.laptop_consumption
+  name: energy_spent_laptop
+  unit_prefix: k
+  round: 2
+  method: left
+- platform: template
+  sensors:
+    laptop_inactive:
+      friendly_name: Laptop inactive
+      value_template: >-
+        {% if (states('sensor.0529gaguilar_system_idle_time') | int) >= 300 -%}
+          on
+        {%- else -%}
+          off
+        {%- endif %}
+- platform: openhardwaremonitor
+  host: 192.168.1.89
+  port: 8581
+- platform: template
+  sensors:
+    using_laptop:
+      friendly_name: Using Laptop
+      value_template: "{{is_state('sensor.0529gaguilar_system_idle_time', '0')}}"
+- platform: template
+  sensors:
+    laptop_time_inactive:
+      friendly_name: Laptop Time inactive
+      value_template: >-
+        {% if is_state("sensor.using_laptop", "True") -%}
+          0
+        {%- else -%}
+          {{as_timestamp(now()) | int - as_timestamp(states.sensor.using_laptop.last_changed) | int}}
+        {%- endif %}
+- platform: template
+  sensors:
+    laptop_time_no_volume:
+      friendly_name: Laptop Time With No Volume
+      value_template: >-
+        {% if (not is_state("sensor.laptop_volume", "unavailable") and is_state("sensor.laptop_volume", "0")) or (is_state("switch.laptop", "off") and is_state("sensor.0529gaguilar_system_idle_time", "unavailable"))-%}
+          {{as_timestamp(now()) | int - as_timestamp(states.sensor.laptop_volume.last_changed) | int}}
+        {%- else -%}
+          0
+        {%- endif %}
+#UPS 1500
+- platform: template
+  sensors:
+    pc_ups_on:
+      value_template: >-
+        {% if is_state("sensor.ups_1500_status", "Online") -%}
+          on
+        {%- else -%}
+          off
+        {%- endif %}
+- platform: template
+  sensors:
+    pc_ups_watts:
+      value_template: "{{(((states('sensor.ups_1500_load') | int / 100) * 1000) | int)}}"
+- platform: template
+  sensors:
+    pc_ups_runtime_minutes:
+      value_template: "{{(states('sensor.ups_1500_battery_runtime') | int / 60) | int}}"
+#UPS 850
+- platform: template
+  sensors:
+    tv_ups_on:
+      value_template: >-
+        {% if is_state("sensor.ups_850_status", "Online") -%}
+          on
+        {%- else -%}
+          off
+        {%- endif %}
+- platform: template
+  sensors:
+    tv_ups_watts:
+      value_template: "{{(((states('sensor.ups_850_load') | int / 100) * 1000) | int)}}"
+- platform: template
+  sensors:
+    tv_ups_runtime_minutes:
+      value_template: "{{(states('sensor.ups_850_battery_runtime') | int / 60) | int}}"
+#Wall E
+- platform: template
+  sensors:
+    walle_fan_speed:
+      friendly_name: 'Fan Speed'
+      value_template: "{{state_attr('sensor.vacuum','carpet_boost')}}"
+- platform: template
+  sensors:
+    walle_status:
+      value_template: "{{states('sensor.vacuum')}}"
+- platform: template
+  sensors:
+    walle_bin_present:
+      value_template: >-
+                      {%if state_attr('sensor.vacuum','bin_present') == 'Yes'-%}
+                        on
+                      {%- else -%}
+                        off
+                      {%- endif %}
+- platform: template
+  sensors:
+    walle_bin_full:
+      value_template: >-
+                      {%if state_attr('sensor.vacuum','bin') == 'Not Full' -%}
+                        off
+                      {%- else -%}
+                        on
+                      {%- endif %}
+- platform: template
+  sensors:
+    walle_state:
+      value_template: >-
+                {% if state_attr('sensor.vacuum','phase') == 'cleaning' -%}
+                  on
+                {%- else -%}
+                  off
+                {%- endif %}
+- platform: template
+  sensors:
+    wall_e_battery_level:
+      value_template: "{{state_attr('sensor.vacuum','battery')[0:3] | int}}"
+      unit_of_measurement: '%'
+      device_class: battery
+      friendly_name: WallE Battery Level
+#Eva
+- platform: template
+  sensors:
+    eva_fan_speed:
+      value_template: "{{state_attr('sensor.mop','clean_mode')}}"
+      
+- platform: template
+  sensors:
+    eva_status:
+      value_template: "{{states('sensor.mop')}}"
+- platform: template
+  sensors:
+    eva_detected_pad:
+      value_template: "{{state_attr('sensor.mop','pad')}}"
+      icon_template: 'mdi:card-multiple'
+- platform: template
+  sensors:
+    eva_lid_closed:
+      value_template: >-
+                    {%if state_attr('vacuum.eva', 'lid_closed') == 1-%}
+                      on
+                    {%- else -%}
+                      off
+                    {%- endif %}
+- platform: template
+  sensors:
+    eva_tank_level:
+      value_template: "{{state_attr('sensor.mop','tank')}}"
+- platform: template
+  sensors:
+    eva_state:
+      value_template: >-
+                {% if states('sensor.mop') == 'Ready' -%}
+                  off
+                {%- else -%}
+                  on
+                {%- endif %}
+
+- platform: scrape
+  resource: https://www.home-assistant.io
+  select: ".current-version h1"
+
+#Air
+- platform: template
+  sensors:
+    air_temperature:
+      value_template: "{{state_attr('climate.air_conditioner', 'temperature')}}"
+      
+

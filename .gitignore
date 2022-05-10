@@ -18,6 +18,8 @@
 !custom_configs/devices/input_selects/
 !custom_configs/devices/rest_commands/
 !custom_configs/devices/sensors/
+!custom_configs/devices/
+!custom_configs/
 # Comment these 2 lines if you don't want to include your SSH keys
 #!.ssh/
 #!id_rsa*

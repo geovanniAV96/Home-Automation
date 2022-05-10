@@ -1,0 +1,54 @@
+#hue
+syncbox_moviemode:
+  url: https://192.168.1.75/api/v1/execution
+  method: PUT
+  headers:
+    Authorization: !secret hue_sync_box_token_bearer
+  payload: '{"mode":"video", "syncActive":true, "hdmiSource":"{{ hdmiSource }}", "brightness": {{ brightness }}, "intensity": "{{ intensity }}"}'
+  verify_ssl: false
+syncbox_musicmode:
+  url: https://192.168.1.75/api/v1/execution
+  method: PUT
+  headers:
+    Authorization: !secret hue_sync_box_token_bearer
+  payload: '{"mode":"music", "syncActive":true, "hdmiSource":"{{ hdmiSource }}", "brightness": {{ brightness }}, "intensity": "{{ intensity }}"}}'
+  verify_ssl: false
+syncbox_gamemode:
+  url: https://192.168.1.75/api/v1/execution
+  method: PUT
+  headers:
+    Authorization: !secret hue_sync_box_token_bearer
+  payload: '{"mode":"game", "syncActive":true, "hdmiSource":"{{ hdmiSource }}", "brightness": {{ brightness }}, "intensity": "{{ intensity }}"}}'
+  verify_ssl: false
+syncbox_standby:
+  url: https://192.168.1.75/api/v1/execution
+  method: PUT
+  headers:
+    Authorization: !secret hue_sync_box_token_bearer
+  payload: '{"mode":"powersave"}'
+  content_type: "application/json; charset=utf-8"
+  verify_ssl: false
+syncbox_passthrough:
+  url: https://192.168.1.75/api/v1/execution
+  method: PUT
+  headers:
+    Authorization: !secret hue_sync_box_token_bearer
+  payload: '{"mode":"passthroug"}'
+  content_type: "application/json; charset=utf-8"
+  verify_ssl: false
+syncbox_mode:
+  url: https://192.168.1.75/api/v1/execution
+  method: PUT
+  headers:
+    Authorization: !secret hue_sync_box_token_bearer
+  payload: '{"mode": "{{ mode }}", "syncActive":true, "hdmiSource": "{{ hdmiSource }}", "brightness": {{ brightness }}, "intensity": "{{ intensity }}"}}'
+  verify_ssl: false
+syncbox_mode_off:
+  url: https://192.168.1.75/api/v1/execution
+  method: PUT
+  headers:
+    Authorization: !secret hue_sync_box_token_bearer
+  payload: '{"mode": "{{ mode }}"}'
+  content_type: "application/json; charset=utf-8"
+  verify_ssl: false
+

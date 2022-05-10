@@ -1,0 +1,32 @@
+#hue
+- platform: rest
+  name: hue_sync_box
+  value_template: 1
+  resource: https://192.168.1.75/api/v1/execution
+  headers:
+    Authorization: !secret hue_sync_box_token_bearer
+  verify_ssl: false
+  scan_interval: 1
+  json_attributes:
+    - mode
+    - syncActive
+    - video/intensity
+    - game/intensity
+    - music/intensity
+    - hdmiSource
+- platform: template
+  sensors:
+    hue_sync_box_mode:
+      value_template: "{{ state_attr('sensor.hue_sync_box', 'mode') }}"
+    hue_sync_box_intensity:
+      value_template: >
+        {% if is_state("sensor.hue_sync_box_mode", "video") -%}
+          {{ state_attr('sensor.hue_sync_box', 'video/intensity') }}
+        {%- elif is_state("sensor.hue_sync_box_mode", "music") -%}
+          {{ state_attr('sensor.hue_sync_box', 'music/intensity') }}
+        {%- elif is_state("sensor.hue_sync_box_mode", "game") -%}
+        {{ state_attr('sensor.hue_sync_box', 'game/intensity') }}{%- else -%}
+          off
+        {%- endif %}
+    hue_sync_box_hdmi_source:
+      value_template: "{{ state_attr('sensor.hue_sync_box', 'hdmiSource') }}"

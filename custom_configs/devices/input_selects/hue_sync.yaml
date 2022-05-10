@@ -1,0 +1,32 @@
+#hue
+hue_sync_mode:
+  name: Hue Sync
+  options:
+    - Movie
+    - Music
+    - Game
+    - Standby
+    - Passthrough
+    - Ambient 
+  icon: mdi:led-strip-variant
+  initial: Standby
+
+hue_sync_intensity:
+  name: Hue Sync
+  options:
+    - Subtle
+    - Moderate
+    - High
+    - Intense
+  icon: hue:sync-box-alt
+  initial: High
+
+hue_sync_input:
+  name: Hue Sync
+  options:
+    - PS5
+    - Switch
+    - PS4
+    - PS3
+  icon: hue:sync-box-alt
+  initial: PS5

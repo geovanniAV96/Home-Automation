@@ -1,0 +1,25 @@
+#switchbot
+control_ac:
+  url: https://api.switch-bot.com/v1.0/devices/02-202205051754-38072996/commands
+  method: POST
+  headers:
+    Authorization: !secret switchbot_token
+  payload: '{"command": "setAll", "parameter": "{{temperature}},2,{{fan_speed}},on", "commandType": "command"}'
+  content_type: "application/json; charset=utf-8"
+  verify_ssl: false
+turn_off_ac:
+  url: https://api.switch-bot.com/v1.0/devices/02-202205051754-38072996/commands
+  method: POST
+  headers:
+    Authorization: !secret switchbot_token
+  payload: '{"command": "turnOff", "parameter": "default", "commandType": "command"}'
+  content_type: "application/json; charset=utf-8"
+  verify_ssl: false
+control_monitor:
+  url: https://api.switch-bot.com/v1.0/devices/02-202205051801-82826352/commands
+  method: POST
+  headers:
+    Authorization: !secret switchbot_token
+  payload: '{"command": "input", "parameter": "default", "commandType": "command"}'
+  content_type: "application/json; charset=utf-8"
+  verify_ssl: false
