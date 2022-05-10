@@ -1,4 +1,3 @@
-#hue
 - platform: rest
   name: hue_sync_box
   value_template: 1

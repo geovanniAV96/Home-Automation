@@ -1,4 +1,3 @@
-#switchbot
 control_ac:
   url: https://api.switch-bot.com/v1.0/devices/02-202205051754-38072996/commands
   method: POST
