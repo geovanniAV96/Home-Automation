@@ -431,12 +431,12 @@ browser_mod:
 
 http:
   trusted_proxies:
-    - 127.0.0.1
-    - 172.30.32.2
+    - !secret local_ip
+    - !secret external_ip
   use_x_forwarded_for: true
   ip_ban_enabled: true
   login_attempts_threshold: 5
-  server_port: 8123
+  server_port: !secret port
   ssl_certificate: /ssl/fullchain.pem
   ssl_key: /ssl/privkey.pem
 
@@ -545,12 +545,17 @@ sonoff:
   username: !secret username
   password: !secret password
 
+# Todoist Integration
+calendar:
+  - platform: todoist
+    token: !secret todoist_token
+
 switch:
   - platform: template
     switches:
       computer:
         value_template: >
-          {% if states('sensor.pc_escritori_system_idle_time') != 'unavailable' and states('switch.sonoff_1000331d93') == 'on' and states('sensor.sonoff_1000331d93_power') | int > 10 -%}
+          {% if states('sensor.pc_escritori_system_idle_time') != 'unavailable' and states('switch.sonoff_1000331d93') == 'on' and states('sensor.sonoff_1000331d93_power') | int > 1 -%}
             on
           {%- else -%}
             off
@@ -560,14 +565,14 @@ switch:
         turn_off:
           service: script.turn_off_pc_2
         icon_template: >
-          {% if states('sensor.0529gaguilar_system_idle_time') != 'unavailable' and states('switch.laptop') == 'on' and states('sensor.sonoff_1000332281_power') | int > 10 -%}
+          {% if states('sensor.0529gaguilar_system_idle_time') != 'unavailable' and states('switch.laptop') == 'on' and states('sensor.sonoff_1000332281_power') | int > 1 -%}
             mdi:desktop-tower-monitor
           {%- else -%}
             mdi:desktop-tower
           {%- endif %}
       laptop:
         value_template: >
-          {% if states('sensor.0529gaguilar_system_idle_time') != 'unavailable' and states('switch.laptop') == 'on' and states('sensor.sonoff_1000332281_power') | int > 10 -%}
+          {% if states('sensor.0529gaguilar_system_idle_time') != 'unavailable' and states('switch.sonoff_1000332281') == 'on' and states('sensor.sonoff_1000332281_power') | int > 1 -%}
             on
           {%- else -%}
             off
@@ -577,7 +582,7 @@ switch:
         turn_off:
           service: script.turn_off_pc
         icon_template: >
-          {% if states('sensor.0529gaguilar_system_idle_time') != 'unavailable' and states('switch.laptop') == 'on' and states('sensor.sonoff_1000332281_power') | int > 10 -%}
+          {% if states('sensor.0529gaguilar_system_idle_time') != 'unavailable' and states('switch.sonoff_1000332281') == 'on' and states('sensor.sonoff_1000332281_power') | int > 1 -%}
             mdi:laptop
           {%- else -%}
             mdi:laptop-off
