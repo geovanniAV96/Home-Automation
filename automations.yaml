@@ -2097,8 +2097,6 @@
     at: 00:00:00
   condition: []
   action:
-  - service: shell_command.git_push
-    data: {}
   - service: hassio.addon_stdin
     data:
       addon: a0d7b954_ssh
