@@ -2101,7 +2101,7 @@
     data: {}
   - service: hassio.addon_stdin
     data:
-      addon: core_ssh
+      addon: a0d7b954_ssh
       input: /config/ha_gitpush.sh
   mode: single
 - id: '1652153441271'
