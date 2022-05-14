@@ -1224,9 +1224,6 @@
   - condition: state
     entity_id: person.cristian_geovanni_aguilar_valencia
     state: home
-  - condition: state
-    entity_id: switch.sonoff_1000331d93
-    state: 'on'
   action:
   - choose:
     - conditions:
