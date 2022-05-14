@@ -2094,7 +2094,7 @@
   description: ''
   trigger:
   - platform: time
-    at: 00:00:00
+    at: '11:59:59'
   condition: []
   action:
   - service: hassio.addon_stdin
