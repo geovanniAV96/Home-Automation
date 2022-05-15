@@ -21,6 +21,11 @@ switch_hdmi_to_tv:
     data: {}
     target:
       entity_id: input_boolean.hdmi_on_tv
+  - service: input_datetime.set_datetime
+    data:
+      date: '{{now()}}'
+    target:
+      entity_id: input_datetime.hdmi_switch_last_used
   mode: queued
   icon: mdi:video-input-hdmi
 switch_hdmi_to_pc:
@@ -46,6 +51,11 @@ switch_hdmi_to_pc:
     data: {}
     target:
       entity_id: input_boolean.hdmi_on_pc
+  - service: input_datetime.set_datetime
+    data:
+      date: '{{now()}}'
+    target:
+      entity_id: input_datetime.hdmi_switch_last_used
   mode: queued
   icon: mdi:video-input-hdmi
   max: 10
@@ -142,7 +152,7 @@ turn_off_pc_2:
       topic: iotlink/workgroup/pc-escritori/commands/shutdown
       payload: ''
       qos: '1'
-  - wait_template: '{{states("sensor.sonoff_1000331d93_power") | int < 10}}'
+  - wait_template: '{{states("sensor.sonoff_1000331d93_power") | int == 0}}'
   - service: switch.turn_off
     data: {}
     target:
@@ -210,6 +220,11 @@ set_air_purifier_at_max:
           minutes: 0
           seconds: 8
           milliseconds: 0
+  - service: input_datetime.set_datetime
+    data:
+      date: '{{now()}}'
+    target:
+      entity_id: input_datetime.purifier_last_used
   mode: single
   icon: mdi:numeric-5
 set_air_purifier_at_0:
@@ -259,6 +274,11 @@ set_air_purifier_at_0:
             minutes: 0
             seconds: 8
             milliseconds: 0
+  - service: input_datetime.set_datetime
+    data:
+      date: '{{now()}}'
+    target:
+      entity_id: input_datetime.purifier_last_used
   mode: single
   icon: mdi:numeric-0
 set_air_purifier_at_4:
@@ -305,6 +325,11 @@ set_air_purifier_at_4:
             minutes: 0
             seconds: 8
             milliseconds: 0
+  - service: input_datetime.set_datetime
+    data:
+      date: '{{now()}}'
+    target:
+      entity_id: input_datetime.purifier_last_used
   mode: single
   icon: mdi:numeric-4
 turn_on_tv:
@@ -606,6 +631,11 @@ turn_on_fan:
     data: {}
     target:
       entity_id: input_boolean.fan
+  - service: input_datetime.set_datetime
+    data:
+      date: '{{now()}}'
+    target:
+      entity_id: input_datetime.fan_on_last_used
   mode: single
   icon: mdi:fan
 turn_off_fan:
@@ -631,6 +661,11 @@ turn_off_fan:
     data: {}
     target:
       entity_id: input_boolean.fan
+  - service: input_datetime.set_datetime
+    data:
+      date: '{{now()}}'
+    target:
+      entity_id: input_datetime.fan_off_last_used
   mode: single
   icon: mdi:fan-off
 turn_on_air_conditioner:

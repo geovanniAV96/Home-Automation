@@ -19,211 +19,210 @@ views:
           entity_1:
             entity_id: "sun.sun"
             icon: |
-                [[[
+              [[[
+                  var icon = 'mdi:monitor';
+                  if (states['switch.computer'].state === 'on' || states['switch.laptop'].state === 'on'){
                     var icon = 'mdi:monitor';
-                    if (states['switch.computer'].state === 'on' || states['switch.laptop'].state === 'on'){
-                      var icon = 'mdi:monitor';
-                    } else {
-                      var icon = 'mdi:monitor-off';
-                    }
-                    return icon ;
-                ]]]
+                  } else {
+                    var icon = 'mdi:monitor-off';
+                  }
+                  return icon ;
+              ]]]
             name: "Desk"
             color: |
-                [[[
+              [[[
+                  var color = 'pink';
+                  if (states['switch.computer'].state === 'on' || states['switch.laptop'].state === 'on'){
                     var color = 'pink';
-                    if (states['switch.computer'].state === 'on' || states['switch.laptop'].state === 'on'){
-                      var color = 'pink';
-                    } else {
-                      var color = 'brown';
-                    }
-                    return color ;
-                ]]]
+                  } else {
+                    var color = 'brown';
+                  }
+                  return color ;
+              ]]]
             tap_action:
               action: navigate
               navigation_path: "/lovelace-minimalist-2/desk"
           entity_2:
             entity_id: "sun.sun"
             icon: |
-                [[[
+              [[[
+                  var icon = 'mdi:hvac';
+                  if (states['climate.air_conditioner'].state === 'cool'){
                     var icon = 'mdi:hvac';
-                    if (states['climate.air_conditioner'].state === 'cool'){
-                      var icon = 'mdi:hvac';
-                    } else {
-                      var icon = 'mdi:hvac-off';
-                    }
-                    return icon ;
-                ]]]
-            name: "Air" 
+                  } else {
+                    var icon = 'mdi:hvac-off';
+                  }
+                  return icon ;
+              ]]]
+            name: "Air"
             color: |
-                [[[
+              [[[
+                  var color = 'blue';
+                  if (states['climate.air_conditioner'].state === 'cool'){
                     var color = 'blue';
-                    if (states['climate.air_conditioner'].state === 'cool'){
-                      var color = 'blue';
-                    } else {
-                      var color = 'brown';
-                    }
-                    return color ;
-                ]]]
+                  } else {
+                    var color = 'brown';
+                  }
+                  return color ;
+              ]]]
           entity_3:
             entity_id: "script.empty_room_turn_off"
             icon: "mdi:home"
-            name: "Home" 
+            name: "Home"
             color: "brown"
           entity_4:
             entity_id: "binary_sensor.withings_in_bed_geovanni"
             icon: |
-                [[[
+              [[[
+                  var icon = 'mdi:bed';
+                  if (states['binary_sensor.withings_in_bed_geovanni'].state === 'on'){
                     var icon = 'mdi:bed';
-                    if (states['binary_sensor.withings_in_bed_geovanni'].state === 'on'){
-                      var icon = 'mdi:bed';
-                    } else {
-                      var icon = 'mdi:bed-empty';
-                    }
-                    return icon ;
-                ]]]
-            name: "Bed" 
+                  } else {
+                    var icon = 'mdi:bed-empty';
+                  }
+                  return icon ;
+              ]]]
+            name: "Bed"
             color: |
-                [[[
+              [[[
+                  var color = 'green';
+                  if (states['binary_sensor.withings_in_bed_geovanni'].state === 'on'){
                     var color = 'green';
-                    if (states['binary_sensor.withings_in_bed_geovanni'].state === 'on'){
-                      var color = 'green';
-                    } else {
-                      var color = 'brown';
-                    }
-                    return color ;
-                ]]]
+                  } else {
+                    var color = 'brown';
+                  }
+                  return color ;
+              ]]]
           entity_5:
             entity_id: "sun.sun"
             icon: |
-                [[[
+              [[[
+                  var icon = 'mdi:television';
+                  if (states['media_player.lg_cx'].state === 'on'){
                     var icon = 'mdi:television';
-                    if (states['media_player.lg_cx'].state === 'on'){
-                      var icon = 'mdi:television';
-                    } else {
-                      var icon = 'mdi:television-off';
-                    }
-                    return icon ;
-                ]]]
-            name: "TV" 
+                  } else {
+                    var icon = 'mdi:television-off';
+                  }
+                  return icon ;
+              ]]]
+            name: "TV"
             color: |
-                [[[
+              [[[
+                  var color = 'yellow';
+                  if (states['media_player.lg_cx'].state === 'on'){
                     var color = 'yellow';
-                    if (states['media_player.lg_cx'].state === 'on'){
-                      var color = 'yellow';
-                    } else {
-                      var color = 'brown';
-                    }
-                    return color ;
-                ]]]
+                  } else {
+                    var color = 'brown';
+                  }
+                  return color ;
+              ]]]
       #-------------Computers Start---------------------
       - type: custom:mushroom-title-card
         title: Computers
       - type: "horizontal-stack"
         cards:
-        - type: "custom:button-card"
-          template:
-            - custom_card_room
-            - blue_on
-            - grey_off
-          name: PC
-          entity: switch.sonoff_1000331d93
-          icon: |
-                [[[
+          - type: "custom:button-card"
+            template:
+              - custom_card_room
+              - blue_on
+              - grey_off
+            name: PC
+            entity: switch.sonoff_1000331d93
+            icon: |
+              [[[
+                  var icon = 'mdi:desktop-tower';
+                  if (states['switch.sonoff_1000331d93'].state === 'on'){
+                    var icon = 'mdi:desktop-tower-monitor';
+                  } else {
                     var icon = 'mdi:desktop-tower';
-                    if (states['switch.sonoff_1000331d93'].state === 'on'){
-                      var icon = 'mdi:desktop-tower-monitor';
-                    } else {
-                      var icon = 'mdi:desktop-tower';
-                    }
-                    return icon ;
-                ]]]
-          tap_action:
-            action: navigate
-            navigation_path: "/lovelace-minimalist-3/pc"
-          variables:
-            label_use_temperature: true
-            label_use_brightness: false
-            variable_entity_temperature: sensor.pc_escritori_amd_ryzen_7_5800x_temperatures_cpu_package
-            entity_1:
-              entity_id: script.hibernate_pc
-              templates:
-                - yellow_on
-              tap_action:
-                action: call-service
-                service: script.hibernate_pc
-            entity_2:
-              entity_id: input_boolean.hdmi_on_pc
-              templates:
-                - blue_on
-              tap_action:
-                action: none
-            entity_3:
-              entity_id: switch.sonoff_1000331d93
-              templates:
-                - green_on
-                - red_off
-              tap_action:
-                action: toggle
-            entity_4:
-              entity_id: sensor.pc_inactive
-              icon: mdi:monitor-off
-              templates:
-                - pink_on
-              tap_action:
-                action: toggle
-        - type: "custom:button-card"
-          template:
-            - custom_card_room
-            - blue_on
-            - grey_off
-          name: Laptop
-          entity: switch.laptop
-          icon: |
-                [[[
+                  }
+                  return icon ;
+              ]]]
+            tap_action:
+              action: navigate
+              navigation_path: "/lovelace-minimalist-3/pc"
+            variables:
+              label_use_temperature: true
+              label_use_brightness: false
+              variable_entity_temperature: sensor.pc_escritori_amd_ryzen_7_5800x_temperatures_cpu_package
+              entity_1:
+                entity_id: script.hibernate_pc
+                templates:
+                  - yellow_on
+                tap_action:
+                  action: call-service
+                  service: script.hibernate_pc
+              entity_2:
+                entity_id: input_boolean.hdmi_on_pc
+                templates:
+                  - blue_on
+                tap_action:
+                  action: none
+              entity_3:
+                entity_id: switch.sonoff_1000331d93
+                templates:
+                  - green_on
+                  - red_off
+                tap_action:
+                  action: toggle
+              entity_4:
+                entity_id: sensor.pc_inactive
+                icon: mdi:monitor-off
+                templates:
+                  - pink_on
+                tap_action:
+                  action: toggle
+          - type: "custom:button-card"
+            template:
+              - custom_card_room
+              - blue_on
+            name: Laptop
+            entity: switch.laptop
+            icon: |
+              [[[
+                  var icon = 'mdi:laptop';
+                  if (states['switch.laptop'].state === 'on'){
                     var icon = 'mdi:laptop';
-                    if (states['switch.laptop'].state === 'on'){
-                      var icon = 'mdi:laptop';
-                    } else {
-                      var icon = 'mdi:laptop-off';
-                    }
-                    return icon ;
-                ]]]
-          tap_action:
-            action: navigate
-            navigation_path: "/lovelace-minimalist-4/laptop"
-          variables:
-            label_use_temperature: false
-            label_use_brightness: false
-            variable_entity_temperature: sensor.0529gaguilar_intel_core_i7_8665u_temperatures_cpu_package
-            entity_1:
-              entity_id: script.hibernate_laptop
-              templates:
-                - yellow_on
-              tap_action:
-                action: call-service
-                service: script.turn_on
-                service_data:
-                  entity_id: script.hibernate_laptop
-            entity_2:
-              entity_id: input_boolean.laptop_extended_screen
-              templates:
-                - blue_on
-              tap_action:
-                action: none
-            entity_3:
-              entity_id: switch.laptop
-              templates:
-                - green_on
-              tap_action:
-                action: toggle
-            entity_4:
-              entity_id: sensor.laptop_inactive
-              icon: mdi:laptop-off
-              templates:
-                - pink_on
-              tap_action:
-                action: toggle
+                  } else {
+                    var icon = 'mdi:laptop-off';
+                  }
+                  return icon ;
+              ]]]
+            tap_action:
+              action: navigate
+              navigation_path: "/lovelace-minimalist-4/laptop"
+            variables:
+              label_use_temperature: false
+              label_use_brightness: false
+              variable_entity_temperature: sensor.0529gaguilar_intel_core_i7_8665u_temperatures_cpu_package
+              entity_1:
+                entity_id: script.hibernate_laptop
+                templates:
+                  - yellow_on
+                tap_action:
+                  action: call-service
+                  service: script.turn_on
+                  service_data:
+                    entity_id: script.hibernate_laptop
+              entity_2:
+                entity_id: input_boolean.laptop_extended_screen
+                templates:
+                  - blue_on
+                tap_action:
+                  action: none
+              entity_3:
+                entity_id: switch.laptop
+                templates:
+                  - green_on
+                tap_action:
+                  action: toggle
+              entity_4:
+                entity_id: sensor.laptop_inactive
+                icon: mdi:laptop-off
+                templates:
+                  - pink_on
+                tap_action:
+                  action: toggle
       #-------------Computers End---------------------
       #-------------Controls Start--------------------
       - type: custom:mushroom-title-card
@@ -245,150 +244,138 @@ views:
           ulm_card_light_enable_popup: true
       - type: "horizontal-stack"
         cards:
-        - type: "custom:button-card"
-          template: card_power_outlet
-          entity: switch.left_monitor
-          name: Left Monitor
-        - type: "custom:button-card"
-          template: card_power_outlet
-          entity: switch.right_monitor
-          name: Right Monitor
+          - type: "custom:button-card"
+            template: card_power_outlet
+            entity: switch.left_monitor
+            name: Left Monitor
+          - type: "custom:button-card"
+            template: card_power_outlet
+            entity: switch.right_monitor
+            name: Right Monitor
       - type: "horizontal-stack"
         cards:
-        - type: 'custom:button-card'
-          template: card_generic
-          entity: sensor.fg6122tm_external_ip
-        - type: 'custom:button-card'
-          template: card_script
-          variables:
-            ulm_card_script_title: Turn Off Everything
-            ulm_card_script_icon: 'mdi:home-remove'
-          tap_action:
-            action: call-service
-            service: script.turn_on
-            service_data:
-              entity_id: script.turn_off_everything
+          - type: "custom:button-card"
+            template: card_generic
+            entity: sensor.fg6122tm_external_ip
+          - type: "custom:button-card"
+            template: card_script
+            variables:
+              ulm_card_script_title: Turn Off Everything
+              ulm_card_script_icon: "mdi:home-remove"
+            tap_action:
+              action: call-service
+              service: script.turn_on
+              service_data:
+                entity_id: script.turn_off_everything
       #-------------Controls End----------------------
       #-------------Media Start-----------------------
       - type: "horizontal-stack"
         cards:
-        - type: "custom:button-card"
-          template: card_media_player
-          entity: media_player.echo_de_cristian
-          name: TV
-          ulm_card_media_player_enable_art: true
-          ulm_card_media_player_enable_controls: true
-          ulm_card_media_player_enable_volume_slider: true
-          ulm_card_media_player_enable_popup: true
-        - type: "custom:button-card"
-          template: card_input_boolean
-          entity: binary_sensor.ps5
-          name: PS5
-          icon: mdi:sony-playstation
+          - type: "custom:button-card"
+            template: card_media_player
+            entity: media_player.echo_de_cristian
+            name: TV
+            ulm_card_media_player_enable_art: true
+            ulm_card_media_player_enable_controls: true
+            ulm_card_media_player_enable_volume_slider: true
+            ulm_card_media_player_enable_popup: true
+          - type: "custom:button-card"
+            template: card_input_boolean
+            entity: binary_sensor.ps5
+            name: PS5
+            icon: mdi:sony-playstation
       #-------------Media End-------------------------
       #-------------UPS Start-------------------------
       - type: custom:mushroom-title-card
         title: UPS Stats
       - type: "horizontal-stack"
         cards:
-        - type: "custom:button-card"
-          template: card_input_boolean
-          entity: sensor.pc_ups_on
-          name: UPS
-          icon: |
-                [[[
+          - type: "custom:button-card"
+            template: card_input_boolean
+            entity: sensor.pc_ups_on
+            name: UPS
+            icon: |
+              [[[
+                  var icon = 'mdi:lightning-bolt';
+                  if (states['sensor.pc_ups_on'].state === 'on'){
                     var icon = 'mdi:lightning-bolt';
-                    if (states['sensor.pc_ups_on'].state === 'on'){
-                      var icon = 'mdi:lightning-bolt';
-                    } else {
-                      var icon = 'mdi:lightning-bolt-outline';
-                    }
-                    return icon ;
-                ]]]
-        - type: "custom:button-card"
-          template: card_battery
-          entity: sensor.ups_1500_battery_charge
-          variables:
-            ulm_card_battery_charger_type_entity_id: sensor.ups_1500_battery_charge
-            ulm_card_battery_battery_level_danger: 15
-            ulm_card_battery_battery_level_warning: 50
-          name: UPS
+                  } else {
+                    var icon = 'mdi:lightning-bolt-outline';
+                  }
+                  return icon ;
+              ]]]
+          - type: "custom:button-card"
+            template: card_battery
+            entity: sensor.ups_1500_battery_charge
+            variables:
+              ulm_card_battery_charger_type_entity_id: sensor.ups_1500_battery_charge
+              ulm_card_battery_battery_level_danger: 15
+              ulm_card_battery_battery_level_warning: 50
+            name: UPS
       - type: "horizontal-stack"
         cards:
-        - type: "custom:button-card"
-          template: card_graph
-          variables:
-            ulm_card_graph_color: "var(--google-blue)"
-            ulm_card_graph_name: UPS Watts Output
-            ulm_card_graph_entity: sensor.pc_ups_watts
-            ulm_card_graph_type: fill
-            ulm_card_graph_hours: 12
-        - type: "custom:button-card"
-          template: card_graph
-          variables:
-            ulm_card_graph_color: "var(--google-blue)"
-            ulm_card_graph_name: UPS Runtime
-            ulm_card_graph_entity: sensor.pc_ups_runtime_minutes
-            ulm_card_graph_type: fill
-            ulm_card_graph_hours: 12
+          - type: "custom:button-card"
+            template: card_graph
+            variables:
+              ulm_card_graph_color: "var(--google-blue)"
+              ulm_card_graph_name: UPS Watts Output
+              ulm_card_graph_entity: sensor.pc_ups_watts
+              ulm_card_graph_type: fill
+              ulm_card_graph_hours: 12
+          - type: "custom:button-card"
+            template: card_graph
+            variables:
+              ulm_card_graph_color: "var(--google-blue)"
+              ulm_card_graph_name: UPS Runtime
+              ulm_card_graph_entity: sensor.pc_ups_runtime_minutes
+              ulm_card_graph_type: fill
+              ulm_card_graph_hours: 12
       #-------------UPS End---------------------------
       #-------------SwitchBot Start-------------------
       - type: custom:mushroom-title-card
         title: SwitchBot
       - type: "horizontal-stack"
         cards:
-        - type: "custom:button-card"
-          template: card_battery
-          entity: sensor.deskup_battery
-          variables:
-            ulm_card_battery_charger_type_entity_id: sensor.deskup_battery
-            ulm_card_battery_battery_level_danger: 15
-            ulm_card_battery_battery_level_warning: 50
-        - type: "custom:button-card"
-          template: card_battery
-          entity: sensor.deskdown_battery
-          variables:
-            ulm_card_battery_charger_type_entity_id: sensor.deskdown_battery
-            ulm_card_battery_battery_level_danger: 15
-            ulm_card_battery_battery_level_warning: 50
+          - type: "custom:button-card"
+            template: card_battery
+            entity: sensor.deskup_battery
+            variables:
+              ulm_card_battery_charger_type_entity_id: sensor.deskup_battery
+              ulm_card_battery_battery_level_danger: 15
+              ulm_card_battery_battery_level_warning: 50
+          - type: "custom:button-card"
+            template: card_battery
+            entity: sensor.deskdown_battery
+            variables:
+              ulm_card_battery_charger_type_entity_id: sensor.deskdown_battery
+              ulm_card_battery_battery_level_danger: 15
+              ulm_card_battery_battery_level_warning: 50
       - type: "horizontal-stack"
         cards:
-        - type: "custom:button-card"
-          template: "custom_card_eraycetinay_elapsed_time"
-          entity: button.deskup_button
-          name: "Up Last Used"
-          icon: 'mdi:history'
-        - type: "custom:button-card"
-          template: "custom_card_eraycetinay_elapsed_time"
-          entity: button.deskdown_button
-          name: "Down Last Used"
-          icon: 'mdi:history'
+          - type: "custom:button-card"
+            template: "custom_card_eraycetinay_elapsed_time"
+            entity: input_datetime.desk_up_last_used
+            name: "Up Last Used"
+            icon: "mdi:history"
+          - type: "custom:button-card"
+            template: "custom_card_eraycetinay_elapsed_time"
+            entity: input_datetime.desk_down_last_used
+            name: "Down Last Used"
+            icon: "mdi:history"
       - type: "horizontal-stack"
         cards:
-        - type: 'custom:button-card'
-          template: card_generic
-          entity: sensor.deskup_holdsecs
-        - type: 'custom:button-card'
-          template: card_generic
-          entity: sensor.deskdown_holdsecs
+          - type: "custom:button-card"
+            template: card_generic
+            entity: sensor.deskup_holdsecs
+          - type: "custom:button-card"
+            template: card_generic
+            entity: sensor.deskdown_holdsecs
       - type: "horizontal-stack"
         cards:
-        - type: 'custom:button-card'
-          template: card_graph
-          variables:
-            ulm_card_graph_color: "var(--google-blue)"
-            ulm_card_graph_name: Signal Up
-            ulm_card_graph_entity: sensor.deskup_linkquality
-            ulm_card_graph_type: fill
-            ulm_card_graph_hours: 1
-        - type: 'custom:button-card'
-          template: card_graph
-          variables:
-            ulm_card_graph_color: "var(--google-blue)"
-            ulm_card_graph_name: Down Signal
-            ulm_card_graph_entity: sensor.deskdown_linkquality
-            ulm_card_graph_type: fill
-            ulm_card_graph_hours: 1
+          - type: "custom:button-card"
+            template: custom_card_mpse_wifisignal
+            entity: sensor.deskup_linkquality
+          - type: "custom:button-card"
+            template: custom_card_mpse_wifisignal
+            entity: sensor.deskdown_linkquality
       #-------------SwitchBot End---------------------
-      
-      

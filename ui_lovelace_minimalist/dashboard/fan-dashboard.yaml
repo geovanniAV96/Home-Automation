@@ -186,32 +186,22 @@ views:
           entity: sensor.fanoff_holdsecs
       - type: "horizontal-stack"
         cards:
-        - type: 'custom:button-card'
-          template: card_graph
-          variables:
-            ulm_card_graph_color: "var(--google-blue)"
-            ulm_card_graph_name: Signal
-            ulm_card_graph_entity: sensor.fanon_linkquality
-            ulm_card_graph_type: fill
-            ulm_card_graph_hours: 1
-        - type: 'custom:button-card'
-          template: card_graph
-          variables:
-            ulm_card_graph_color: "var(--google-blue)"
-            ulm_card_graph_name: Signal
-            ulm_card_graph_entity: sensor.fanoff_linkquality
-            ulm_card_graph_type: fill
-            ulm_card_graph_hours: 1
+          - type: 'custom:button-card'
+            template: custom_card_mpse_wifisignal
+            entity: sensor.fanon_linkquality
+          - type: 'custom:button-card'
+            template: custom_card_mpse_wifisignal
+            entity: sensor.fanoff_linkquality
       - type: "horizontal-stack"
         cards:
-        - type: "custom:button-card"
-          template: "custom_card_eraycetinay_elapsed_time"
-          entity: button.fanon_button
-          name: "FanOn Last Used"
-          icon: 'mdi:history'
-        - type: "custom:button-card"
-          template: "custom_card_eraycetinay_elapsed_time"
-          entity: button.fanoff_button
-          name: "FanOff Last Used"
-          icon: 'mdi:history'
+          - type: "custom:button-card"
+            template: "custom_card_eraycetinay_elapsed_time"
+            entity: input_datetime.fan_on_last_used
+            name: "FanOn Last Used"
+            icon: "mdi:history"
+          - type: "custom:button-card"
+            template: "custom_card_eraycetinay_elapsed_time"
+            entity: input_datetime.fan_off_last_used
+            name: "FanOff Last Used"
+            icon: "mdi:history"
       #-------------Sensors Start-----------------

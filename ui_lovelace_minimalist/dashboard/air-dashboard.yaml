@@ -274,7 +274,6 @@ views:
         template:
           - card_room
           - custom_blue_on
-          - grey_off
         name: Fan
         entity: input_boolean.fan
         icon: mdi:fan

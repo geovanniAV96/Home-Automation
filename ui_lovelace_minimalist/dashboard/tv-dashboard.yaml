@@ -313,7 +313,7 @@ views:
             ulm_card_battery_battery_level_warning: 50
         - type: "custom:button-card"
           template: "custom_card_eraycetinay_elapsed_time"
-          entity: button.hdmiswitch_button
+          entity: input_datetime.hdmi_switch_last_used
           name: "Up Last Used"
       - type: "horizontal-stack"
         cards:
@@ -321,11 +321,6 @@ views:
           template: card_generic
           entity: sensor.hdmiswitch_holdsecs
         - type: 'custom:button-card'
-          template: card_graph
-          variables:
-            ulm_card_graph_color: "var(--google-blue)"
-            ulm_card_graph_name: Signal Up
-            ulm_card_graph_entity: sensor.hdmiswitch_linkquality
-            ulm_card_graph_type: fill
-            ulm_card_graph_hours: 1
+          template: custom_card_mpse_wifisignal
+          entity: sensor.hdmiswitch_linkquality
       #-------------SwitchBot End---------------------

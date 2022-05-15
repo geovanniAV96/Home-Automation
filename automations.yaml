@@ -1616,6 +1616,11 @@
       datetime: '{{now()}}'
     target:
       entity_id: input_datetime.last_time_desk_up
+  - service: input_datetime.set_datetime
+    data:
+      datetime: '{{now()}}'
+    target:
+      entity_id: input_datetime.desk_up_last_used
   mode: single
 - id: '1650773599159'
   alias: Desk Down
@@ -1649,6 +1654,11 @@
     data: {}
     target:
       entity_id: cover.standup_desk
+  - service: input_datetime.set_datetime
+    data:
+      datetime: '{{now()}}'
+    target:
+      entity_id: input_datetime.desk_down_last_used
   mode: single
 - id: '1650951445082'
   alias: Play sleep sounds after 1 hour

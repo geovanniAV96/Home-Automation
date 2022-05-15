@@ -220,13 +220,18 @@ views:
             ulm_custom_card_bar_card_color: "var(--google-blue)"
             ulm_custom_card_bar_card_min: 10
             ulm_custom_card_bar_card_max: 100
-        - type: "custom:button-card"
-          template: card_battery
-          entity: sensor.0529gaguilar_battery_remaining
-          variables:
-            ulm_card_battery_charger_type_entity_id: sensor.0529gaguilar_battery_remaining
-            ulm_card_battery_battery_level_danger: 15
-            ulm_card_battery_battery_level_warning: 50
+        - type: conditional
+          conditions:
+            - entity: sensor.0529gaguilar_battery_remaining
+              state_not: 'unavailable'
+          card:
+            type: "custom:button-card"
+            template: card_battery
+            entity: sensor.0529gaguilar_battery_remaining
+            variables:
+              ulm_card_battery_charger_type_entity_id: sensor.0529gaguilar_battery_remaining
+              ulm_card_battery_battery_level_danger: 15
+              ulm_card_battery_battery_level_warning: 50
       - type: "horizontal-stack"
         cards:
         - type: 'custom:button-card'
@@ -279,30 +284,50 @@ views:
                 color: "#DB4437"
       - type: horizontal-stack
         cards:
-          - hours_to_show: 1
-            graph: line
-            type: sensor
-            entity: sensor.0529gaguilar_system_idle_time
-            detail: 2
-            name: Idle Time
-            unit: Seconds
-          - hours_to_show: 1
-            graph: line
-            type: sensor
-            entity: sensor.laptop_volume
-            name: Volume
-            detail: 2
+          - type: conditional
+            conditions:
+              - entity: sensor.0529gaguilar_system_idle_time
+                state_not: 'unavailable'
+            card:
+              hours_to_show: 1
+              graph: line
+              type: sensor
+              entity: sensor.0529gaguilar_system_idle_time
+              detail: 2
+              name: Idle Time
+              unit: Seconds
+          - type: conditional
+            conditions:
+              - entity: sensor.laptop_volume
+                state_not: 'unavailable'
+            card:
+              hours_to_show: 1
+              graph: line
+              type: sensor
+              entity: sensor.laptop_volume
+              name: Volume
+              detail: 2
       #---------------Graphics End--------------------
       - type: "horizontal-stack"
         cards:
-        - type: 'custom:button-card'
-          template: card_input_boolean
-          entity: binary_sensor.laptop_microphone
-          name: Microphone
-        - type: 'custom:button-card'
-          template: card_input_boolean
-          entity: binary_sensor.laptop_webcam
-          name: Webcam
+        - type: conditional
+          conditions:
+            - entity: binary_sensor.laptop_microphone
+              state_not: 'unavailable'
+          card:
+            type: 'custom:button-card'
+            template: card_input_boolean
+            entity: binary_sensor.laptop_microphone
+            name: Microphone
+        - type: conditional
+          conditions:
+            - entity: binary_sensor.laptop_webcam
+              state_not: 'unavailable'
+          card:
+            type: 'custom:button-card'
+            template: card_input_boolean
+            entity: binary_sensor.laptop_webcam
+            name: Webcam
       - type: "horizontal-stack"
         cards:
         - type: "custom:button-card"

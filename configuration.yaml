@@ -426,6 +426,94 @@ homeassistant:
             }
             return icon ;
         ]]]
+    light.bed_light:
+      icon: |
+        [[[
+            var icon = 'kuf:light_bedside';
+            if (states['light.bed_light'].state === 'on'){
+              var icon = 'kuf:light_bedside';
+            } else {
+              var icon = 'hue:floor-spot-off';
+            }
+            return icon ;
+        ]]]
+    light.cama:
+      icon: |
+        [[[
+            var icon = 'hue:gradient-lightstrip';
+            if (states['light.cama'].state === 'on'){
+              var icon = 'hue:gradient-lightstrip';
+            } else {
+              var icon = 'hue:lightstrip-off';
+            }
+            return icon ;
+        ]]]
+    light.luz_escritorio:
+      icon: |
+        [[[
+            var icon = 'hue:gradient-lightstrip';
+            if (states['light.luz_escritorio'].state === 'on'){
+              var icon = 'hue:gradient-lightstrip';
+            } else {
+              var icon = 'hue:lightstrip-off';
+            }
+            return icon ;
+        ]]]
+    light.hue_play_center:
+      icon: |
+        [[[
+            var icon = 'hue:play-bar';
+            if (states['light.hue_play_center'].state === 'on'){
+              var icon = 'hue:play-bar';
+            } else {
+              var icon = 'hue:play-bar-off';
+            }
+            return icon ;
+        ]]]
+    light.hue_play_gradient_lightstrip:
+      icon: |
+        [[[
+            var icon = 'hue:lightstrip-tv';
+            if (states['light.hue_play_gradient_lightstrip'].state === 'on'){
+              var icon = 'hue:lightstrip-tv';
+            } else {
+              var icon = 'hue:lightstrip-tv-off';
+            }
+            return icon ;
+        ]]]
+    light.hue_play_left:
+      icon: |
+        [[[
+            var icon = 'hue:play-bar';
+            if (states['light.hue_play_left'].state === 'on'){
+              var icon = 'hue:play-bar';
+            } else {
+              var icon = 'hue:play-bar-off';
+            }
+            return icon ;
+        ]]]
+    light.hue_play_right:
+      icon: |
+        [[[
+            var icon = 'hue:play-bar';
+            if (states['light.hue_play_right'].state === 'on'){
+              var icon = 'hue:play-bar';
+            } else {
+              var icon = 'hue:play-bar-off';
+            }
+            return icon ;
+        ]]]
+    light.luz:
+      icon: |
+        [[[
+            var icon = 'hue:bulb-sultan';
+            if (states['light.luz'].state === 'on'){
+              var icon = 'hue:bulb-sultan';
+            } else {
+              var icon = 'hue:bulb-sultan-off';
+            }
+            return icon ;
+        ]]]
 
 browser_mod:
 

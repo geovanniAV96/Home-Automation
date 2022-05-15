@@ -193,16 +193,11 @@ views:
       - type: "horizontal-stack"
         cards:
         - type: 'custom:button-card'
-          template: card_graph
-          variables:
-            ulm_card_graph_color: "var(--google-blue)"
-            ulm_card_graph_name: Signal
-            ulm_card_graph_entity: sensor.airpurifier_linkquality
-            ulm_card_graph_type: fill
-            ulm_card_graph_hours: 1
+          template: custom_card_mpse_wifisignal
+          entity: sensor.airpurifier_linkquality
         - type: "custom:button-card"
           template: "custom_card_eraycetinay_elapsed_time"
-          entity: button.airpurifier_button
+          entity: input_datetime.purifier_last_used
           name: "Last Used"
           icon: mdi:update
       #---------------Graphs End------------------------

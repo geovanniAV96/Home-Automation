@@ -68,8 +68,8 @@ dashboards:
     filename: ui_lovelace_minimalist/dashboard/tv-dashboard.yaml
   lovelace-minimalist-14:
     mode: yaml
-    title: test
-    icon: mdi:test-tube
+    title: Main Mobile
+    icon: mdi:menu
     show_in_sidebar: true
     filename: ui_lovelace_minimalist/dashboard/test-dashboard.yaml
 resources:
