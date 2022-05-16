@@ -222,7 +222,7 @@ set_air_purifier_at_max:
           milliseconds: 0
   - service: input_datetime.set_datetime
     data:
-      date: '{{now()}}'
+      datetime: '{{now()}}'
     target:
       entity_id: input_datetime.purifier_last_used
   mode: single
@@ -276,7 +276,7 @@ set_air_purifier_at_0:
             milliseconds: 0
   - service: input_datetime.set_datetime
     data:
-      date: '{{now()}}'
+      datetime: '{{now()}}'
     target:
       entity_id: input_datetime.purifier_last_used
   mode: single
@@ -327,7 +327,7 @@ set_air_purifier_at_4:
             milliseconds: 0
   - service: input_datetime.set_datetime
     data:
-      date: '{{now()}}'
+      datetime: '{{now()}}'
     target:
       entity_id: input_datetime.purifier_last_used
   mode: single
@@ -633,7 +633,7 @@ turn_on_fan:
       entity_id: input_boolean.fan
   - service: input_datetime.set_datetime
     data:
-      date: '{{now()}}'
+      datetime: '{{now()}}'
     target:
       entity_id: input_datetime.fan_on_last_used
   mode: single
@@ -663,7 +663,7 @@ turn_off_fan:
       entity_id: input_boolean.fan
   - service: input_datetime.set_datetime
     data:
-      date: '{{now()}}'
+      datetime: '{{now()}}'
     target:
       entity_id: input_datetime.fan_off_last_used
   mode: single
