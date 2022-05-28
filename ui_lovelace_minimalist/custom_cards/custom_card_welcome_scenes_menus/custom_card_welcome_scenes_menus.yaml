@@ -40,7 +40,7 @@ custom_card_welcome_scenes_menus:
         ]]]
       tap_action:
         action: navigate
-        navigation_path: "/ui-lovelace-minimalist/home"
+        navigation_path: "/ui-lovelace-minimalist-14/home"
     entity_4:
       entity_id:
       icon: "[[[ return entity.attributes.icon  ]]]"

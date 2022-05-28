@@ -123,7 +123,6 @@ views:
           template:
             - custom_card_room
             - custom_blue_on_desk
-            - grey_off
           name: Desk
           entity: cover.standup_desk
           icon: kuf:light_office_desk
@@ -202,7 +201,6 @@ views:
           template:
             - custom_card_room
             - blue_on
-            - grey_off
           name: Air
           entity: sensor.air_state
           icon: |
@@ -256,7 +254,7 @@ views:
                     [[[
                         var icon = 'mdi:television';
                         if (states['media_player.lg_cx'].state === 'on'){
-                          var icon = 'mdi:television-off';
+                          var icon = 'mdi:television';
                         } else {
                           var icon = 'mdi:television-off';
                         }

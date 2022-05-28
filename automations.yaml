@@ -1144,9 +1144,10 @@
   description: ''
   trigger:
   - platform: state
-    entity_id: input_boolean.iphone_bluetooth_connected
-    from: 'off'
-    to: 'on'
+    entity_id:
+    - device_tracker.wf_1000xm3
+    from: not_home
+    to: home
   condition:
   - condition: time
     before: '22:00:00'
@@ -1166,6 +1167,9 @@
     value_template: '{{((as_timestamp(now())) / 60 / 60 | int - as_timestamp(states(''input_datetime.last_time_bedroom_cleaned''))
       / 60 / 60 | int) > 20}}'
   action:
+  - wait_template: '{{states(''input_boolean.iphone_bluetooth_connected'') == ''on''}}'
+    continue_on_timeout: false
+    timeout: 00:05:00
   - service: script.turn_off_everything
     data: {}
   - condition: state
@@ -1501,6 +1505,11 @@
     entity_id: sensor.mop
     from: Not Ready
     to: Ready
+  - platform: state
+    entity_id:
+    - sensor.mop
+    from: Clean
+    to: Not Ready
   condition:
   - condition: time
     before: '22:00:00'
@@ -1691,6 +1700,15 @@
       payload:
         id: youtube.leanback.v4
         contentId: nEi2Udjc0lQ
+  - delay:
+      hours: 0
+      minutes: 0
+      seconds: 10
+      milliseconds: 0
+  - service: webostv.command
+    data:
+      entity_id: media_player.lg_webos_smart_tv
+      command: com.webos.service.tvpower/power/turnOffScreen
   mode: single
 - id: '1651017145887'
   alias: Turn Off Laptop After Work
@@ -1877,9 +1895,7 @@
   trigger:
   - platform: state
     entity_id: sensor.fg6122tm_external_ip
-  condition:
-  - condition: template
-    value_template: '{{ trigger.from_state }}'
+  condition: []
   action:
   - service: notify.mobile_app_cristian_geovannis_iphone
     data:
@@ -1938,116 +1954,6 @@
         "args": "", "path": "C:\\Users\\geovanni.aguilar\\Documents\\HA\\", "user":
         "", "visible": false, "fallback": true}'
   mode: single
-- id: '1651817525082'
-  alias: Refill Eva Water
-  description: ''
-  trigger:
-  - platform: time
-    at: '18:05:00'
-  condition:
-  - condition: state
-    entity_id: input_boolean.cleaning_day
-    state: 'on'
-  - condition: time
-    before: '19:00:00'
-    after: '18:00:00'
-    weekday:
-    - sun
-    - fri
-    - mon
-    - sat
-    - wed
-    - thu
-    - tue
-  - condition: state
-    entity_id: sensor.mop
-    attribute: tank
-    state: empty
-  - condition: state
-    entity_id: person.cristian_geovanni_aguilar_valencia
-    state: home
-  action:
-  - service: light.turn_on
-    data:
-      rgb_color:
-      - 235
-      - 77
-      - 61
-      brightness_pct: 26
-    target:
-      entity_id: light.cama
-  - repeat:
-      until:
-      - condition: state
-        entity_id: sensor.mop
-        attribute: tank
-        state: Ready
-      sequence:
-      - device_id: bad0b5042b55509c57201aa9d948dc7d
-        domain: light
-        entity_id: light.cama
-        type: flash
-      - delay:
-          hours: 0
-          minutes: 0
-          seconds: 7
-          milliseconds: 0
-  - type: turn_off
-    device_id: bad0b5042b55509c57201aa9d948dc7d
-    entity_id: light.cama
-    domain: light
-  mode: single
-- id: '1651817525903'
-  alias: Refill Eva Water
-  description: ''
-  trigger:
-  - platform: time
-    at: '18:00:00'
-  condition:
-  - condition: state
-    entity_id: input_boolean.cleaning_day
-    state: 'on'
-  - condition: time
-    before: '19:00:00'
-    after: '18:00:00'
-    weekday:
-    - sun
-    - fri
-    - mon
-    - sat
-    - wed
-    - thu
-    - tue
-  - condition: state
-    entity_id: sensor.mop
-    attribute: tank
-    state: empty
-  action:
-  - service: light.turn_on
-    data:
-      rgb_color:
-      - 235
-      - 77
-      - 61
-    target:
-      entity_id: light.cama
-  - repeat:
-      until:
-      - condition: state
-        entity_id: sensor.mop
-        attribute: tank
-        state: Ready
-      sequence:
-      - device_id: bad0b5042b55509c57201aa9d948dc7d
-        domain: light
-        entity_id: light.cama
-        type: flash
-      - delay:
-          hours: 0
-          minutes: 0
-          seconds: 7
-          milliseconds: 0
-  mode: single
 - id: '1651817527279'
   alias: Refill Eva Water
   description: ''
@@ -2072,7 +1978,7 @@
   - condition: state
     entity_id: sensor.mop
     attribute: tank
-    state: empty
+    state: Fill Tank
   action:
   - service: light.turn_on
     data:
@@ -2080,6 +1986,11 @@
       - 235
       - 77
       - 61
+    target:
+      entity_id: light.cama
+    enabled: true
+  - service: light.turn_off
+    data: {}
     target:
       entity_id: light.cama
   - repeat:
@@ -2130,4 +2041,20 @@
     data: {}
     target:
       entity_id: scene.power_loss
+  mode: single
+- id: '1652851873766'
+  alias: Turn Off Iphone Bluetooth Boolean
+  description: ''
+  trigger:
+  - platform: state
+    entity_id:
+    - device_tracker.wf_1000xm3
+    from: home
+    to: not_home
+  condition: []
+  action:
+  - service: input_boolean.turn_off
+    data: {}
+    target:
+      entity_id: input_boolean.iphone_bluetooth_connected
   mode: single

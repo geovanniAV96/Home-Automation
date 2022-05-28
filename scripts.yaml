@@ -125,11 +125,7 @@ turn_off_pc:
       topic: iotlink/netlogistik/0529gaguilar/commands/shutdown
       payload: ''
       qos: '2'
-  - wait_for_trigger:
-    - platform: numeric_state
-      entity_id: sensor.sonoff_1000332281_power
-      below: '10'
-    continue_on_timeout: false
+  - wait_template: '{{states("sensor.sonoff_1000332281_power") | int == 0}}'
   - service: switch.turn_off
     data: {}
     target:
@@ -616,7 +612,7 @@ turn_on_fan:
     entity_id: input_boolean.fan
     state: 'off'
   - repeat:
-      count: 2
+      count: '2'
       sequence:
       - service: button.press
         data: {}
@@ -645,7 +641,7 @@ turn_off_fan:
     entity_id: input_boolean.fan
     state: 'on'
   - repeat:
-      count: '6'
+      count: '3'
       sequence:
       - service: button.press
         data: {}
@@ -705,11 +701,7 @@ hibernate_laptop:
       topic: iotlink/netlogistik/0529gaguilar/commands/hibernate
       payload: ''
       qos: '1'
-  - wait_for_trigger:
-    - platform: numeric_state
-      entity_id: sensor.sonoff_1000332281_power
-      below: '10'
-    continue_on_timeout: false
+  - wait_template: '{{states("sensor.sonoff_1000332281_power") | int == 0}}'
   - service: switch.turn_off
     data: {}
     target:
@@ -732,10 +724,7 @@ hibernate_pc:
       topic: iotlink/workgroup/pc-escritori/commands/hibernate
       payload: ''
       qos: '1'
-  - wait_for_trigger:
-    - platform: numeric_state
-      entity_id: sensor.sonoff_1000331d93_power
-      below: '10'
+  - wait_template: '{{states("sensor.sonoff_1000331d93_power") | int == 0}}'
   - service: switch.turn_off
     data: {}
     target:
@@ -821,6 +810,20 @@ send_walle_to_clean:
     target:
       entity_id:
       - light.luz_escritorio
+  - delay:
+      hours: 0
+      minutes: 0
+      seconds: 5
+      milliseconds: 0
+  - service: light.turn_on
+    data:
+      brightness_pct: 100
+      rgb_color:
+      - 255
+      - 255
+      - 255
+    target:
+      entity_id:
       - light.cama
   - service: rest_command.vacuum_action
     data:
@@ -839,8 +842,22 @@ send_eva_to_clean:
       - 255
     target:
       entity_id:
-      - light.luz_escritorio
       - light.cama
+  - delay:
+      hours: 0
+      minutes: 0
+      seconds: 5
+      milliseconds: 0
+  - service: light.turn_on
+    data:
+      brightness_pct: 100
+      rgb_color:
+      - 255
+      - 255
+      - 255
+    target:
+      entity_id:
+      - light.luz_escritorio
   - service: rest_command.mop_action
     data:
       command: start
@@ -912,6 +929,7 @@ desk_up:
       topic: switchbot/nodemcuesp32/setHold
       payload_template: '{"id":"DeskUp", "hold":"{{((100 - states(''input_number.desk_heigth'')
         | int) / 7.14) | int }}"}'
+      qos: '1'
   - service: button.press
     data: {}
     target:
@@ -938,6 +956,7 @@ desk_down:
       topic: switchbot/nodemcuesp32/setHold
       payload_template: '{"id":"DeskDown", "hold":"{{((states(''input_number.desk_heigth'')
         | int) / 8.33) | int }}"}'
+      qos: '1'
   - service: button.press
     data: {}
     target:
@@ -966,6 +985,7 @@ set_desk_height:
           topic: switchbot/nodemcuesp32/setHold
           payload_template: '{"id":"DeskDown", "hold":"{{((states(''input_number.desk_heigth'')
             | int - position) / 7.69) | int }}"}'
+          qos: '1'
       - service: button.press
         data: {}
         target:
@@ -1263,6 +1283,18 @@ empty_room_turn_off:
         target:
           entity_id: scene.before
     default:
+    - condition: and
+      conditions:
+      - condition: not
+        conditions:
+        - condition: state
+          entity_id: media_player.lg_cx
+          state: 'on'
+      - condition: not
+        conditions:
+        - condition: state
+          entity_id: binary_sensor.withings_in_bed_geovanni
+          state: 'on'
     - service: script.turn_off_air_conditioner
       data: {}
   mode: restart

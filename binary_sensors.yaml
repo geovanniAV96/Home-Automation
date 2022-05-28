@@ -1,7 +1,7 @@
 # PS5 On/Off
 - platform: command_line
   name: ps5
-  command: python /config/sensors/ps5.py -q -b 192.168.1.91
+  command: python /config/sensors/ps5.py -q -b 192.168.1.115
   scan_interval: 10
 
 - platform: group
