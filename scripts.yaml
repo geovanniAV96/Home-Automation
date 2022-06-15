@@ -23,7 +23,7 @@ switch_hdmi_to_tv:
       entity_id: input_boolean.hdmi_on_tv
   - service: input_datetime.set_datetime
     data:
-      date: '{{now()}}'
+      datetime: '{{now()}}'
     target:
       entity_id: input_datetime.hdmi_switch_last_used
   mode: queued
@@ -53,7 +53,7 @@ switch_hdmi_to_pc:
       entity_id: input_boolean.hdmi_on_pc
   - service: input_datetime.set_datetime
     data:
-      date: '{{now()}}'
+      datetime: '{{now()}}'
     target:
       entity_id: input_datetime.hdmi_switch_last_used
   mode: queued
@@ -69,10 +69,12 @@ turn_on_pc:
     data: {}
     target:
       entity_id: switch.sonoff_1000331d93
-  - wait_for_trigger:
-    - platform: state
-      entity_id: sensor.pc_escritori_system_uptime
-      from: unavailable
+  - service: switch.turn_on
+    data: {}
+    target:
+      entity_id: switch.go_xlr
+  - wait_template: '{{states(''sensor.pc_escritori_current_username'') == ''Geovanni''}}'
+    continue_on_timeout: true
     timeout: 00:05:00
   - service: script.turn_on_rgb
     data: {}
@@ -81,6 +83,18 @@ turn_on_pc:
 turn_on_laptop:
   alias: Turn On Laptop
   sequence:
+  - condition: time
+    before: '19:00:00'
+    after: 09:00:00
+    weekday:
+    - mon
+    - tue
+    - wed
+    - thu
+    - fri
+    - sat
+    - sun
+    enabled: true
   - condition: state
     entity_id: switch.laptop
     state: 'off'
@@ -120,6 +134,18 @@ turn_off_pc:
   - condition: state
     entity_id: switch.laptop
     state: 'on'
+  - if:
+    - condition: state
+      entity_id: input_boolean.laptop_extended_screen
+      state: 'on'
+    then:
+    - service: script.pc_extend_screen
+      data: {}
+    - delay:
+        hours: 0
+        minutes: 0
+        seconds: 5
+        milliseconds: 0
   - service: mqtt.publish
     data:
       topic: iotlink/netlogistik/0529gaguilar/commands/shutdown
@@ -148,11 +174,15 @@ turn_off_pc_2:
       topic: iotlink/workgroup/pc-escritori/commands/shutdown
       payload: ''
       qos: '1'
-  - wait_template: '{{states("sensor.sonoff_1000331d93_power") | int == 0}}'
+  - wait_template: '{{states("sensor.sonoff_1000331d93_power") | int < 10}}'
   - service: switch.turn_off
     data: {}
     target:
       entity_id: switch.sonoff_1000331d93
+  - service: switch.turn_off
+    data: {}
+    target:
+      entity_id: switch.go_xlr
   - delay:
       hours: 0
       minutes: 0
@@ -460,6 +490,11 @@ change_air_conditioner_temperature:
       description: Temperature to change
       example: '23'
   sequence:
+  - delay:
+      hours: 0
+      minutes: 0
+      seconds: 5
+      milliseconds: 0
   - condition: state
     entity_id: input_boolean.air_conditioner
     state: 'on'
@@ -590,6 +625,13 @@ turn_off_air_conditioner:
     state: 'on'
   - service: rest_command.turn_off_ac
     data: {}
+  - delay:
+      hours: 0
+      minutes: 0
+      seconds: 5
+      milliseconds: 0
+  - service: rest_command.turn_off_ac
+    data: {}
   - service: input_boolean.turn_off
     data: {}
     target:
@@ -653,6 +695,7 @@ turn_off_fan:
           minutes: 0
           seconds: 2
           milliseconds: 0
+    enabled: false
   - service: input_boolean.turn_off
     data: {}
     target:
@@ -680,6 +723,21 @@ turn_on_air_conditioner:
         \ 3\n{%- elif states('input_number.air_conditioner_fan_speed') | int == 100\
         \ -%}\n  4\n{%- else -%}\n  1\n{%- endif %}"
       state: 'on'
+  - delay:
+      hours: 0
+      minutes: 0
+      seconds: 5
+      milliseconds: 0
+  - service: rest_command.control_ac
+    data:
+      temperature: '{{state_attr(''climate.air_conditioner'', ''temperature'')}}'
+      fan_speed: "{% if states('input_number.air_conditioner_fan_speed') | int >=\
+        \ 33 and states('input_number.air_conditioner_fan_speed') | int < 66  -%}\n\
+        \  2\n{%- elif states('input_number.air_conditioner_fan_speed') | int >= 66\
+        \ and states('input_number.air_conditioner_fan_speed') | int < 100 -%}\n \
+        \ 3\n{%- elif states('input_number.air_conditioner_fan_speed') | int == 100\
+        \ -%}\n  4\n{%- else -%}\n  1\n{%- endif %}"
+      state: 'on'
   - service: input_boolean.turn_on
     data: {}
     target:
@@ -696,6 +754,18 @@ hibernate_laptop:
   - condition: state
     entity_id: switch.laptop
     state: 'on'
+  - if:
+    - condition: state
+      entity_id: input_boolean.laptop_extended_screen
+      state: 'on'
+    then:
+    - service: script.pc_extend_screen
+      data: {}
+    - delay:
+        hours: 0
+        minutes: 0
+        seconds: 5
+        milliseconds: 0
   - service: mqtt.publish
     data:
       topic: iotlink/netlogistik/0529gaguilar/commands/hibernate
@@ -724,11 +794,17 @@ hibernate_pc:
       topic: iotlink/workgroup/pc-escritori/commands/hibernate
       payload: ''
       qos: '1'
-  - wait_template: '{{states("sensor.sonoff_1000331d93_power") | int == 0}}'
+  - wait_template: '{{states("sensor.sonoff_1000331d93_power") | int < 10}}'
+    continue_on_timeout: true
+    timeout: 00:05:00
   - service: switch.turn_off
     data: {}
     target:
       entity_id: switch.sonoff_1000331d93
+  - service: switch.turn_off
+    data: {}
+    target:
+      entity_id: switch.go_xlr
   - delay:
       hours: 0
       minutes: 0
@@ -768,7 +844,7 @@ change_tv_to_ps5:
   sequence:
   - service: media_player.select_source
     data:
-      source: HDMI 3
+      source: PS5
     target:
       entity_id: media_player.lg_webos_smart_tv
   mode: single
@@ -887,6 +963,30 @@ turn_off_everything:
     data: {}
   - service: script.turn_off_air_conditioner
     data: {}
+  - service: script.turn_off_pc
+    data: {}
+  - service: light.turn_off
+    data: {}
+    target:
+      entity_id: light.hue_play_center
+  - delay:
+      hours: 0
+      minutes: 0
+      seconds: 2
+      milliseconds: 0
+  - service: light.turn_off
+    data: {}
+    target:
+      entity_id: light.hue_play_left
+  - delay:
+      hours: 0
+      minutes: 0
+      seconds: 2
+      milliseconds: 0
+  - service: light.turn_off
+    data: {}
+    target:
+      entity_id: light.hue_play_right
   mode: single
   icon: mdi:home-circle-outline
 pc_extend_screen:
@@ -943,6 +1043,19 @@ desk_up:
       value: '{{(100 - states(''input_number.desk_heigth'') | int)}}'
     target:
       entity_id: input_number.desk_heigth
+  - wait_for_trigger:
+    - platform: state
+      entity_id:
+      - binary_sensor.hue_motion_sensor_3_motion
+      from: 'off'
+      to: 'on'
+    timeout: 00:00:30
+  - delay:
+      hours: 0
+      minutes: 0
+      seconds: '{{((100 - states(''input_number.desk_heigth'') | int) / 7.14) | int
+        }}'
+      milliseconds: 0
   mode: single
   icon: mdi:desk
 desk_down:
@@ -970,6 +1083,18 @@ desk_down:
       value: 0
     target:
       entity_id: input_number.desk_heigth
+  - wait_for_trigger:
+    - platform: state
+      entity_id:
+      - binary_sensor.hue_motion_sensor_3_motion
+      from: 'off'
+      to: 'on'
+    timeout: 00:01:30
+  - delay:
+      hours: 0
+      minutes: 0
+      seconds: '{{((states(''input_number.desk_heigth'') | int) / 8.33) | int }}'
+      milliseconds: 0
   mode: single
   icon: mdi:table-furniture
 set_desk_height:
@@ -1142,6 +1267,31 @@ lock_laptop:
 empty_room_turn_off:
   alias: Empty Room Turn Off
   sequence:
+  - if:
+    - condition: template
+      value_template: '{{ (as_timestamp(now()) | int - as_timestamp(states(''input_datetime.last_time_empty_room_run''))
+        | int) > 600 }}'
+    - condition: or
+      conditions:
+      - condition: state
+        entity_id: switch.computer
+        state: 'on'
+      - condition: state
+        entity_id: switch.laptop
+        state: 'on'
+    then:
+    - service: scene.create
+      data:
+        scene_id: before
+        snapshot_entities:
+        - switch.laptop
+        - switch.computer
+        - switch.left_monitor
+        - switch.right_monitor
+        - climate.air_conditioner
+        - light.hue_play_center
+        - light.hue_play_left
+        - light.hue_play_right
   - service: scene.create
     data:
       scene_id: before
@@ -1151,6 +1301,10 @@ empty_room_turn_off:
       - switch.left_monitor
       - switch.right_monitor
       - climate.air_conditioner
+      - light.hue_play_center
+      - light.hue_play_left
+      - light.hue_play_right
+    enabled: false
   - choose:
     - conditions:
       - condition: state
@@ -1187,33 +1341,75 @@ empty_room_turn_off:
       state: 'on'
   - choose:
     - conditions:
-      - condition: numeric_state
-        entity_id: sensor.laptop_time_inactive
-        below: '1'
-      - condition: numeric_state
-        entity_id: sensor.pc_time_inactive
-        below: '1'
+      - condition: or
+        conditions:
+        - condition: state
+          entity_id: sensor.pc_escritori_system_idle_time
+          state: '0'
+        - condition: state
+          entity_id: sensor.0529gaguilar_system_idle_time
+          state: '0'
+        - condition: numeric_state
+          entity_id: sensor.laptop_time_inactive
+          below: '1'
+        - condition: numeric_state
+          entity_id: sensor.pc_time_inactive
+          below: '1'
+        - condition: state
+          entity_id: binary_sensor.hue_motion_sensor_1_motion
+          state: 'on'
+        - condition: state
+          entity_id: binary_sensor.hue_motion_sensor_2_motion
+          state: 'on'
+        - condition: numeric_state
+          entity_id: sensor.pc_time_no_volume
+          below: '1'
+        - condition: numeric_state
+          entity_id: sensor.laptop_time_no_volume
+          below: '1'
       sequence:
       - service: scene.turn_on
         data: {}
         target:
           entity_id: scene.before
+      - stop: PC or Laptop active or Movement detected
     default:
     - service: script.turn_off_monitor
       data: {}
   - choose:
     - conditions:
-      - condition: numeric_state
-        entity_id: sensor.pc_time_inactive
-        below: '1'
-      - condition: numeric_state
-        entity_id: sensor.laptop_time_inactive
-        below: '1'
+      - condition: or
+        conditions:
+        - condition: state
+          entity_id: sensor.pc_escritori_system_idle_time
+          state: '0'
+        - condition: state
+          entity_id: sensor.0529gaguilar_system_idle_time
+          state: '0'
+        - condition: numeric_state
+          entity_id: sensor.laptop_time_inactive
+          below: '1'
+        - condition: numeric_state
+          entity_id: sensor.pc_time_inactive
+          below: '1'
+        - condition: state
+          entity_id: binary_sensor.hue_motion_sensor_1_motion
+          state: 'on'
+        - condition: state
+          entity_id: binary_sensor.hue_motion_sensor_2_motion
+          state: 'on'
+        - condition: numeric_state
+          entity_id: sensor.pc_time_no_volume
+          below: '1'
+        - condition: numeric_state
+          entity_id: sensor.laptop_time_no_volume
+          below: '1'
       sequence:
       - service: scene.turn_on
         data: {}
         target:
           entity_id: scene.before
+      - stop: PC or Laptop active
     default:
     - choose:
       - conditions:
@@ -1239,49 +1435,76 @@ empty_room_turn_off:
         data: {}
   - choose:
     - conditions:
-      - condition: numeric_state
-        entity_id: sensor.laptop_time_inactive
-        below: '1'
-      - condition: numeric_state
-        entity_id: sensor.pc_time_inactive
-        below: '1'
+      - condition: or
+        conditions:
+        - condition: state
+          entity_id: sensor.pc_escritori_system_idle_time
+          state: '0'
+        - condition: numeric_state
+          entity_id: sensor.pc_time_inactive
+          below: '1'
+        - condition: state
+          entity_id: binary_sensor.hue_motion_sensor_1_motion
+          state: 'on'
+        - condition: state
+          entity_id: binary_sensor.hue_motion_sensor_2_motion
+          state: 'on'
+        - condition: numeric_state
+          entity_id: sensor.pc_time_no_volume
+          below: '1'
       sequence:
       - service: scene.turn_on
         data: {}
         target:
           entity_id: scene.before
+      - stop: PC or Laptop active
     default:
     - service: script.turn_off_right_monitor
       data: {}
   - choose:
     - conditions:
-      - condition: numeric_state
-        entity_id: sensor.laptop_time_inactive
-        below: '1'
-      - condition: numeric_state
-        entity_id: sensor.pc_time_inactive
-        below: '1'
+      - condition: or
+        conditions:
+        - condition: state
+          entity_id: sensor.pc_escritori_system_idle_time
+          state: '0'
+        - condition: numeric_state
+          entity_id: sensor.pc_time_inactive
+          below: '1'
+        - condition: state
+          entity_id: binary_sensor.hue_motion_sensor_1_motion
+          state: 'on'
+        - condition: state
+          entity_id: binary_sensor.hue_motion_sensor_2_motion
+          state: 'on'
+        - condition: numeric_state
+          entity_id: sensor.pc_time_no_volume
+          below: '1'
       sequence:
       - service: scene.turn_on
         data: {}
         target:
           entity_id: scene.before
+      - stop: PC or Laptop active
     default:
     - service: script.hibernate_pc
       data: {}
   - choose:
     - conditions:
-      - condition: numeric_state
-        entity_id: sensor.laptop_time_inactive
-        below: '1'
-      - condition: numeric_state
-        entity_id: sensor.pc_time_inactive
-        below: '1'
+      - condition: or
+        conditions:
+        - condition: state
+          entity_id: binary_sensor.hue_motion_sensor_1_motion
+          state: 'on'
+        - condition: state
+          entity_id: binary_sensor.hue_motion_sensor_2_motion
+          state: 'on'
       sequence:
       - service: scene.turn_on
         data: {}
         target:
           entity_id: scene.before
+      - stop: PC or Laptop active
     default:
     - condition: and
       conditions:
@@ -1293,9 +1516,124 @@ empty_room_turn_off:
       - condition: not
         conditions:
         - condition: state
-          entity_id: binary_sensor.withings_in_bed_geovanni
+          entity_id: binary_sensor.geo_in_bed
           state: 'on'
     - service: script.turn_off_air_conditioner
       data: {}
+  - choose:
+    - conditions:
+      - condition: or
+        conditions:
+        - condition: state
+          entity_id: binary_sensor.hue_motion_sensor_1_motion
+          state: 'on'
+        - condition: state
+          entity_id: binary_sensor.hue_motion_sensor_2_motion
+          state: 'on'
+      sequence:
+      - service: scene.turn_on
+        data: {}
+        target:
+          entity_id: scene.before
+      - stop: PC or Laptop active
+    default:
+    - service: light.turn_off
+      data: {}
+      target:
+        entity_id: light.hue_play_center
+    - delay:
+        hours: 0
+        minutes: 0
+        seconds: 1
+        milliseconds: 0
+    - service: light.turn_off
+      data: {}
+      target:
+        entity_id: light.hue_play_left
+    - delay:
+        hours: 0
+        minutes: 0
+        seconds: 1
+        milliseconds: 0
+    - service: light.turn_off
+      data: {}
+      target:
+        entity_id: light.hue_play_right
+  - service: input_datetime.set_datetime
+    data:
+      datetime: '{{now()}}'
+    target:
+      entity_id: input_datetime.last_time_empty_room_run
   mode: restart
   icon: mdi:account-off
+switch_hdmi_to_sync_box:
+  alias: Switch HDMI to Sync Box
+  sequence:
+  - condition: state
+    entity_id: input_boolean.ps5_hue_sync
+    state: 'off'
+  - service: button.press
+    data: {}
+    target:
+      entity_id: button.fanoff_button
+  - service: input_boolean.turn_on
+    data: {}
+    target:
+      entity_id: input_boolean.ps5_hue_sync
+  mode: single
+  icon: hue:sync-box-alt
+switch_hdmi_to_desk:
+  alias: Switch HDMI to Desk
+  sequence:
+  - condition: state
+    entity_id: input_boolean.ps5_hue_sync
+    state: 'on'
+  - service: button.press
+    data: {}
+    target:
+      entity_id: button.fanoff_button
+  - service: input_boolean.turn_off
+    data: {}
+    target:
+      entity_id: input_boolean.ps5_hue_sync
+  mode: single
+  icon: kuf:light_office_desk
+start_ps5_hue_sync:
+  alias: Start PS5 Hue Sync
+  sequence:
+  - service: media_player.turn_on
+    data: {}
+    target:
+      entity_id: media_player.hue_sync_box
+  - service: input_select.set_options
+    data:
+      options: Intense
+    target:
+      entity_id: input_select.hue_sync_intensity
+  - service: input_select.set_options
+    data:
+      options: PS5
+    target:
+      entity_id: input_select.hue_sync_input
+  - delay:
+      hours: 0
+      minutes: 0
+      seconds: 10
+      milliseconds: 0
+  - service: media_player.select_source
+    data:
+      source: Game
+    target:
+      entity_id: media_player.hue_sync_box
+  mode: single
+  icon: hue:sync-high
+change_tv_to_hue_sync:
+  alias: Change TV to Hue Sync
+  sequence:
+  - service: media_player.select_source
+    data:
+      source: HDMI 3
+    target:
+      entity_id: media_player.lg_webos_smart_tv
+  mode: single
+  icon: mdi:sony-playstation

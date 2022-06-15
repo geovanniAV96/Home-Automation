@@ -52,11 +52,11 @@ views:
                 name: "Home" 
                 color: "green"
               entity_4:
-                entity_id: "binary_sensor.withings_in_bed_geovanni"
+                entity_id: "binary_sensor.geo_in_bed"
                 icon: |
                     [[[
                         var icon = 'mdi:bed';
-                        if (states['binary_sensor.withings_in_bed_geovanni'].state === 'on'){
+                        if (states['binary_sensor.geo_in_bed'].state === 'on'){
                           var icon = 'mdi:bed';
                         } else {
                           var icon = 'mdi:bed-empty';
@@ -104,6 +104,14 @@ views:
             ulm_custom_card_yagrasdemonde_lights_count_icon_off: "mdi:table-furniture"
             ulm_custom_card_yagrasdemonde_lights_count_color: "blue"
             ulm_custom_card_yagrasdemonde_lights_count_force_background_color: false
+      - type: conditional
+        conditions:
+          - entity: sensor.low_batteries
+            state_not: unavailable
+        card:
+          type: markdown
+          content: '{{states(''sensor.low_batteries'')}}'
+          title: Low Batteries
       - type: "custom:button-card"
         template: card_weather
         entity: weather.home
@@ -162,7 +170,7 @@ views:
             - custom_card_room
             - blue_on
           name: Bed
-          entity: binary_sensor.withings_in_bed_geovanni
+          entity: binary_sensor.geo_in_bed
           icon: mdi:bed-double
           tap_action:
             action: navigate
@@ -178,7 +186,7 @@ views:
               tap_action:
                 action: toggle
             entity_2:
-              entity_id: binary_sensor.withings_in_bed_geovanni
+              entity_id: binary_sensor.geo_in_bed
               templates:
                 - blue_on
               tap_action:

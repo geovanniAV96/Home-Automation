@@ -23,9 +23,9 @@ hue_sync_intensity:
 hue_sync_input:
   name: Hue Sync
   options:
-    - PS5
-    - Switch
-    - PS4
+    - Nintendo Switch
     - PS3
+    - PS5
+    - PS4
   icon: hue:sync-box-alt
   initial: PS5

@@ -71,11 +71,11 @@ views:
             name: "Home" 
             color: "brown"
           entity_4:
-            entity_id: "binary_sensor.withings_in_bed_geovanni"
+            entity_id: "binary_sensor.geo_in_bed"
             icon: |
                 [[[
                     var icon = 'mdi:bed';
-                    if (states['binary_sensor.withings_in_bed_geovanni'].state === 'on'){
+                    if (states['binary_sensor.geo_in_bed'].state === 'on'){
                       var icon = 'mdi:bed';
                     } else {
                       var icon = 'mdi:bed-empty';
@@ -86,7 +86,7 @@ views:
             color: |
                 [[[
                     var color = 'green';
-                    if (states['binary_sensor.withings_in_bed_geovanni'].state === 'on'){
+                    if (states['binary_sensor.geo_in_bed'].state === 'on'){
                       var color = 'green';
                     } else {
                       var color = 'brown';
@@ -143,5 +143,8 @@ views:
         cards:
         - type: 'custom:button-card'
           template: card_input_boolean
-          entity: binary_sensor.withings_in_bed_geovanni
+          entity: binary_sensor.geo_in_bed
           name: Bed Ocuppancy
+        - type: 'custom:button-card'
+          template: card_generic
+          entity: sensor.bed

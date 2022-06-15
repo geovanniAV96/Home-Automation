@@ -11,6 +11,12 @@ homeassistant:
     "cover.*":
       assumed_state: true
   customize:
+    sensor.bed:
+      icon: |
+        [[[
+            var icon = 'mdi:weight-kilogram';
+            return icon ;
+        ]]]
     switch.right_monitor:
       icon: |
         [[[
@@ -52,11 +58,11 @@ homeassistant:
       icon: "phu:seagate-ssd"
     sensor.pc_escritori_kingston_sa400s37480g_load_used_space:
       icon: "phu:seagate-ssd"
-    binary_sensor.withings_in_bed_geovanni:
+    binary_sensor.geo_in_bed:
       icon: |
         [[[
             var icon = 'mdi:bed';
-            if (states['binary_sensor.withings_in_bed_geovanni'].state === 'on'){
+            if (states['binary_sensor.geo_in_bed'].state === 'on'){
               var icon = 'mdi:bed';
             } else {
               var icon = 'mdi:bed-empty';
@@ -408,7 +414,7 @@ homeassistant:
       icon: |
         [[[
             var icon = 'hue:sync-box';
-            if (states['climate.air_conditioner'].state === 'off'){
+            if (states['media_player.hue_sync_box'].state === 'off'){
               var icon = 'hue:sync-box';
             } else {
               var icon = 'hue:sync-box-alt';
@@ -643,7 +649,7 @@ switch:
     switches:
       computer:
         value_template: >
-          {% if states('sensor.pc_escritori_system_idle_time') != 'unavailable' and states('switch.sonoff_1000331d93') == 'on' and states('sensor.sonoff_1000331d93_power') | int > 1 -%}
+          {% if states('sensor.pc_escritori_system_idle_time') != 'unavailable' or states('switch.sonoff_1000331d93') == 'on' or states('sensor.sonoff_1000331d93_power') | int > 1 -%}
             on
           {%- else -%}
             off
@@ -653,14 +659,14 @@ switch:
         turn_off:
           service: script.turn_off_pc_2
         icon_template: >
-          {% if states('sensor.0529gaguilar_system_idle_time') != 'unavailable' and states('switch.laptop') == 'on' and states('sensor.sonoff_1000332281_power') | int > 1 -%}
+          {% if states('sensor.0529gaguilar_system_idle_time') != 'unavailable' or states('switch.laptop') == 'on' or states('sensor.sonoff_1000332281_power') | int > 1 -%}
             mdi:desktop-tower-monitor
           {%- else -%}
             mdi:desktop-tower
           {%- endif %}
       laptop:
         value_template: >
-          {% if states('sensor.0529gaguilar_system_idle_time') != 'unavailable' and states('switch.sonoff_1000332281') == 'on' and states('sensor.sonoff_1000332281_power') | int > 1 -%}
+          {% if states('sensor.0529gaguilar_system_idle_time') != 'unavailable' or states('switch.sonoff_1000332281') == 'on' or states('sensor.sonoff_1000332281_power') | int > 1 -%}
             on
           {%- else -%}
             off
@@ -670,7 +676,7 @@ switch:
         turn_off:
           service: script.turn_off_pc
         icon_template: >
-          {% if states('sensor.0529gaguilar_system_idle_time') != 'unavailable' and states('switch.sonoff_1000332281') == 'on' and states('sensor.sonoff_1000332281_power') | int > 1 -%}
+          {% if states('sensor.0529gaguilar_system_idle_time') != 'unavailable' or states('switch.sonoff_1000332281') == 'on' or states('sensor.sonoff_1000332281_power') | int > 1 -%}
             mdi:laptop
           {%- else -%}
             mdi:laptop-off
@@ -691,3 +697,4 @@ group: !include groups.yaml
 lovelace: !include lovelace.yaml
 light: !include lights.yaml
 media_player: !include media_player.yaml
+mqtt: !include mqtt_sensors.yaml

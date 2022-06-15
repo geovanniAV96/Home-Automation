@@ -57,3 +57,14 @@
       value_template: "{{ states('sensor.hacs')|int(0) != 0 }}"
       attribute_templates:
         repositories: "{{ state_attr('sensor.hacs', 'repositories') }}"
+
+    geo_in_bed:
+      friendly_name: "Geovanni in Bed"
+      value_template: >
+        {{ states('sensor.bed')|float >= 0 }}
+    someone_in_bed:
+      friendly_name: "Someone else in Bed"
+      value_template: >
+        {{ states('sensor.bed')|float > 40
+          and (states('sensor.bed')|float < 60
+              or states('sensor.bed')|float >= 150 )}}

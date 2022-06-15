@@ -14,7 +14,7 @@ custom_card_welcome_scenes_menus:
         ]]]
       tap_action:
         action: navigate
-        navigation_path: "/lovelace-minimalist-2/desk"
+        navigation_path: "/lovelace-minimalist-14/desk"
     entity_2:
       entity_id:
       icon: "[[[ return entity.attributes.icon  ]]]"
@@ -27,7 +27,7 @@ custom_card_welcome_scenes_menus:
         ]]]
       tap_action:
         action: navigate
-        navigation_path: "/lovelace-minimalist-7/air"
+        navigation_path: "/lovelace-minimalist-14/air"
     entity_3:
       entity_id:
       icon: "[[[ return entity.attributes.icon  ]]]"
@@ -40,7 +40,7 @@ custom_card_welcome_scenes_menus:
         ]]]
       tap_action:
         action: navigate
-        navigation_path: "/ui-lovelace-minimalist-14/home"
+        navigation_path: "/lovelace-minimalist-14/home"
     entity_4:
       entity_id:
       icon: "[[[ return entity.attributes.icon  ]]]"
@@ -53,7 +53,7 @@ custom_card_welcome_scenes_menus:
         ]]]
       tap_action:
         action: navigate
-        navigation_path: "/lovelace-minimalist-5/bed"
+        navigation_path: "/lovelace-minimalist-14/bed"
     entity_5:
       entity_id:
       icon: "[[[ return entity.attributes.icon  ]]]"
@@ -66,7 +66,7 @@ custom_card_welcome_scenes_menus:
         ]]]
       tap_action:
         action: navigate
-        navigation_path: "/lovelace-minimalist-11/tv"
+        navigation_path: "/lovelace-minimalist-14/tv"
   template:
     - "ulm_language_variables"
   show_icon: false
@@ -259,14 +259,14 @@ card_scenes_welcome_menus:
         entity: "[[[ return variables.entity_1.entity_id ]]]"
         tap_action:
           action: navigate
-          navigation_path: "/lovelace-minimalist-2/desk"
+          navigation_path: "/lovelace-minimalist-14/desk"
         custom_fields:
           item1:
             card:
               type: "custom:button-card"
               tap_action:
                 action: navigate
-                navigation_path: "/lovelace-minimalist-2/desk"
+                navigation_path: "/lovelace-minimalist-14/desk"
               entity: "[[[ return variables.entity_1.entity_id ]]]"
               icon: "[[[ return variables.entity_1.icon ]]]"
               styles:
@@ -279,7 +279,7 @@ card_scenes_welcome_menus:
               type: "custom:button-card"
               tap_action:
                 action: navigate
-                navigation_path: "/lovelace-minimalist-2/desk"
+                navigation_path: "/lovelace-minimalist-14/desk"
               entity: "[[[ return variables.entity_1.entity_id ]]]"
               name: "[[[ return variables.entity_1.name ]]]"
     item2:
@@ -289,14 +289,14 @@ card_scenes_welcome_menus:
         entity: "[[[ return variables.entity_2.entity_id ]]]"
         tap_action:
           action: navigate
-          navigation_path: "/lovelace-minimalist-7/air"
+          navigation_path: "/lovelace-minimalist-14/air"
         custom_fields:
           item1:
             card:
               type: "custom:button-card"
               tap_action:
                 action: navigate
-                navigation_path: "/lovelace-minimalist-7/air"
+                navigation_path: "/lovelace-minimalist-14/air"
               entity: "[[[ return variables.entity_2.entity_id ]]]"
               icon: "[[[ return variables.entity_2.icon ]]]"
               styles:
@@ -309,7 +309,7 @@ card_scenes_welcome_menus:
               type: "custom:button-card"
               tap_action:
                 action: navigate
-                navigation_path: "/lovelace-minimalist-7/air"
+                navigation_path: "/lovelace-minimalist-14/air"
               entity: "[[[ return variables.entity_2.entity_id ]]]"
               name: "[[[ return variables.entity_2.name ]]]"
     item3:
@@ -319,7 +319,7 @@ card_scenes_welcome_menus:
         entity: "[[[ return variables.entity_3.entity_id ]]]"
         tap_action:
           action: navigate
-          navigation_path: "/ui-lovelace-minimalist/home"
+          navigation_path: "/lovelace-minimalist/home"
         custom_fields:
           item1:
             card:
@@ -328,7 +328,7 @@ card_scenes_welcome_menus:
                 - custom_red_on_home
               tap_action:
                 action: navigate
-                navigation_path: "/ui-lovelace-minimalist/home"
+                navigation_path: "/lovelace-minimalist/home"
               entity: "[[[ return variables.entity_3.entity_id ]]]"
               icon: "[[[ return variables.entity_3.icon ]]]"
               styles:
@@ -341,7 +341,7 @@ card_scenes_welcome_menus:
               type: "custom:button-card"
               tap_action:
                 action: navigate
-                navigation_path: "/ui-lovelace-minimalist/home"
+                navigation_path: "/lovelace-minimalist/home"
               entity: "[[[ return variables.entity_3.entity_id ]]]"
               name: "[[[ return variables.entity_3.name ]]]"
     item4:
@@ -351,14 +351,14 @@ card_scenes_welcome_menus:
         entity: "[[[ return variables.entity_4.entity_id ]]]"
         tap_action:
           action: navigate
-          navigation_path: "/lovelace-minimalist-5/bed"
+          navigation_path: "/lovelace-minimalist-14/bed"
         custom_fields:
           item1:
             card:
               type: "custom:button-card"
               tap_action:
                 action: navigate
-                navigation_path: "/lovelace-minimalist-5/bed"
+                navigation_path: "/lovelace-minimalist-14/bed"
               entity: "[[[ return variables.entity_4.entity_id ]]]"
               icon: "[[[ return variables.entity_4.icon ]]]"
               styles:
@@ -371,7 +371,7 @@ card_scenes_welcome_menus:
               type: "custom:button-card"
               tap_action:
                 action: navigate
-                navigation_path: "/lovelace-minimalist-5/bed"
+                navigation_path: "/lovelace-minimalist-14/bed"
               entity: "[[[ return variables.entity_4.entity_id ]]]"
               name: "[[[ return variables.entity_4.name ]]]"
     item5:
@@ -381,14 +381,14 @@ card_scenes_welcome_menus:
         entity: "[[[ return variables.entity_5.entity_id ]]]"
         tap_action:
           action: navigate
-          navigation_path: "/lovelace-minimalist-11/tv"
+          navigation_path: "/lovelace-minimalist-14/tv"
         custom_fields:
           item1:
             card:
               type: "custom:button-card"
               tap_action:
                 action: navigate
-                navigation_path: "/lovelace-minimalist-11/tv"
+                navigation_path: "/lovelace-minimalist-14/tv"
               entity: "[[[ return variables.entity_5.entity_id ]]]"
               icon: "[[[ return variables.entity_5.icon ]]]"
               styles:
@@ -401,7 +401,7 @@ card_scenes_welcome_menus:
               type: "custom:button-card"
               tap_action:
                 action: navigate
-                navigation_path: "/lovelace-minimalist-11/tv"
+                navigation_path: "/lovelace-minimalist-14/tv"
               entity: "[[[ return variables.entity_5.entity_id ]]]"
               name: "[[[ return variables.entity_5.name ]]]"
 card_scenes_pill_welcome_menus:

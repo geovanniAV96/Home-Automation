@@ -9,6 +9,10 @@
     entity_id: input_select.hue_sync_intensity
   - platform: state
     entity_id: input_select.hue_sync_input
+  condition:
+  - condition: state
+    entity_id: media_player.lg_cx
+    state: 'on'
   action:
   - choose:
     - conditions:
@@ -37,8 +41,8 @@
             , \"High\") -%}\n  high\n{%- else -%}\n  intense\n{%- endif %}\n"
           hdmiSource: "{% if is_state(\"input_select.hue_sync_input\", \"Switch\"\
             ) -%}\n  input1\n{%- elif is_state(\"input_select.hue_sync_input\", \"\
-            FireTV\") -%}\n  input2\n{%- elif is_state(\"input_select.hue_sync_input\"\
-            , \"PS3\") -%}\n  input3\n{%- else -%}\n  input4\n{%- endif %}\n"
+            PS3\") -%}\n  input2\n{%- elif is_state(\"input_select.hue_sync_input\"\
+            , \"PS5\") -%}\n  input3\n{%- else -%}\n  input4\n{%- endif %}\n"
           mode: "{% if is_state(\"input_select.hue_sync_mode\", \"Movie\") -%}\n \
             \ video\n{%- elif is_state(\"input_select.hue_sync_mode\", \"Music\")\
             \ -%}\n  music\n{%- elif is_state(\"input_select.hue_sync_mode\", \"Game\"\
@@ -129,6 +133,12 @@
     entity_id: binary_sensor.hue_motion_sensor_2_motion
     from: 'off'
     to: 'on'
+  - platform: state
+    entity_id:
+    - binary_sensor.hue_motion_sensor_3_motion
+    from: 'off'
+    to: 'on'
+    enabled: false
   condition: []
   action:
   - choose:
@@ -136,10 +146,10 @@
       - condition: or
         conditions:
         - condition: state
-          entity_id: binary_sensor.withings_in_bed_geovanni
+          entity_id: binary_sensor.geo_in_bed
           state: unavailable
         - condition: state
-          entity_id: binary_sensor.withings_in_bed_geovanni
+          entity_id: binary_sensor.geo_in_bed
           state: 'off'
       sequence:
       - service: light.turn_on
@@ -170,6 +180,20 @@
         data: {}
         target:
           entity_id: light.luz
+      - delay:
+          hours: 0
+          minutes: 0
+          seconds: 1
+          milliseconds: 0
+      - condition: not
+        conditions:
+        - condition: state
+          entity_id: sensor.mop
+          state: Clean
+      - service: light.turn_off
+        data: {}
+        target:
+          entity_id: light.cama
     default:
     - service: light.turn_on
       data:
@@ -199,6 +223,30 @@
       data: {}
       target:
         entity_id: light.cama
+      enabled: false
+  - service: light.turn_off
+    data: {}
+    target:
+      entity_id:
+      - light.luz
+  - delay:
+      hours: 0
+      minutes: 0
+      seconds: 1
+      milliseconds: 0
+  - condition: not
+    conditions:
+    - condition: state
+      entity_id: sensor.mop
+      state: Clean
+    - condition: state
+      entity_id: sensor.vacuum
+      state: Clean
+  - service: light.turn_off
+    data: {}
+    target:
+      entity_id:
+      - light.cama
   mode: restart
 - id: '1649392489396'
   alias: Notify Power Loss
@@ -230,6 +278,7 @@
       - light.hue_play_center
       - light.cama
       - light.bed_light
+      - light.hue_gradient_lightstrip_1
   - service: notify.mobile_app_cristian_geovannis_iphone
     data:
       message: Power Loss
@@ -249,14 +298,24 @@
   - service: script.change_air_conditioner_temperature
     data:
       temperature: '{{states(''input_number.air_conditioner_temperature'') | int}}'
-  mode: single
+  - service: input_number.set_value
+    data:
+      value: '{{states(''input_number.air_conditioner_temperature'') | int}}'
+    target:
+      entity_id: input_number.last_temperature
+  mode: queued
 - id: '1649398137024'
   alias: Sleep Routine
   description: ''
   trigger:
   - platform: state
-    entity_id: binary_sensor.withings_in_bed_geovanni
+    entity_id:
+    - binary_sensor.geo_in_bed
     to: 'on'
+    for:
+      hours: 0
+      minutes: 0
+      seconds: 5
   condition:
   - condition: state
     entity_id: person.cristian_geovanni_aguilar_valencia
@@ -275,21 +334,71 @@
     - fri
     - sat
     - sun
+  - condition: state
+    entity_id: binary_sensor.ps5
+    state: 'off'
   action:
   - service: script.turn_off_pc_2
     data: {}
+    enabled: false
   - service: script.turn_on_tv
     data: {}
+    enabled: false
+  - parallel:
+    - service: script.turn_off_pc_2
+      data: {}
+    - service: script.turn_on_tv
+      data: {}
   - service: script.change_tv_sound_output
     data: {}
   - service: script.open_youtube_in_tv
     data: {}
-  - service: script.turn_off_monitor
-    data: {}
+  - parallel:
+    - service: script.turn_off_monitor
+      data: {}
+    - service: script.turn_off_right_monitor
+      data: {}
+    - service: script.set_air_purifier_at_0
+      data: {}
+    - service: light.turn_off
+      data: {}
+      target:
+        entity_id:
+        - light.hue_play_center
+    - service: light.turn_off
+      data: {}
+      target:
+        entity_id:
+        - light.hue_play_left
+    - service: light.turn_off
+      data: {}
+      target:
+        entity_id:
+        - light.hue_play_right
   - service: script.turn_off_right_monitor
     data: {}
+    enabled: false
   - service: script.set_air_purifier_at_0
     data: {}
+    enabled: false
+  - service: light.turn_off
+    data: {}
+    target:
+      entity_id:
+      - light.hue_play_center
+    enabled: false
+  - service: light.turn_off
+    data: {}
+    target:
+      entity_id:
+      - light.hue_play_left
+    enabled: false
+  - service: light.turn_off
+    data: {}
+    target:
+      entity_id:
+      - light.hue_play_right
+    enabled: false
   - service: input_datetime.set_datetime
     data:
       timestamp: '{{as_timestamp(now())}}'
@@ -308,7 +417,7 @@
       minutes: 0
       seconds: 0
   - platform: state
-    entity_id: binary_sensor.withings_in_bed_geovanni
+    entity_id: binary_sensor.geo_in_bed
     to: 'on'
     for:
       hours: 3
@@ -321,6 +430,8 @@
       hours: 3
       minutes: 0
       seconds: 0
+  - platform: time
+    at: 05:00:00
   condition:
   - condition: time
     before: 07:00:00
@@ -333,6 +444,14 @@
     - thu
     - sun
     after: 00:00:00
+  - condition: or
+    conditions:
+    - condition: state
+      entity_id: climate.air_conditioner
+      state: 'on'
+    - condition: state
+      entity_id: climate.air_conditioner
+      state: cool
   action:
   - service: script.turn_on_fan
     data: {}
@@ -356,9 +475,14 @@
   description: ''
   trigger:
   - platform: state
-    entity_id: binary_sensor.withings_in_bed_geovanni
+    entity_id:
+    - binary_sensor.geo_in_bed
     from: 'on'
     to: 'off'
+    for:
+      hours: 0
+      minutes: 0
+      seconds: 10
   condition:
   - condition: state
     entity_id: binary_sensor.workday_sensor
@@ -386,7 +510,7 @@
   - choose:
     - conditions:
       - condition: state
-        entity_id: binary_sensor.withings_in_bed_geovanni
+        entity_id: binary_sensor.geo_in_bed
         state: 'on'
       sequence:
       - service: script.turn_off
@@ -406,7 +530,7 @@
   - choose:
     - conditions:
       - condition: state
-        entity_id: binary_sensor.withings_in_bed_geovanni
+        entity_id: binary_sensor.geo_in_bed
         state: 'on'
       sequence:
       - service: script.turn_off
@@ -430,7 +554,7 @@
   - choose:
     - conditions:
       - condition: state
-        entity_id: binary_sensor.withings_in_bed_geovanni
+        entity_id: binary_sensor.geo_in_bed
         state: 'on'
       sequence:
       - service: script.turn_off
@@ -455,7 +579,7 @@
   - choose:
     - conditions:
       - condition: state
-        entity_id: binary_sensor.withings_in_bed_geovanni
+        entity_id: binary_sensor.geo_in_bed
         state: 'on'
       sequence:
       - service: script.turn_off
@@ -484,7 +608,7 @@
   - choose:
     - conditions:
       - condition: state
-        entity_id: binary_sensor.withings_in_bed_geovanni
+        entity_id: binary_sensor.geo_in_bed
         state: 'on'
       sequence:
       - service: script.turn_off
@@ -516,7 +640,7 @@
   - choose:
     - conditions:
       - condition: state
-        entity_id: binary_sensor.withings_in_bed_geovanni
+        entity_id: binary_sensor.geo_in_bed
         state: 'on'
       sequence:
       - service: script.turn_off
@@ -551,7 +675,7 @@
   - choose:
     - conditions:
       - condition: state
-        entity_id: binary_sensor.withings_in_bed_geovanni
+        entity_id: binary_sensor.geo_in_bed
         state: 'on'
       sequence:
       - service: script.turn_off
@@ -592,7 +716,7 @@
   - choose:
     - conditions:
       - condition: state
-        entity_id: binary_sensor.withings_in_bed_geovanni
+        entity_id: binary_sensor.geo_in_bed
         state: 'on'
       sequence:
       - service: script.turn_off
@@ -640,7 +764,7 @@
       data: {}
   - wait_for_trigger:
     - platform: state
-      entity_id: binary_sensor.withings_in_bed_geovanni
+      entity_id: binary_sensor.geo_in_bed
       to: 'on'
     timeout: 00:15:00
     continue_on_timeout: false
@@ -667,7 +791,7 @@
   description: ''
   trigger:
   - platform: state
-    entity_id: binary_sensor.withings_in_bed_geovanni
+    entity_id: binary_sensor.geo_in_bed
     from: 'on'
     to: 'off'
   condition:
@@ -697,7 +821,7 @@
   - choose:
     - conditions:
       - condition: state
-        entity_id: binary_sensor.withings_in_bed_geovanni
+        entity_id: binary_sensor.geo_in_bed
         state: 'on'
       sequence:
       - service: script.turn_off
@@ -717,7 +841,7 @@
   - choose:
     - conditions:
       - condition: state
-        entity_id: binary_sensor.withings_in_bed_geovanni
+        entity_id: binary_sensor.geo_in_bed
         state: 'on'
       sequence:
       - service: script.turn_off
@@ -741,7 +865,7 @@
   - choose:
     - conditions:
       - condition: state
-        entity_id: binary_sensor.withings_in_bed_geovanni
+        entity_id: binary_sensor.geo_in_bed
         state: 'on'
       sequence:
       - service: script.turn_off
@@ -769,7 +893,7 @@
   - choose:
     - conditions:
       - condition: state
-        entity_id: binary_sensor.withings_in_bed_geovanni
+        entity_id: binary_sensor.geo_in_bed
         state: 'on'
       sequence:
       - service: script.turn_off
@@ -800,7 +924,7 @@
   - choose:
     - conditions:
       - condition: state
-        entity_id: binary_sensor.withings_in_bed_geovanni
+        entity_id: binary_sensor.geo_in_bed
         state: 'on'
       sequence:
       - service: script.turn_off
@@ -834,7 +958,7 @@
   - choose:
     - conditions:
       - condition: state
-        entity_id: binary_sensor.withings_in_bed_geovanni
+        entity_id: binary_sensor.geo_in_bed
         state: 'on'
       sequence:
       - service: script.turn_off
@@ -874,7 +998,7 @@
   - choose:
     - conditions:
       - condition: state
-        entity_id: binary_sensor.withings_in_bed_geovanni
+        entity_id: binary_sensor.geo_in_bed
         state: 'on'
       sequence:
       - service: script.turn_off
@@ -921,7 +1045,7 @@
       data: {}
   - wait_for_trigger:
     - platform: state
-      entity_id: binary_sensor.withings_in_bed_geovanni
+      entity_id: binary_sensor.geo_in_bed
       to: 'on'
     - platform: template
       value_template: '{{states(''sensor.pc_escritori_system_idle_time'') | int >
@@ -951,11 +1075,8 @@
   description: ''
   trigger:
   - platform: state
-    entity_id: binary_sensor.hue_motion_sensor_1_motion
-    from: 'off'
-    to: 'on'
-  - platform: state
-    entity_id: binary_sensor.hue_motion_sensor_2_motion
+    entity_id:
+    - binary_sensor.hue_motion_sensor_3_motion
     from: 'off'
     to: 'on'
   condition:
@@ -965,10 +1086,10 @@
   - condition: or
     conditions:
     - condition: state
-      entity_id: binary_sensor.withings_in_bed_geovanni
+      entity_id: binary_sensor.geo_in_bed
       state: 'off'
     - condition: state
-      entity_id: binary_sensor.withings_in_bed_geovanni
+      entity_id: binary_sensor.geo_in_bed
       state: unavailable
   - condition: state
     entity_id: input_boolean.iphone_bluetooth_connected
@@ -991,20 +1112,40 @@
     - thu
     - wed
     - mon
+  - condition: state
+    entity_id: script.desk_up
+    state: 'off'
+  - condition: state
+    entity_id: script.desk_down
+    state: 'off'
   action:
   - wait_template: '{{states(''sensor.cristian_geovannis_iphone_bssid'') == ''c0:6:c3:4d:c0:8b''}}'
     timeout: 00:01:00
+    enabled: false
   - service: script.turn_on_pc
     data: {}
+    enabled: false
   - service: script.turn_on_left_monitor
     data: {}
+    enabled: false
   - service: script.turn_on_right_monitor
     data: {}
+    enabled: false
   - service: script.turn_on_air_conditioner
     data: {}
+    enabled: false
   - condition: state
     entity_id: binary_sensor.workday_sensor
     state: 'on'
+    enabled: false
+  - service: light.turn_on
+    data: {}
+    target:
+      entity_id:
+      - light.hue_play_center
+      - light.hue_play_left
+      - light.hue_play_right
+    enabled: false
   - condition: time
     before: '19:00:00'
     after: 08:00:00
@@ -1016,8 +1157,14 @@
     - wed
     - tue
     - mon
+    enabled: false
   - service: script.turn_on_laptop
     data: {}
+    enabled: false
+  - service: scene.turn_on
+    data: {}
+    target:
+      entity_id: scene.before
   mode: single
 - id: '1649472190844'
   alias: Play PS5
@@ -1037,19 +1184,32 @@
       - condition: state
         entity_id: switch.computer
         state: 'off'
+        enabled: true
+      - condition: state
+        entity_id: binary_sensor.geo_in_bed
+        state: 'on'
       sequence:
       - service: script.turn_on_tv
         data: {}
       - service: script.switch_hdmi_to_tv
         data: {}
-      - service: script.change_tv_to_ps5
+      - service: script.switch_hdmi_to_sync_box
+        data: {}
+      - service: script.change_tv_to_hue_sync
         data: {}
       - service: script.change_tv_sound_output
         data: {}
+      - service: script.start_ps5_hue_sync
+        data: {}
+      - service: script.hibernate_pc
+        data: {}
+        enabled: true
     default:
     - service: script.expand_monitors
       data: {}
     - service: script.switch_hdmi_to_pc
+      data: {}
+    - service: script.switch_hdmi_to_desk
       data: {}
   mode: single
 - id: '1649473333533'
@@ -1057,8 +1217,10 @@
   description: ''
   trigger:
   - platform: state
-    entity_id: binary_sensor.withings_in_bed_geovanni
+    entity_id:
+    - binary_sensor.geo_in_bed
     to: 'on'
+    from: 'off'
   condition:
   - condition: state
     entity_id: binary_sensor.ps5
@@ -1069,9 +1231,12 @@
   action:
   - service: script.turn_off_pc_2
     data: {}
+    enabled: false
   - service: script.switch_hdmi_to_tv
     data: {}
   - service: script.turn_on_tv
+    data: {}
+  - service: script.switch_hdmi_to_desk
     data: {}
   - service: script.change_tv_to_ps5
     data: {}
@@ -1079,7 +1244,7 @@
     data: {}
   mode: single
 - id: '1649473852071'
-  alias: Run Sleep Routine After PS5 Off
+  alias: PS5 Off
   description: ''
   trigger:
   - platform: state
@@ -1090,33 +1255,52 @@
       hours: 0
       minutes: 0
       seconds: 10
-  condition:
-  - condition: state
-    entity_id: switch.computer
-    state: 'off'
-  - condition: time
-    before: 06:00:00
-    after: '22:00:00'
-    weekday:
-    - mon
-    - tue
-    - wed
-    - thu
-    - fri
-    - sat
-    - sun
-  - condition: state
-    entity_id: person.cristian_geovanni_aguilar_valencia
-    state: home
-  - condition: state
-    entity_id: binary_sensor.withings_in_bed_geovanni
-    state: 'on'
+  condition: []
   action:
-  - service: automation.trigger
-    data:
-      skip_condition: false
-    target:
-      entity_id: automation.sleep_routine_2
+  - choose:
+    - conditions:
+      - condition: state
+        entity_id: switch.computer
+        state: 'off'
+      - condition: time
+        before: 06:00:00
+        after: '22:00:00'
+        weekday:
+        - mon
+        - tue
+        - wed
+        - thu
+        - fri
+        - sat
+        - sun
+      - condition: state
+        entity_id: binary_sensor.geo_in_bed
+        state: 'on'
+      - condition: state
+        entity_id: person.cristian_geovanni_aguilar_valencia
+        state: home
+      sequence:
+      - service: automation.trigger
+        data:
+          skip_condition: false
+        target:
+          entity_id: automation.sleep_routine_2
+    - conditions:
+      - condition: state
+        entity_id: switch.computer
+        state: 'on'
+      sequence:
+      - service: script.pc_extend_screen
+        data: {}
+    default:
+    - service: script.turn_off_tv
+      data: {}
+    - service: script.turn_on_pc
+      data: {}
+    - service: script.turn_on_right_monitor
+      data: {}
+    - service: script.turn_on_left_monitor
+      data: {}
   mode: single
 - id: '1649475330638'
   alias: Change Cleaning Day
@@ -1145,9 +1329,9 @@
   trigger:
   - platform: state
     entity_id:
-    - device_tracker.wf_1000xm3
-    from: not_home
-    to: home
+    - input_boolean.iphone_bluetooth_connected
+    from: 'off'
+    to: 'on'
   condition:
   - condition: time
     before: '22:00:00'
@@ -1170,6 +1354,7 @@
   - wait_template: '{{states(''input_boolean.iphone_bluetooth_connected'') == ''on''}}'
     continue_on_timeout: false
     timeout: 00:05:00
+    enabled: false
   - service: script.turn_off_everything
     data: {}
   - condition: state
@@ -1200,16 +1385,11 @@
   - service: script.change_air_conditioner_temperature
     data:
       temperature: '{{state_attr(''climate.air_conditioner'',''temperature'') | int}}'
-  mode: single
-- id: '1649716659615'
-  alias: Changing Temperature
-  description: ''
-  trigger:
-  - platform: state
-    entity_id: climate.air_conditioner
-    attribute: temperature
-  condition: []
-  action: []
+  - service: input_number.set_value
+    data:
+      value: '{{state_attr(''climate.air_conditioner'',''temperature'') | int}}'
+    target:
+      entity_id: input_number.last_temperature
   mode: single
 - id: '1649717218836'
   alias: Air Conditioner On/Off
@@ -1310,15 +1490,19 @@
   - platform: numeric_state
     entity_id: sensor.pc_escritori_system_idle_time
     above: '30'
+    enabled: false
   - platform: numeric_state
     entity_id: sensor.0529gaguilar_system_idle_time
     above: '30'
+    enabled: false
   - platform: numeric_state
     entity_id: sensor.pc_time_no_volume
     above: '30'
+    enabled: false
   - platform: numeric_state
     entity_id: sensor.laptop_time_no_volume
     above: '30'
+    enabled: false
   - platform: state
     entity_id: sensor.pc_inactive
     to: 'on'
@@ -1396,7 +1580,7 @@
   - condition: not
     conditions:
     - condition: state
-      entity_id: binary_sensor.withings_in_bed_geovanni
+      entity_id: binary_sensor.geo_in_bed
       state: 'on'
   - condition: state
     entity_id: media_player.lg_cx
@@ -1419,12 +1603,22 @@
         hours: 0
         minutes: 4
         seconds: 0
+  - condition: numeric_state
+    entity_id: sensor.laptop_time_no_volume
+    above: '29'
+  - condition: numeric_state
+    entity_id: sensor.pc_time_no_volume
+    above: '29'
+  - condition: template
+    value_template: '{{(as_timestamp(now()) | int - as_timestamp(state_attr(''automation.return_to_bedroom'',
+      ''last_triggered'')) | int) > 420}}'
   action:
   - wait_template: '{{(as_timestamp(now()) | int - as_timestamp(state_attr(''automation.return_to_bedroom'',
       ''last_triggered'')) | int) > 420}}'
+    enabled: false
   - service: script.empty_room_turn_off
     data: {}
-  mode: restart
+  mode: single
 - id: '1650695433982'
   alias: Stop Empty Room
   description: ''
@@ -1438,21 +1632,31 @@
   - platform: numeric_state
     entity_id: sensor.pc_time_no_volume
     below: '1'
+    enabled: false
   - platform: numeric_state
     entity_id: sensor.pc_time_inactive
     below: '1'
+    enabled: false
   - platform: numeric_state
     entity_id: sensor.laptop_time_no_volume
     below: '1'
+    enabled: false
   - platform: numeric_state
     entity_id: sensor.laptop_time_inactive
     below: '1'
+    enabled: false
   - platform: state
     entity_id: sensor.0529gaguilar_system_idle_time
     to: '0'
+    enabled: false
   - platform: state
     entity_id: sensor.pc_escritori_system_idle_time
     to: '0'
+    enabled: false
+  - platform: state
+    entity_id:
+    - binary_sensor.hue_motion_sensor_3_motion
+    to: 'on'
   condition:
   - condition: state
     entity_id: script.empty_room_turn_off
@@ -1460,6 +1664,9 @@
   - condition: state
     entity_id: input_boolean.iphone_bluetooth_connected
     state: 'off'
+  - condition: template
+    value_template: '{{(as_timestamp(now()) | int - as_timestamp(state_attr(''script.desk_down'',
+      ''last_triggered'')) | int) > 90}}'
   action:
   - service: script.turn_off
     data: {}
@@ -1534,41 +1741,44 @@
   description: ''
   trigger:
   - platform: state
-    entity_id: switch.computer
+    entity_id:
+    - switch.computer
     from: 'off'
     to: 'on'
     for:
       hours: 0
-      minutes: 40
+      minutes: 50
       seconds: 0
   - platform: state
-    entity_id: binary_sensor.ps5
+    entity_id:
+    - binary_sensor.ps5
     for:
       hours: 0
-      minutes: 40
+      minutes: 50
       seconds: 0
     from: 'off'
     to: 'on'
   - platform: state
-    entity_id: switch.laptop
+    entity_id:
+    - switch.laptop
     for:
       hours: 0
-      minutes: 40
+      minutes: 49
       seconds: 0
     from: 'off'
     to: 'on'
   - platform: template
     value_template: '{{(as_timestamp(now()) | int - as_timestamp(states(''input_datetime.last_time_desk_up''))
-      | int) > 2400}}'
+      | int) > 3000}}'
   - platform: template
     value_template: '{{((((as_timestamp(now()) | int - as_timestamp(states.switch.computer.last_changed)
-      | int) / 60) | int) % 40) == 0}}'
+      | int) / 60) | int) % 50) == 0}}'
   - platform: template
     value_template: '{{((((as_timestamp(now()) | int - as_timestamp(states.switch.laptop.last_changed)
-      | int) / 60) | int) % 40) == 0}}'
+      | int) / 60) | int) % 50) == 0}}'
   - platform: template
     value_template: '{{((((as_timestamp(now()) | int - as_timestamp(states.binary_sensor.ps5.last_changed)
-      | int) / 60) | int) % 40) == 0}}'
+      | int) / 60) | int) % 50) == 0}}'
   condition:
   - condition: state
     entity_id: person.cristian_geovanni_aguilar_valencia
@@ -1578,7 +1788,7 @@
     state: 'off'
   - condition: template
     value_template: '{{(as_timestamp(now()) | int - as_timestamp(states(''input_datetime.last_time_desk_up''))
-      | int) > 2399}}'
+      | int) > 2999}}'
   - condition: time
     before: '23:00:01'
     after: 09:00:00
@@ -1596,7 +1806,7 @@
   - condition: not
     conditions:
     - condition: state
-      entity_id: binary_sensor.withings_in_bed_geovanni
+      entity_id: binary_sensor.geo_in_bed
       state: 'on'
   - condition: not
     conditions:
@@ -1615,6 +1825,11 @@
       hours: 0
       minutes: 15
       seconds: 0
+  - condition: not
+    conditions:
+    - condition: state
+      entity_id: sensor.mop
+      state: Clean
   action:
   - service: cover.open_cover
     data: {}
@@ -1636,22 +1851,24 @@
   description: ''
   trigger:
   - platform: state
-    entity_id: input_boolean.desk_up
+    entity_id:
+    - input_boolean.desk_up
     to: 'on'
     for:
       hours: 0
-      minutes: 10
+      minutes: 20
       seconds: 0
   - platform: template
     value_template: '{{(as_timestamp(now()) | int - as_timestamp(states.automation.desk_up.attributes.last_triggered)
-      | int) > 600}}'
+      | int) > 1200}}'
   - platform: state
-    entity_id: cover.standup_desk
+    entity_id:
+    - cover.standup_desk
     from: closed
     to: open
     for:
       hours: 0
-      minutes: 10
+      minutes: 20
       seconds: 0
   condition:
   - condition: numeric_state
@@ -1674,7 +1891,7 @@
   description: ''
   trigger:
   - platform: state
-    entity_id: binary_sensor.withings_in_bed_geovanni
+    entity_id: binary_sensor.geo_in_bed
     to: 'on'
     for:
       hours: 1
@@ -1717,6 +1934,8 @@
   - platform: template
     value_template: '{{states(''sensor.laptop_time_no_volume'') | int >= 600 and states(''sensor.0529gaguilar_system_idle_time'')
       | int >= 600}}'
+  - platform: time
+    at: '19:30:00'
   condition:
   - condition: state
     entity_id: person.cristian_geovanni_aguilar_valencia
@@ -1768,12 +1987,21 @@
       hours: 1
       minutes: 0
       seconds: 0
+  - platform: state
+    entity_id:
+    - media_player.lg_cx
+    from: 'off'
+    to: 'on'
+    for:
+      hours: 1
+      minutes: 0
+      seconds: 0
   condition:
   - condition: state
     entity_id: person.cristian_geovanni_aguilar_valencia
     state: home
   - condition: state
-    entity_id: binary_sensor.withings_in_bed_geovanni
+    entity_id: binary_sensor.geo_in_bed
     state: 'on'
   - condition: time
     before: 06:00:00
@@ -1806,6 +2034,15 @@
     data:
       button: ENTER
       entity_id: media_player.lg_webos_smart_tv
+  - delay:
+      hours: 0
+      minutes: 0
+      seconds: 10
+      milliseconds: 0
+  - service: webostv.command
+    data:
+      entity_id: media_player.lg_webos_smart_tv
+      command: com.webos.service.tvpower/power/turnOffScreen
   mode: single
 - id: '1651034140031'
   alias: Marvel Automation
@@ -1879,14 +2116,17 @@
     entity_id: person.cristian_geovanni_aguilar_valencia
     state: home
   action:
+  - condition: template
+    value_template: "{% if states('input_number.last_temperature') != state_attr('climate.air_conditioner',\
+      \ 'temperature') -%}\n  true\n{%- else -%}\n  false\n{%- endif %}"
   - service: script.change_air_conditioner_temperature
     data:
-      temperature: "{% if states('sensor.mean_temperature') | float > 24.0 and state_attr('climate.air_conditioner',\
+      temperature: "{% if states('sensor.mean_temperature_2') | float > 24.0 and state_attr('climate.air_conditioner',\
         \ 'temperature') | int > 17 -%}\n  {{state_attr('climate.air_conditioner',\
-        \ 'temperature') | int - 1}}\n{%- elif states('sensor.mean_temperature') |\
-        \ float < 24.0 and state_attr('climate.air_conditioner', 'temperature') |\
-        \ int < 30 -%}\n  {{state_attr('climate.air_conditioner', 'temperature') |\
-        \ int + 1}}\n{%- else -%}\n  {{state_attr('climate.air_conditioner', 'temperature')}}\n\
+        \ 'temperature') | int - 1}}\n{%- elif states('sensor.mean_temperature_2')\
+        \ | float < 24.0 and state_attr('climate.air_conditioner', 'temperature')\
+        \ | int < 30 -%}\n  {{state_attr('climate.air_conditioner', 'temperature')\
+        \ | int + 1}}\n{%- else -%}\n  {{state_attr('climate.air_conditioner', 'temperature')}}\n\
         {%- endif %}\n"
   mode: single
 - id: '1651197180710'
@@ -2057,4 +2297,85 @@
     data: {}
     target:
       entity_id: input_boolean.iphone_bluetooth_connected
+  mode: single
+- id: '1654231146545'
+  alias: Remote Tare Bed
+  description: ''
+  trigger:
+  - platform: time
+    at: '12:00:00'
+  condition:
+  - condition: numeric_state
+    entity_id: sensor.num_in_bed
+    below: '1'
+  action:
+  - service: mqtt.publish
+    data:
+      payload: 'on'
+      topic: home/bedroom/bed/tare
+  mode: single
+- id: '1654472252832'
+  alias: Change Monitors for PC, Laptop and PS5
+  description: ''
+  trigger:
+  - platform: state
+    entity_id:
+    - input_boolean.laptop_extended_screen
+    id: Laptop_screen_on
+    from: 'off'
+    to: 'on'
+  - platform: state
+    entity_id:
+    - input_boolean.pc_extended_screen
+    id: PC_screen_on
+    from: 'off'
+    to: 'on'
+  - platform: state
+    entity_id:
+    - input_boolean.laptop_extended_screen
+    id: Laptop_screen_off
+    from: 'on'
+    to: 'off'
+  - platform: state
+    entity_id:
+    - input_boolean.pc_extended_screen
+    id: PC_screen_off
+    from: 'on'
+    to: 'off'
+  condition: []
+  action:
+  - if:
+    - condition: trigger
+      id: Laptop_screen_on
+    then:
+    - service: script.expand_monitors
+      data: {}
+    - stop: PC changed to principal monitor
+  - if:
+    - condition: trigger
+      id: PC_screen_on
+    then:
+    - service: script.laptop_principal_monitor
+      data: {}
+    - stop: Laptop changed to principal monitor
+  - if:
+    - condition: trigger
+      id: Laptop_screen_off
+    then:
+    - condition: state
+      entity_id: binary_sensor.ps5
+      state: 'off'
+    - service: script.pc_extend_screen
+      data: {}
+    - stop: PC changed to extend screen
+  - if:
+    - condition: trigger
+      id: PC_screen_off
+    then:
+    - condition: state
+      entity_id: binary_sensor.ps5
+      state: 'off'
+    - service: script.laptop_extend_screen
+      data: {}
+    - stop: Laptop changed to extend screen
   mode: single

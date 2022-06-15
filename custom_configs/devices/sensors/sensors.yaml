@@ -1,9 +1,9 @@
 - platform: scrape
   resource: https://www.youtube.com/feeds/videos.xml?channel_id=UCYJPby9DRCteedh5tfxVbrw
   name: smosh_pit
-  select: 'yt:videoId'
+  select: "yt:videoId"
 - platform: scrape
-  resource: 'https://www.youtube.com/feeds/videos.xml?channel_id=UCYJPby9DRCteedh5tfxVbrw'
+  resource: "https://www.youtube.com/feeds/videos.xml?channel_id=UCYJPby9DRCteedh5tfxVbrw"
   name: smosh
   select: yt\:videoid
 - platform: template
@@ -18,49 +18,77 @@
   sensors:
     internet:
       value_template: >-
-              {% if is_state("sensor.fg6122tm_wan_status", "Connected") -%}
-                on
-              {%- else -%}
-                off
-              {%- endif %}
+        {% if is_state("sensor.fg6122tm_wan_status", "Connected") -%}
+          on
+        {%- else -%}
+          off
+        {%- endif %}
 - platform: template
   sensors:
-    mean_temperature_int: 
-      value_template: "{{states('sensor.mean_temperature') | int}}"
+    mean_temperature_int:
+      value_template: "{{states('sensor.mean_temperature_2') | int}}"
 
 - platform: template
   sensors:
     lights_on:
       value_template: >-
-              {% set lights = [
-                          states.light.luz,
-                          states.light.bed_light,
-                          states.light.cama,
-                          states.light.hue_play_gradient_lightstrip,
-                          states.light.hue_play_right,
-                          states.light.hue_play_center,
-                          states.light.hue_play_left,
-                          states.light.luz_escritorio,
-                          states.light.pc_rgb,
-                          ] %}
-              {{ lights | selectattr('state','eq','on') | list | count}}
+        {% set lights = [
+                    states.light.luz,
+                    states.light.bed_light,
+                    states.light.cama,
+                    states.light.hue_play_gradient_lightstrip,
+                    states.light.hue_play_right,
+                    states.light.hue_play_center,
+                    states.light.hue_play_left,
+                    states.light.luz_escritorio,
+                    states.light.pc_rgb,
+                    states.light.hue_gradient_lightstrip_1,
+                    ] %}
+        {{ lights | selectattr('state','eq','on') | list | count}}
 - platform: template
   sensors:
     covers_open:
       value_template: >-
-              {% set covers = [
-                          states.cover.standup_desk,
-                          ] %}
-              {{ covers | selectattr('state','eq','open') | list | count}}
+        {% set covers = [
+                    states.cover.standup_desk,
+                    ] %}
+        {{ covers | selectattr('state','eq','open') | list | count}}
 - platform: template
   sensors:
     emprty_room_running:
       value_template: >-
-              {% if is_state("script.lock_laptop", "on") or is_state("script.hibernate_laptop", "on") or is_state("script.hibernate_pc", "on") or is_state("script.turn_off_monitor", "on") or is_state("script.turn_off_right_monitor", "on") or is_state("script.turn_off_air_conditioner", "on") -%}
-                on
-              {%- else -%}
-                off
-              {%- endif %}
+        {% if is_state("script.lock_laptop", "on") or is_state("script.hibernate_laptop", "on") or is_state("script.hibernate_pc", "on") or is_state("script.turn_off_monitor", "on") or is_state("script.turn_off_right_monitor", "on") or is_state("script.turn_off_air_conditioner", "on") -%}
+          on
+        {%- else -%}
+          off
+        {%- endif %}
+- platform: template
+  sensors:
+    low_batteries:
+      value_template: >-
+        {% set threshold = states('input_number.battery_threshold') | int %}
+        {%- set ns = namespace(sensors=[]) -%}
+        {%- for state in states.sensor 
+          | selectattr('attributes.device_class', 'defined') 
+          | selectattr('attributes.unit_of_measurement', 'defined') 
+          | selectattr('attributes.device_class', '==', 'battery') 
+          | selectattr('attributes.unit_of_measurement', '==', '%') 
+          | selectattr('state', 'is_number') -%}
+          {%- if state.state | int <= threshold -%}
+            {% set ns.sensors = ns.sensors + [dict(name = state.name | replace(' battery', '') | replace(' Battery', ''), state = state.state | int)] %}
+          {%- endif -%}
+        {%- endfor -%}
+        {%- set batt = ns.sensors | sort(attribute='state') %}
+        {%- set ns = namespace(batt='') -%}
+        {%- for state in batt -%}
+            {% set ns.batt= ns.batt + (state.name  ~ ' (' ~ state.state ~'%)' ~ "\n") %}
+        {%- endfor -%}
+
+        {% if ns.batt | count > 0 %}
+          {{ ns.batt | truncate(255, true, '...') }}
+        {% else %}
+          {{ 'unavailable' }}
+        {% endif %}
 
 # HA Updates
 - platform: command_line
@@ -93,14 +121,14 @@
 - platform: command_line
   name: addons_updates
   command: 'curl http://supervisor/addons -H "Authorization: Bearer $(printenv SUPERVISOR_TOKEN)" | jq ''{"addons":[.data.addons[] | select(.update_available)]}'''
-  value_template: '{{ value_json.addons | length }}'
+  value_template: "{{ value_json.addons | length }}"
   scan_interval: 600
   unit_of_measurement: pending update(s)
   json_attributes:
     - addons
 - platform: template
   sensors:
-    air_state: 
+    air_state:
       value_template: >-
         {% if is_state('sensor.walle_state', 'on') or is_state('input_boolean.air_conditioner', 'on') or is_state('sensor.eva_state', 'on') or is_state('input_boolean.fan', 'on') -%}
           on
@@ -133,7 +161,7 @@
     pc_inactive:
       friendly_name: PC inactive
       value_template: >-
-        {% if (states('sensor.pc_escritori_system_idle_time') | int) >= 300 -%}
+        {% if (states('sensor.pc_escritori_system_idle_time') | int) >= 300 and (states('sensor.pc_time_no_volume') | int) >= 300-%}
           on
         {%- else -%}
           off
@@ -183,7 +211,7 @@
     laptop_inactive:
       friendly_name: Laptop inactive
       value_template: >-
-        {% if (states('sensor.0529gaguilar_system_idle_time') | int) >= 300 -%}
+        {% if (states('sensor.0529gaguilar_system_idle_time') | int) >= 300 and (states('sensor.laptop_time_no_volume') | int) >= 300 -%}
           on
         {%- else -%}
           off
@@ -256,7 +284,7 @@
 - platform: template
   sensors:
     walle_fan_speed:
-      friendly_name: 'Fan Speed'
+      friendly_name: "Fan Speed"
       value_template: "{{state_attr('sensor.vacuum','carpet_boost')}}"
 - platform: template
   sensors:
@@ -266,34 +294,34 @@
   sensors:
     walle_bin_present:
       value_template: >-
-                      {%if state_attr('sensor.vacuum','bin_present') == 'Yes'-%}
-                        on
-                      {%- else -%}
-                        off
-                      {%- endif %}
+        {%if state_attr('sensor.vacuum','bin_present') == 'Yes'-%}
+          on
+        {%- else -%}
+          off
+        {%- endif %}
 - platform: template
   sensors:
     walle_bin_full:
       value_template: >-
-                      {%if state_attr('sensor.vacuum','bin') == 'Not Full' -%}
-                        off
-                      {%- else -%}
-                        on
-                      {%- endif %}
+        {%if state_attr('sensor.vacuum','bin') == 'Not Full' -%}
+          off
+        {%- else -%}
+          on
+        {%- endif %}
 - platform: template
   sensors:
     walle_state:
       value_template: >-
-                {% if state_attr('sensor.vacuum','phase') == 'cleaning' -%}
-                  on
-                {%- else -%}
-                  off
-                {%- endif %}
+        {% if state_attr('sensor.vacuum','phase') == 'cleaning' -%}
+          on
+        {%- else -%}
+          off
+        {%- endif %}
 - platform: template
   sensors:
     wall_e_battery_level:
       value_template: "{{state_attr('sensor.vacuum','battery')[0:3] | int}}"
-      unit_of_measurement: '%'
+      unit_of_measurement: "%"
       device_class: battery
       friendly_name: WallE Battery Level
 #Eva
@@ -301,7 +329,13 @@
   sensors:
     eva_fan_speed:
       value_template: "{{state_attr('sensor.mop','clean_mode')}}"
-      
+- platform: template
+  sensors:
+    eva_battery_level:
+      value_template: "{{state_attr('sensor.mop','battery')[0:3] | int}}"
+      unit_of_measurement: "%"
+      device_class: battery
+      friendly_name: Eva Battery Level
 - platform: template
   sensors:
     eva_status:
@@ -310,16 +344,16 @@
   sensors:
     eva_detected_pad:
       value_template: "{{state_attr('sensor.mop','pad')}}"
-      icon_template: 'mdi:card-multiple'
+      icon_template: "mdi:card-multiple"
 - platform: template
   sensors:
     eva_lid_closed:
       value_template: >-
-                    {%if state_attr('vacuum.eva', 'lid_closed') == 1-%}
-                      on
-                    {%- else -%}
-                      off
-                    {%- endif %}
+        {%if state_attr('vacuum.eva', 'lid_closed') == 1-%}
+          on
+        {%- else -%}
+          off
+        {%- endif %}
 - platform: template
   sensors:
     eva_tank_level:
@@ -328,11 +362,11 @@
   sensors:
     eva_state:
       value_template: >-
-                {% if states('sensor.mop') == 'Ready' -%}
-                  off
-                {%- else -%}
-                  on
-                {%- endif %}
+        {% if states('sensor.mop') == 'Ready' -%}
+          off
+        {%- else -%}
+          on
+        {%- endif %}
 
 - platform: scrape
   resource: https://www.home-assistant.io
@@ -343,5 +377,28 @@
   sensors:
     air_temperature:
       value_template: "{{state_attr('climate.air_conditioner', 'temperature')}}"
-      
 
+#Bed
+- platform: mqtt
+  name: "Bed"
+  state_topic: "home/bedroom/bed"
+  unit_of_measurement: "kg"
+  availability_topic: "home/bedroom/bed/available"
+- platform: mqtt
+  name: "Bed Raw"
+  state_topic: "home/bedroom/bed/raw"
+  unit_of_measurement: "raw"
+  availability_topic: "home/bedroom/bed/available"
+- platform: template
+  sensors:
+    num_in_bed:
+      friendly_name: "Number of People in Bed"
+      unit_of_measurement: 'people'
+      value_template: >-
+        {% if is_state('binary_sensor.geo_in_bed', 'on') and is_state('binary_sensor.someone_in_bed', 'on') %}
+            2
+        {% elif is_state('binary_sensor.geo_in_bed', 'on') or is_state('binary_sensor.someone_in_bed', 'on') %}
+            1
+        {% else %}
+            0
+        {% endif %}

@@ -71,11 +71,11 @@ views:
             name: "Home"
             color: "brown"
           entity_4:
-            entity_id: "binary_sensor.withings_in_bed_geovanni"
+            entity_id: "binary_sensor.geo_in_bed"
             icon: |
               [[[
                   var icon = 'mdi:bed';
-                  if (states['binary_sensor.withings_in_bed_geovanni'].state === 'on'){
+                  if (states['binary_sensor.geo_in_bed'].state === 'on'){
                     var icon = 'mdi:bed';
                   } else {
                     var icon = 'mdi:bed-empty';
@@ -86,7 +86,7 @@ views:
             color: |
               [[[
                   var color = 'green';
-                  if (states['binary_sensor.withings_in_bed_geovanni'].state === 'on'){
+                  if (states['binary_sensor.geo_in_bed'].state === 'on'){
                     var color = 'green';
                   } else {
                     var color = 'brown';
@@ -242,6 +242,35 @@ views:
           ulm_card_light_enable_color: true
           ulm_card_light_name: Desk Light
           ulm_card_light_enable_popup: true
+      - type: "horizontal-stack"
+        cards:
+        - type: "custom:button-card"
+          template: card_light
+          entity: light.hue_play_left
+          variables:
+            ulm_card_light_enable_collapse: true
+            ulm_card_light_enable_slider: true
+            ulm_card_light_enable_color: true
+            ulm_card_light_name: Center
+            ulm_card_light_enable_popup: true
+        - type: "custom:button-card"
+          template: card_light
+          entity: light.hue_play_center
+          variables:
+            ulm_card_light_enable_collapse: true
+            ulm_card_light_enable_slider: true
+            ulm_card_light_enable_color: true
+            ulm_card_light_name: Right
+            ulm_card_light_enable_popup: true
+        - type: "custom:button-card"
+          template: card_light
+          entity: light.hue_play_right
+          variables:
+            ulm_card_light_enable_collapse: true
+            ulm_card_light_enable_slider: true
+            ulm_card_light_enable_color: true
+            ulm_card_light_name: Left
+            ulm_card_light_enable_popup: true
       - type: "horizontal-stack"
         cards:
           - type: "custom:button-card"
