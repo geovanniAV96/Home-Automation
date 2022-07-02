@@ -410,11 +410,11 @@ homeassistant:
             }
             return icon ;
         ]]]
-    media_player.hue_sync_box:
+    media_player.hue_sync_tv:
       icon: |
         [[[
             var icon = 'hue:sync-box';
-            if (states['media_player.hue_sync_box'].state === 'off'){
+            if (states['media_player.hue_sync_tv'].state === 'off'){
               var icon = 'hue:sync-box';
             } else {
               var icon = 'hue:sync-box-alt';
@@ -520,6 +520,28 @@ homeassistant:
             }
             return icon ;
         ]]]
+    binary_sensor.in_chair:
+      icon: |
+        [[[
+            var icon = 'hue:room-office';
+            if (states['binary_sensor.in_chair'].state === 'on'){
+              var icon = 'hue:room-office';
+            } else {
+              var icon = 'hue:room-office-off';
+            }
+            return icon ;
+        ]]]
+    binary_sensor.chair_state:
+      icon: |
+        [[[
+            var icon = 'hue:room-office';
+            if (states['binary_sensor.chair_state'].state === 'on'){
+              var icon = 'hue:room-office';
+            } else {
+              var icon = 'hue:room-office-off';
+            }
+            return icon ;
+        ]]]
 
 browser_mod:
 
@@ -527,12 +549,14 @@ http:
   trusted_proxies:
     - !secret local_ip
     - !secret external_ip
+    - !secret nginx
+    - !secret local_ip_v6
   use_x_forwarded_for: true
   ip_ban_enabled: true
-  login_attempts_threshold: 5
+  login_attempts_threshold: 3
   server_port: !secret port
-  ssl_certificate: /ssl/fullchain.pem
-  ssl_key: /ssl/privkey.pem
+  #ssl_certificate: /ssl/fullchain.pem
+  #ssl_key: /ssl/privkey.pem
 
 #Enable WOL
 wake_on_lan: # enables `wake_on_lan` integration
@@ -584,7 +608,7 @@ climate:
     heater: input_boolean.ac_helper
     target_sensor: sensor.mean_temperature_int
     ac_mode: true
-    target_temp: 27
+    target_temp: 25
     cold_tolerance: 0.3
     hot_tolerance: 0
     min_cycle_duration:
@@ -649,7 +673,7 @@ switch:
     switches:
       computer:
         value_template: >
-          {% if states('sensor.pc_escritori_system_idle_time') != 'unavailable' or states('switch.sonoff_1000331d93') == 'on' or states('sensor.sonoff_1000331d93_power') | int > 1 -%}
+          {% if states('sensor.sonoff_1000331d93_power') | int > 0 -%}
             on
           {%- else -%}
             off
@@ -659,14 +683,14 @@ switch:
         turn_off:
           service: script.turn_off_pc_2
         icon_template: >
-          {% if states('sensor.0529gaguilar_system_idle_time') != 'unavailable' or states('switch.laptop') == 'on' or states('sensor.sonoff_1000332281_power') | int > 1 -%}
+          {% if states('sensor.sonoff_1000332281_power') | int > 0 -%}
             mdi:desktop-tower-monitor
           {%- else -%}
             mdi:desktop-tower
           {%- endif %}
       laptop:
         value_template: >
-          {% if states('sensor.0529gaguilar_system_idle_time') != 'unavailable' or states('switch.sonoff_1000332281') == 'on' or states('sensor.sonoff_1000332281_power') | int > 1 -%}
+          {% if states('sensor.sonoff_1000332281_power') | int > 0 -%}
             on
           {%- else -%}
             off
@@ -676,7 +700,7 @@ switch:
         turn_off:
           service: script.turn_off_pc
         icon_template: >
-          {% if states('sensor.0529gaguilar_system_idle_time') != 'unavailable' or states('switch.sonoff_1000332281') == 'on' or states('sensor.sonoff_1000332281_power') | int > 1 -%}
+          {% if states('sensor.sonoff_1000332281_power') | int > 0 -%}
             mdi:laptop
           {%- else -%}
             mdi:laptop-off

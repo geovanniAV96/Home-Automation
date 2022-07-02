@@ -156,42 +156,20 @@ views:
         info: scroll
         replace_mute: play_pause
       - type: custom:mini-media-player
-        entity: media_player.hue_sync_box
-        name: Sync Box
+        entity: media_player.hue_sync_tv
+        name: Sync Box TV
         icon: hue:sync-box-alt
+        artwork: material
+      - type: custom:mini-media-player
+        entity: media_player.bedroom
+        name: Apple TV
+        icon: bha:apple-tv
         group: false
         volume_stateless: false
         artwork: material
         toggle_power: true
         source: full
         info: scroll
-        replace_mute: play_pause
-      - type: conditional
-        conditions:
-          - entity: media_player.hue_sync_box
-            state_not: 'off'
-        card:
-          type: custom:select-list-card
-          entity: input_select.hue_sync_intensity
-          icon: 'mdi:television-ambient-light'
-          truncate: false
-          show_toggle: true
-          scroll_to_selected: false
-          max_options: 1
-          title: Intensity
-      - type: conditional
-        conditions:
-          - entity: media_player.hue_sync_box
-            state_not: 'off'
-        card:
-          type: custom:select-list-card
-          entity: input_select.hue_sync_input
-          icon: 'mdi:import'
-          truncate: false
-          show_toggle: true
-          scroll_to_selected: false
-          max_options: 1
-          title: Input
       - type: "horizontal-stack"
         cards:
         - type: 'custom:button-card'
@@ -208,6 +186,22 @@ views:
           template: card_input_boolean
           entity: input_boolean.hdmi_on_tv
           name: HDMI
+      - type: "horizontal-stack"
+        cards:
+          - type: "custom:button-card"
+            template: card_script
+            variables:
+              ulm_card_script_title: HDMI to Hue Sync
+              ulm_card_script_icon: "mdi:home-remove"
+            tap_action:
+              action: call-service
+              service: script.turn_on
+              service_data:
+                entity_id: script.switch_hdmi_to_sync_box
+          - type: 'custom:button-card'
+            template: card_input_boolean
+            entity: input_boolean.ps5_hue_sync
+            name: HDMI to Hue Sync
       #-------------UPS Start-------------------------
       - type: custom:mushroom-title-card
         title: UPS Stats

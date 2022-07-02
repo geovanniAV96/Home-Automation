@@ -1,0 +1,315 @@
+- id: '1655874629395'
+  name: Power Loss
+  entities:
+    light.luz_escritorio:
+      min_mireds: 153
+      max_mireds: 500
+      effect_list:
+      - None
+      - candle
+      - fire
+      supported_color_modes:
+      - color_temp
+      - xy
+      icon: "[[[\n    var icon = 'hue:gradient-lightstrip';\n    if (states['light.luz_escritorio'].state\
+        \ === 'on'){\n      var icon = 'hue:gradient-lightstrip';\n    } else {\n\
+        \      var icon = 'hue:lightstrip-off';\n    }\n    return icon ;\n]]]\n"
+      friendly_name: Luz escritorio
+      supported_features: 44
+      mode: normal
+      dynamics: none
+      state: 'off'
+    light.luz:
+      min_mireds: 153
+      max_mireds: 500
+      effect_list:
+      - None
+      - candle
+      - fire
+      supported_color_modes:
+      - color_temp
+      - xy
+      icon: "[[[\n    var icon = 'hue:bulb-sultan';\n    if (states['light.luz'].state\
+        \ === 'on'){\n      var icon = 'hue:bulb-sultan';\n    } else {\n      var\
+        \ icon = 'hue:bulb-sultan-off';\n    }\n    return icon ;\n]]]\n"
+      friendly_name: Luz
+      supported_features: 44
+      mode: normal
+      dynamics: none
+      state: 'off'
+    light.hue_play_right:
+      min_mireds: 153
+      max_mireds: 500
+      effect_list:
+      - None
+      - candle
+      - fire
+      supported_color_modes:
+      - color_temp
+      - xy
+      icon: "[[[\n    var icon = 'hue:play-bar';\n    if (states['light.hue_play_right'].state\
+        \ === 'on'){\n      var icon = 'hue:play-bar';\n    } else {\n      var icon\
+        \ = 'hue:play-bar-off';\n    }\n    return icon ;\n]]]\n"
+      friendly_name: Hue Play Right
+      supported_features: 44
+      mode: normal
+      dynamics: none
+      state: 'off'
+    light.hue_play_left:
+      min_mireds: 153
+      max_mireds: 500
+      effect_list:
+      - None
+      - candle
+      - fire
+      supported_color_modes:
+      - color_temp
+      - xy
+      icon: "[[[\n    var icon = 'hue:play-bar';\n    if (states['light.hue_play_left'].state\
+        \ === 'on'){\n      var icon = 'hue:play-bar';\n    } else {\n      var icon\
+        \ = 'hue:play-bar-off';\n    }\n    return icon ;\n]]]\n"
+      friendly_name: Hue Play Left
+      supported_features: 44
+      mode: normal
+      dynamics: none
+      state: 'off'
+    light.hue_play_gradient_lightstrip:
+      min_mireds: 153
+      max_mireds: 500
+      effect_list:
+      - None
+      - candle
+      - fire
+      - sunrise
+      supported_color_modes:
+      - color_temp
+      - xy
+      icon: "[[[\n    var icon = 'hue:lightstrip-tv';\n    if (states['light.hue_play_gradient_lightstrip'].state\
+        \ === 'on'){\n      var icon = 'hue:lightstrip-tv';\n    } else {\n      var\
+        \ icon = 'hue:lightstrip-tv-off';\n    }\n    return icon ;\n]]]\n"
+      friendly_name: Hue play gradient lightstrip
+      supported_features: 44
+      mode: normal
+      dynamics: none
+      state: 'off'
+    light.hue_play_center:
+      min_mireds: 153
+      max_mireds: 500
+      effect_list:
+      - None
+      - candle
+      - fire
+      supported_color_modes:
+      - color_temp
+      - xy
+      mode: normal
+      dynamics: none
+      icon: "[[[\n    var icon = 'hue:play-bar';\n    if (states['light.hue_play_center'].state\
+        \ === 'on'){\n      var icon = 'hue:play-bar';\n    } else {\n      var icon\
+        \ = 'hue:play-bar-off';\n    }\n    return icon ;\n]]]\n"
+      friendly_name: Hue Play Center
+      supported_features: 44
+      state: 'off'
+    light.hue_gradient_lightstrip_1:
+      min_mireds: 153
+      max_mireds: 500
+      effect_list:
+      - None
+      - candle
+      - fire
+      - sunrise
+      supported_color_modes:
+      - color_temp
+      - xy
+      friendly_name: Hue gradient lightstrip down
+      supported_features: 44
+      mode: normal
+      dynamics: none
+      state: 'off'
+    light.cama:
+      min_mireds: 153
+      max_mireds: 500
+      effect_list:
+      - None
+      - candle
+      - fire
+      supported_color_modes:
+      - color_temp
+      - xy
+      mode: normal
+      dynamics: none
+      icon: "[[[\n    var icon = 'hue:gradient-lightstrip';\n    if (states['light.cama'].state\
+        \ === 'on'){\n      var icon = 'hue:gradient-lightstrip';\n    } else {\n\
+        \      var icon = 'hue:lightstrip-off';\n    }\n    return icon ;\n]]]\n"
+      friendly_name: Cama
+      supported_features: 44
+      state: 'off'
+    light.bed_light:
+      min_mireds: 153
+      max_mireds: 370
+      effect_list:
+      - Night
+      - Read
+      - Meeting
+      - Leasure
+      - Soft
+      - Rainbow
+      - Shine
+      - Beautiful
+      - Music
+      supported_color_modes:
+      - color_temp
+      - hs
+      friendly_name: Bed Light
+      supported_features: 23
+      icon: "[[[\n    var icon = 'kuf:light_bedside';\n    if (states['light.bed_light'].state\
+        \ === 'on'){\n      var icon = 'kuf:light_bedside';\n    } else {\n      var\
+        \ icon = 'hue:floor-spot-off';\n    }\n    return icon ;\n]]]\n"
+      state: 'off'
+  icon: hue:bulb-group-sultan-4-hung-off
+  metadata:
+    light.hue_play_gradient_lightstrip:
+      entity_only: false
+    light.hue_play_right:
+      entity_only: false
+    light.cama:
+      entity_only: false
+    light.hue_play_center:
+      entity_only: false
+    light.hue_play_left:
+      entity_only: false
+    light.luz:
+      entity_only: false
+    light.luz_escritorio:
+      entity_only: false
+    light.hue_gradient_lightstrip_1:
+      entity_only: false
+    light.bed_light:
+      entity_only: false
+- id: '1656796873751'
+  name: Turn off everything
+  entities:
+    media_player.pc:
+      source_list:
+      - Left Display
+      - Righ Display
+      - Extended
+      is_volume_muted: false
+      source: Extended
+      friendly_name: PC
+      supported_features: 23985
+      state: Hibernated
+    media_player.laptop:
+      source_list:
+      - Laptop Screen
+      - Left Monitor
+      - Right Monitor
+      - Screen + Left Monitor
+      - Screen + Right Monitor
+      - Left + Right
+      - Extended
+      is_volume_muted: false
+      source: Laptop Screen
+      friendly_name: Laptop
+      supported_features: 23985
+      state: 'Off'
+    climate.air_conditioner:
+      hvac_modes:
+      - cool
+      - 'off'
+      min_temp: 17
+      max_temp: 30
+      target_temp_step: 1
+      preset_modes:
+      - none
+      - away
+      - comfort
+      - home
+      - sleep
+      current_temperature: 24
+      temperature: 25
+      hvac_action: idle
+      preset_mode: home
+      friendly_name: Air Conditioner
+      supported_features: 17
+      state: 'off'
+    light.hue_play_center:
+      min_mireds: 153
+      max_mireds: 500
+      effect_list:
+      - None
+      - candle
+      - fire
+      supported_color_modes:
+      - color_temp
+      - xy
+      mode: normal
+      dynamics: none
+      icon: "[[[\n    var icon = 'hue:play-bar';\n    if (states['light.hue_play_center'].state\
+        \ === 'on'){\n      var icon = 'hue:play-bar';\n    } else {\n      var icon\
+        \ = 'hue:play-bar-off';\n    }\n    return icon ;\n]]]\n"
+      friendly_name: Hue Play Center
+      supported_features: 44
+      state: 'off'
+    light.hue_play_left:
+      min_mireds: 153
+      max_mireds: 500
+      effect_list:
+      - None
+      - candle
+      - fire
+      supported_color_modes:
+      - color_temp
+      - xy
+      mode: normal
+      dynamics: none
+      icon: "[[[\n    var icon = 'hue:play-bar';\n    if (states['light.hue_play_left'].state\
+        \ === 'on'){\n      var icon = 'hue:play-bar';\n    } else {\n      var icon\
+        \ = 'hue:play-bar-off';\n    }\n    return icon ;\n]]]\n"
+      friendly_name: Hue Play Left
+      supported_features: 44
+      state: 'off'
+    light.hue_play_right:
+      min_mireds: 153
+      max_mireds: 500
+      effect_list:
+      - None
+      - candle
+      - fire
+      supported_color_modes:
+      - color_temp
+      - xy
+      mode: normal
+      dynamics: none
+      icon: "[[[\n    var icon = 'hue:play-bar';\n    if (states['light.hue_play_right'].state\
+        \ === 'on'){\n      var icon = 'hue:play-bar';\n    } else {\n      var icon\
+        \ = 'hue:play-bar-off';\n    }\n    return icon ;\n]]]\n"
+      friendly_name: Hue Play Right
+      supported_features: 44
+      state: 'off'
+    switch.left_monitor:
+      icon: "[[[\n    var icon = 'mdi:monitor';\n    if (states['switch.left_monitor'].state\
+        \ === 'on'){\n      var icon = 'mdi:monitor';\n    } else {\n      var icon\
+        \ = 'mdi:monitor-off';\n    }\n    return icon ;\n]]]\n"
+      friendly_name: Left Monitor
+      state: 'off'
+    switch.right_monitor:
+      friendly_name: Right Monitor
+      icon: "[[[\n    var icon = 'mdi:monitor';\n    if (states['switch.right_monitor'].state\
+        \ === 'on'){\n      var icon = 'mdi:monitor';\n    } else {\n      var icon\
+        \ = 'mdi:monitor-off';\n    }\n    return icon ;\n]]]\n"
+      state: 'off'
+  icon: hue:room-attic-alt-off
+  metadata:
+    light.hue_play_right:
+      entity_only: true
+    light.hue_play_center:
+      entity_only: true
+    light.hue_play_left:
+      entity_only: true
+    switch.left_monitor:
+      entity_only: true
+    climate.air_conditioner:
+      entity_only: true
+    switch.right_monitor:
+      entity_only: true

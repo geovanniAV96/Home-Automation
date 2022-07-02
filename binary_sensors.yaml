@@ -61,10 +61,25 @@
     geo_in_bed:
       friendly_name: "Geovanni in Bed"
       value_template: >
-        {{ states('sensor.bed')|float >= 0 }}
+        {{ states('sensor.bed')|float >= 15 }}
     someone_in_bed:
       friendly_name: "Someone else in Bed"
       value_template: >
         {{ states('sensor.bed')|float > 40
           and (states('sensor.bed')|float < 60
               or states('sensor.bed')|float >= 150 )}}
+
+    in_chair:
+      friendly_name: "Geovanni in chair"
+      value_template: >
+        {{states('binary_sensor.openclose_2') == 'on' and states('cover.standup_desk') == 'close' and (as_timestamp(now()) | int - as_timestamp(states.binary_sensor.openclose_2.last_changed)) > 300}}
+
+    chair_state:
+      friendly_name: "Chair Sensor"
+      value_template: >
+        {% if is_state("binary_sensor.openclose_2", "off") -%}
+          True
+        {%- else -%}
+          False
+        {%- endif %}
+      delay_off: "00:00:01"

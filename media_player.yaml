@@ -26,49 +26,135 @@
       {%- endif %}
 
 - platform: universal
-  name: Hue Sync Box
-  state_template: >-
-          {% if state_attr('sensor.hue_sync_box', 'mode') == 'powersave' or is_state('input_select.hue_sync_mode', 'Standby') -%}
-            off
-          {%- else -%}
-            {{ state_attr('sensor.hue_sync_box', 'mode') }}
-          {%- endif %}
+  name: PC
   commands:
     turn_on:
-      service: script.turn_on_hue_sync_box
-      data: {}
+      service: script.turn_on_pc
     turn_off:
-      service: script.turn_off_hue_sync_box
-      data: {}
+      service: script.turn_off_pc_2
+    volume_up:
+      service: button.press
+      target:
+        entity_id: button.pc_escritori_mediavolumeup
+    volume_down:
+      service: button.press
+      target:
+        entity_id: button.pc_escritori_mediavolumedown
+    volume_mute:
+      service: button.press
+      target:
+        entity_id: button.pc_escritori_mediamute
+    media_play_pause:
+      service: button.press
+      target:
+        entity_id: button.pc_escritori_mediaplaypause
+    media_next_track:
+      service: button.press
+      target:
+        entity_id: button.pc_escritori_medianext
+    media_previous_track:
+      service: button.press
+      target:
+        entity_id: button.pc_escritori_mediaprevious
+    media_stop:
+      service: script.hibernate_pc
     select_source:
       service: input_select.select_option
       data_template:
-        entity_id: input_select.hue_sync_mode
-        option: >-
-          {% if source == 'Movie' %}
-            Movie 
-          {% elif source == 'Music' %}
-            Music
-          {% elif source == 'Game' %}
-            Game 
-          {% elif source == 'Passthrough' %}
-            Passthrough
-          {% else %}
-            Standby 
-          {% endif %}
-    volume_set:
-      service: input_number.set_value
-      data:
-        value: "{{volume_level * 200}}"
-      target:
-        entity_id: input_number.hue_sync_brightness
+        entity_id: input_select.pc_display
+        option: "{{ source }}"
   attributes:
-    source_list: input_select.hue_sync_mode|options
-    source: input_select.hue_sync_mode
-  device_class: receiver
-  icon: >-
-      {% if states('media_player.hue_sync_box') == 'powersave' -%}
-        hue:sync-box
-      {%- else -%}
-        hue:sync-box-alt
-      {%- endif %}
+    state: input_select.pc_state
+    source: input_select.pc_display
+    source_list: input_select.pc_display|options
+      
+- platform: universal
+  name: Laptop
+  commands:
+    turn_on:
+      service: script.turn_on_laptop
+    turn_off:
+      service: script.turn_off_pc
+    volume_up:
+      service: button.press
+      target:
+        entity_id: button.laptop_mediavolumeup
+    volume_down:
+      service: button.press
+      target:
+        entity_id: button.laptop_mediavolumedown
+    volume_mute:
+      service: button.press
+      target:
+        entity_id: button.laptop_mediamute
+    media_play_pause:
+      service: button.press
+      target:
+        entity_id: button.laptop_mediaplaypause
+    media_next_track:
+      service: button.press
+      target:
+        entity_id: button.laptop_medianext
+    media_previous_track:
+      service: button.press
+      target:
+        entity_id: button.laptop_mediaprevious
+    media_stop:
+      service: script.hibernate_laptop
+    select_source:
+      service: input_select.select_option
+      data_template:
+        entity_id: input_select.laptop_display
+        option: "{{ source }}"
+  attributes:
+    state: input_select.laptop_state
+    source: input_select.laptop_display
+    source_list: input_select.laptop_display|options
+
+# - platform: universal
+#   name: Hue Sync Box
+#   state_template: >-
+#           {% if state_attr('sensor.hue_sync_box', 'mode') == 'powersave' or is_state('input_select.hue_sync_mode', 'Standby') -%}
+#             off
+#           {%- else -%}
+#             {{ state_attr('sensor.hue_sync_box', 'mode') }}
+#           {%- endif %}
+#   commands:
+#     turn_on:
+#       service: script.turn_on_hue_sync_box
+#       data: {}
+#     turn_off:
+#       service: script.turn_off_hue_sync_box
+#       data: {}
+#     select_source:
+#       service: input_select.select_option
+#       data_template:
+#         entity_id: input_select.hue_sync_mode
+#         option: >-
+#           {% if source == 'Movie' %}
+#             Movie 
+#           {% elif source == 'Music' %}
+#             Music
+#           {% elif source == 'Game' %}
+#             Game 
+#           {% elif source == 'Passthrough' %}
+#             Passthrough
+#           {% else %}
+#             Standby 
+#           {% endif %}
+#     volume_set:
+#       service: input_number.set_value
+#       data:
+#         value: "{{volume_level * 200}}"
+#       target:
+#         entity_id: input_number.hue_sync_brightness
+#   attributes:
+#     source_list: input_select.hue_sync_mode|options
+#     source: input_select.hue_sync_mode
+#   device_class: receiver
+#   icon: >-
+#       {% if states('media_player.hue_sync_box') == 'powersave' -%}
+#         hue:sync-box
+#       {%- else -%}
+#         hue:sync-box-alt
+#       {%- endif %}

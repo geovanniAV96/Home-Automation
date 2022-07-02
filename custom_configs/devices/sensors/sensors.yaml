@@ -145,105 +145,7 @@
         {% else %}
           closed
         {% endif %}
-#PC
-- platform: template
-  sensors:
-    pc_consumption:
-      value_template: "{{states('sensor.sonoff_1000331d93_power')}}"
-- platform: integration
-  source: sensor.pc_consumption
-  name: energy_spent_pc
-  unit_prefix: k
-  round: 2
-  method: left
-- platform: template
-  sensors:
-    pc_inactive:
-      friendly_name: PC inactive
-      value_template: >-
-        {% if (states('sensor.pc_escritori_system_idle_time') | int) >= 300 and (states('sensor.pc_time_no_volume') | int) >= 300-%}
-          on
-        {%- else -%}
-          off
-        {%- endif %}
-- platform: openhardwaremonitor
-  host: 192.168.1.67
-  port: 8580
-- platform: template
-  sensors:
-    using_pc:
-      friendly_name: Using PC
-      value_template: "{{is_state('sensor.pc_escritori_system_idle_time', '0')}}"
-- platform: template
-  sensors:
-    pc_time_inactive:
-      friendly_name: PC Time inactive
-      value_template: >-
-        {% if is_state("sensor.using_pc", "True") -%}
-          0
-        {%- else -%}
-          {{as_timestamp(now()) | int - as_timestamp(states.sensor.using_pc.last_changed) | int}}
-        {%- endif %}
-- platform: template
-  sensors:
-    pc_time_no_volume:
-      friendly_name: PC Time With No Volume
-      value_template: >-
-        {% if (not is_state("sensor.pc_volume", "unavailable") and is_state("sensor.pc_volume", "0")) or (is_state("switch.computer", "off") and is_state("sensor.pc_escritori_system_idle_time", "unavailable"))-%}
-          {{as_timestamp(now()) | int - as_timestamp(states.sensor.pc_volume.last_changed) | int}}
-        {%- else -%}
-          0
-        {%- endif %}
 
-#Laptop
-- platform: template
-  sensors:
-    laptop_consumption:
-      value_template: "{{states('sensor.sonoff_1000332281_power')}}"
-- platform: integration
-  source: sensor.laptop_consumption
-  name: energy_spent_laptop
-  unit_prefix: k
-  round: 2
-  method: left
-- platform: template
-  sensors:
-    laptop_inactive:
-      friendly_name: Laptop inactive
-      value_template: >-
-        {% if (states('sensor.0529gaguilar_system_idle_time') | int) >= 300 and (states('sensor.laptop_time_no_volume') | int) >= 300 -%}
-          on
-        {%- else -%}
-          off
-        {%- endif %}
-- platform: openhardwaremonitor
-  host: 192.168.1.89
-  port: 8581
-- platform: template
-  sensors:
-    using_laptop:
-      friendly_name: Using Laptop
-      value_template: "{{is_state('sensor.0529gaguilar_system_idle_time', '0')}}"
-- platform: template
-  sensors:
-    laptop_time_inactive:
-      friendly_name: Laptop Time inactive
-      value_template: >-
-        {% if is_state("sensor.using_laptop", "True") -%}
-          0
-        {%- else -%}
-          {{as_timestamp(now()) | int - as_timestamp(states.sensor.using_laptop.last_changed) | int}}
-        {%- endif %}
-- platform: template
-  sensors:
-    laptop_time_no_volume:
-      friendly_name: Laptop Time With No Volume
-      value_template: >-
-        {% if (not is_state("sensor.laptop_volume", "unavailable") and is_state("sensor.laptop_volume", "0")) or (is_state("switch.laptop", "off") and is_state("sensor.0529gaguilar_system_idle_time", "unavailable"))-%}
-          {{as_timestamp(now()) | int - as_timestamp(states.sensor.laptop_volume.last_changed) | int}}
-        {%- else -%}
-          0
-        {%- endif %}
 #UPS 1500
 - platform: template
   sensors:
@@ -379,16 +281,16 @@
       value_template: "{{state_attr('climate.air_conditioner', 'temperature')}}"
 
 #Bed
-- platform: mqtt
-  name: "Bed"
-  state_topic: "home/bedroom/bed"
-  unit_of_measurement: "kg"
-  availability_topic: "home/bedroom/bed/available"
-- platform: mqtt
-  name: "Bed Raw"
-  state_topic: "home/bedroom/bed/raw"
-  unit_of_measurement: "raw"
-  availability_topic: "home/bedroom/bed/available"
+# - platform: mqtt
+#   name: "Bed"
+#   state_topic: "home/bedroom/bed"
+#   unit_of_measurement: "kg"
+#   availability_topic: "home/bedroom/bed/available"
+# - platform: mqtt
+#   name: "Bed Raw"
+#   state_topic: "home/bedroom/bed/raw"
+#   unit_of_measurement: "raw"
+#   availability_topic: "home/bedroom/bed/available"
 - platform: template
   sensors:
     num_in_bed:
@@ -402,3 +304,143 @@
         {% else %}
             0
         {% endif %}
+
+#PC new
+- platform: template
+  sensors:
+    pc_watching_youtube:
+      friendly_name: "Watching Youtube on PC"
+      value_template: "{{ 'YouTube' in states('sensor.pc_escritori_activewindow') }}"
+
+- platform: template
+  sensors:
+    pc_studying:
+      friendly_name: "Studying "
+      value_template: "{{ 'Udemy' in states('sensor.pc_escritori_activewindow') or 'Visual Studio' in states('sensor.pc_escritori_activewindow') or 'Unreal' in states('sensor.pc_escritori_activewindow') or 'Epic' in states('sensor.pc_escritori_activewindow')}} "
+
+- platform: template
+  sensors:
+    pc_sound_playing:
+      friendly_name: "Sound Playing"
+      value_template: "{{states('sensor.pc_escritori_volume_peak_volume') | float > 0}}" 
+
+- platform: template
+  sensors:
+    pc_display_extended:
+      friendly_name: "Display Extended"
+      value_template: "{{states('sensor.pc_escritori_display_display_count') | int == 2}}" 
+
+- platform: template
+  sensors:
+    pc_inactive:
+      friendly_name: "PC inactive"
+      value_template: "{{ (now() - states('sensor.pc_escritori_lastactive') | as_datetime).total_seconds() > 300 and states('sensor.pc_sound_playing') == 'off'}}" 
+
+- platform: template
+  sensors:
+    pc_consumption:
+      value_template: "{{states('sensor.sonoff_1000331d93_power')}}"
+
+- platform: integration
+  source: sensor.pc_consumption
+  name: energy_spent_pc
+  unit_prefix: k
+  round: 2
+  method: left
+
+- platform: openhardwaremonitor
+  host: 192.168.1.67
+  port: 8580
+
+- platform: template
+  sensors:
+    pc_time_no_volume:
+      friendly_name: PC Time With No Volume
+      value_template: >-
+        {% if is_state("sensor.pc_sound_playing", "off") or is_state("sensor.pc_escritori_volume_peak_volume", "unknown") or is_state("sensor.pc_escritori_volume_peak_volume", "unavailable")-%}
+          {{as_timestamp(now()) | int - as_timestamp(states.sensor.pc_escritori_volume_peak_volume.last_changed) | int}}
+        {%- else -%}
+          0
+        {%- endif %}
+
+- platform: template
+  sensors:
+    pc_unlocked:
+      friendly_name: "PC Unlocked"
+      value_template: "{{states('sensor.pc_escritori_lastsystemstatechange') == 'SessionUnlock' or states('sensor.pc_escritori_lastsystemstatechange') == 'ApplicationStarted'}}" 
+
+- platform: template
+  sensors:
+    pc_time_on:
+      friendly_name: "PC Time On"
+      value_template: "{{ (now() - states('sensor.pc_escritori_lastboot') | as_datetime).total_seconds()  }}"
+
+#Laptop
+- platform: template
+  sensors:
+    laptop_consumption:
+      value_template: "{{states('sensor.sonoff_1000332281_power')}}"
+
+- platform: integration
+  source: sensor.laptop_consumption
+  name: energy_spent_laptop
+  unit_prefix: k
+  round: 2
+  method: left
+
+- platform: openhardwaremonitor
+  host: 192.168.1.89
+  port: 8581
+
+- platform: template
+  sensors:
+    laptop_watching_youtube:
+      friendly_name: "Watching Youtube on PC"
+      value_template: "{{ 'YouTube' in states('sensor.laptop_activewindow') }}"
+
+- platform: template
+  sensors:
+    laptop_working:
+      friendly_name: "Working "
+      value_template: "{{ 'LextEdit' in states('sensor.laptop_activewindow') or 'SQL' in states('sensor.laptop_activewindow') or 'Blue Yonder' in states('sensor.laptop_activewindow') or 'RedPrairie' in states('sensor.laptop_activewindow')}} "
+
+- platform: template
+  sensors:
+    laptop_sound_playing:
+      friendly_name: "Laptop Sound Playing"
+      value_template: "{{states('sensor.laptop_audio_peak_volume') | float > 0}}" 
+
+- platform: template
+  sensors:
+    laptop_display_extended:
+      friendly_name: "Laptop Extended"
+      value_template: "{{states('sensor.laptop_display_display_count') | int == 2}}" 
+
+- platform: template
+  sensors:
+    laptop_inactive:
+      friendly_name: "Laptop inactive"
+      value_template: "{{ (now() - states('sensor.laptop_lastactive') | as_datetime).total_seconds() > 300 and states('sensor.laptop_sound_playing') == 'off'}}" 
+
+- platform: template
+  sensors:
+    laptop_time_no_volume:
+      friendly_name: Laptop Time With No Volume
+      value_template: >-
+        {% if is_state("sensor.laptop_sound_playing", "off") or is_state("sensor.laptop_audio_peak_volume", "unknown") or is_state("sensor.laptop_audio_peak_volume", "unavailable")-%}
+          {{as_timestamp(now()) | int - as_timestamp(states.sensor.laptop_audio_peak_volume.last_changed) | int}}
+        {%- else -%}
+          0
+        {%- endif %}
+
+- platform: template
+  sensors:
+    laptop_unlocked:
+      friendly_name: "Laptop Unlocked"
+      value_template: "{{states('sensor.laptop_lastsystemstatechange') == 'ApplicationStarted' or states('sensor.laptop_lastsystemstatechange') == 'SessionUnlock'}}" 
+
+- platform: template
+  sensors:
+    laptop_time_on:
+      friendly_name: "Laptop Time On"
+      value_template: "{{ (now() - states('sensor.laptop_lastboot') | as_datetime).total_seconds()  }}"

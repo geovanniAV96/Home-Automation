@@ -133,6 +133,8 @@ views:
               action: navigate
               navigation_path: "/lovelace-minimalist-14/desk"
             variables:
+              ulm_card_custom_card_room_name: "Desk"
+              ulm_card_custom_card_room_icon: "kuf:light_office_desk"
               label_use_temperature: false
               label_use_brightness: false
               variable_entity_temperature: cover.standup_desk
@@ -1261,8 +1263,9 @@ views:
       - type: "horizontal-stack"
         cards:
           - type: "custom:button-card"
-            template: card_generic
-            entity: sensor.fg6122tm_external_ip
+            template: card_input_boolean
+            entity: binary_sensor.in_chair
+            name: In Chair
           - type: "custom:button-card"
             template: card_script
             variables:
@@ -1273,6 +1276,40 @@ views:
               service: script.turn_on
               service_data:
                 entity_id: script.turn_off_everything
+      - type: "horizontal-stack"
+        cards:
+          - type: 'custom:button-card'
+            template: card_input_boolean
+            entity: input_boolean.ps5_hue_sync
+            name: HDMI to Hue Sync
+          - type: 'custom:button-card'
+            template: card_input_boolean
+            entity: input_boolean.hdmi_on_pc
+            name: HDMI to PS5
+      - type: "custom:button-card"
+        template: card_script
+        variables:
+          ulm_card_script_title: HDMI to Desk
+          ulm_card_script_icon: "mdi:home-remove"
+        tap_action:
+          action: call-service
+          service: script.turn_on
+          service_data:
+            entity_id: script.switch_hdmi_to_desk
+      - type: "horizontal-stack"
+        cards:
+          - type: 'custom:button-card'
+            template: card_input_boolean
+            entity: binary_sensor.chair_state
+            name: Chair Sensor
+          - type: "custom:button-card"
+            template: card_battery
+            entity: sensor.openclose_2_battery
+            variables:
+              ulm_card_battery_charger_type_entity_id: sensor.openclose_2_battery
+              ulm_card_battery_battery_level_danger: 15
+              ulm_card_battery_battery_level_warning: 50
+            name: Chair
       #-------------Controls End----------------------
       #-------------Media Start-----------------------
       - type: "horizontal-stack"
@@ -2400,26 +2437,34 @@ views:
                 entity_id: script.hibernate_pc
       - type: "horizontal-stack"
         cards:
-          - type: "custom:button-card"
+          - type: 'custom:button-card'
             template: card_script
             variables:
               ulm_card_script_title: Extend Screen
-              ulm_card_script_icon: "mdi:fit-to-screen"
+              ulm_card_script_icon: 'mdi:fit-to-screen'
             tap_action:
               action: call-service
               service: script.turn_on
               service_data:
                 entity_id: script.pc_extend_screen
-          - type: "custom:button-card"
+          - type: 'custom:button-card'
             template: card_script
             variables:
               ulm_card_script_title: Principal Screen
-              ulm_card_script_icon: "mdi:monitor-screenshot"
+              ulm_card_script_icon: 'mdi:monitor-screenshot'
             tap_action:
               action: call-service
               service: script.turn_on
               service_data:
                 entity_id: script.expand_monitors
+      - type: 'custom:button-card'
+        template: card_script
+        variables:
+          ulm_card_script_title: RGB On
+          ulm_card_script_icon: 'mdi:led-strip'
+        tap_action:
+          action: call-service
+          service: script.turn_on_rgb
       #---------------Scripts End---------------------
       #---------------Graphics Start------------------
       - type: custom:mushroom-title-card
@@ -2838,7 +2883,7 @@ views:
                 ]]]
             tap_action:
               action: navigate
-              navigation_path: "/lovelace-minimalist-2/desk"
+              navigation_path: "/lovelace-minimalist-14/desk"
           entity_2:
             entity_id: "sun.sun"
             icon: |
@@ -2953,42 +2998,20 @@ views:
         info: scroll
         replace_mute: play_pause
       - type: custom:mini-media-player
-        entity: media_player.hue_sync_box
-        name: Sync Box
+        entity: media_player.hue_sync_tv
+        name: Sync Box TV
         icon: hue:sync-box-alt
+        artwork: material
+      - type: custom:mini-media-player
+        entity: media_player.bedroom
+        name: Apple TV
+        icon: bha:apple-tv
         group: false
         volume_stateless: false
         artwork: material
         toggle_power: true
         source: full
         info: scroll
-        replace_mute: play_pause
-      - type: conditional
-        conditions:
-          - entity: media_player.hue_sync_box
-            state_not: 'off'
-        card:
-          type: custom:select-list-card
-          entity: input_select.hue_sync_intensity
-          icon: 'mdi:television-ambient-light'
-          truncate: false
-          show_toggle: true
-          scroll_to_selected: false
-          max_options: 1
-          title: Intensity
-      - type: conditional
-        conditions:
-          - entity: media_player.hue_sync_box
-            state_not: 'off'
-        card:
-          type: custom:select-list-card
-          entity: input_select.hue_sync_input
-          icon: 'mdi:import'
-          truncate: false
-          show_toggle: true
-          scroll_to_selected: false
-          max_options: 1
-          title: Input
       - type: "horizontal-stack"
         cards:
         - type: 'custom:button-card'
@@ -3005,6 +3028,22 @@ views:
           template: card_input_boolean
           entity: input_boolean.hdmi_on_tv
           name: HDMI
+      - type: "horizontal-stack"
+        cards:
+          - type: "custom:button-card"
+            template: card_script
+            variables:
+              ulm_card_script_title: HDMI to Hue Sync
+              ulm_card_script_icon: "mdi:home-remove"
+            tap_action:
+              action: call-service
+              service: script.turn_on
+              service_data:
+                entity_id: script.switch_hdmi_to_sync_box
+          - type: 'custom:button-card'
+            template: card_input_boolean
+            entity: input_boolean.ps5_hue_sync
+            name: HDMI to Hue Sync
       #-------------UPS Start-------------------------
       - type: custom:mushroom-title-card
         title: UPS Stats

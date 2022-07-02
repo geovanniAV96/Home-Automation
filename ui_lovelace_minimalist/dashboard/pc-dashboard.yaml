@@ -185,6 +185,14 @@ views:
               service: script.turn_on
               service_data:
                 entity_id: script.expand_monitors
+      - type: 'custom:button-card'
+        template: card_script
+        variables:
+          ulm_card_script_title: RGB On
+          ulm_card_script_icon: 'mdi:led-strip'
+        tap_action:
+          action: call-service
+          service: script.turn_on_rgb
       #---------------Scripts End---------------------
       #---------------Graphics Start------------------
       - type: custom:mushroom-title-card
@@ -371,4 +379,8 @@ views:
           image: https://demo.home-assistant.io/stub_config/bedroom.png
           name: Right Screen
           camera_image: camera.pc_escritori_screen_1
-      
+      - type: custom:mini-media-player
+        entity: media_player.pc
+        name: PC
+        icon: mdi:desktop-tower-monitor
+        artwork: material

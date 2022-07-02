@@ -157,6 +157,8 @@ views:
             template: card_input_boolean
             entity: sensor.laptop_inactive
             name: Inactive
+            variables:
+              ulm_card_card_input_boolean_name: "Inactive"
       - type: "horizontal-stack"
         cards:
           - type: 'custom:button-card'
@@ -373,3 +375,8 @@ views:
           name: Right Screen
           camera_image: camera.0529gaguilar_screen_1
       #---------------Screen End----------------------
+      - type: custom:mini-media-player
+        entity: media_player.laptop
+        name: Laptop
+        icon: mdi:laptop
+        artwork: material

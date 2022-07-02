@@ -142,6 +142,8 @@ views:
               action: navigate
               navigation_path: "/lovelace-minimalist-3/pc"
             variables:
+              ulm_card_custom_card_room_name: "Desk"
+              ulm_card_custom_card_room_icon: "kuf:light_office_desk"
               label_use_temperature: true
               label_use_brightness: false
               variable_entity_temperature: sensor.pc_escritori_amd_ryzen_7_5800x_temperatures_cpu_package
@@ -285,7 +287,7 @@ views:
         cards:
           - type: "custom:button-card"
             template: card_generic
-            entity: sensor.fg6122tm_external_ip
+            entity: binary_sensor.in_chair
           - type: "custom:button-card"
             template: card_script
             variables:
@@ -296,6 +298,40 @@ views:
               service: script.turn_on
               service_data:
                 entity_id: script.turn_off_everything
+      - type: "horizontal-stack"
+        cards:
+          - type: 'custom:button-card'
+            template: card_input_boolean
+            entity: input_boolean.ps5_hue_sync
+            name: HDMI to Hue Sync
+          - type: 'custom:button-card'
+            template: card_input_boolean
+            entity: input_boolean.hdmi_on_pc
+            name: HDMI to PS5
+      - type: "custom:button-card"
+        template: card_script
+        variables:
+          ulm_card_script_title: HDMI to Desk
+          ulm_card_script_icon: "mdi:home-remove"
+        tap_action:
+          action: call-service
+          service: script.turn_on
+          service_data:
+            entity_id: script.switch_hdmi_to_desk
+      - type: "horizontal-stack"
+        cards:
+          - type: 'custom:button-card'
+            template: card_input_boolean
+            entity: binary_sensor.chair_state
+            name: Chair Sensor
+          - type: "custom:button-card"
+            template: card_battery
+            entity: sensor.openclose_2_battery
+            variables:
+              ulm_card_battery_charger_type_entity_id: sensor.openclose_2_battery
+              ulm_card_battery_battery_level_danger: 15
+              ulm_card_battery_battery_level_warning: 50
+            name: Chair
       #-------------Controls End----------------------
       #-------------Media Start-----------------------
       - type: "horizontal-stack"
@@ -408,3 +444,8 @@ views:
             template: custom_card_mpse_wifisignal
             entity: sensor.deskdown_linkquality
       #-------------SwitchBot End---------------------
+      - type: custom:mini-media-player
+        entity: media_player.pc
+        name: Sync Box TV
+        icon: hue:sync-box-alt
+        artwork: material

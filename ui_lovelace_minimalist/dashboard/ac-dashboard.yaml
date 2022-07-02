@@ -134,4 +134,9 @@ views:
           action: none
         double_tap_action:
           action: none
+      - type: "custom:button-card"
+        template: card_input_number
+        entity: input_number.desire_temperature
+        variables:
+          ulm_card_input_number_name: "Desire Temperature"
       #-------------Controls End-------------------

@@ -253,18 +253,16 @@
   description: ''
   trigger:
   - platform: state
-    entity_id: sensor.ups_1500_status
+    entity_id:
+    - sensor.ups_1500_status
     to: On Battery Battery Discharging
+    from: Online
   - platform: state
-    entity_id: sensor.ups_850_status
+    entity_id:
+    - sensor.ups_850_status
     to: On Battery Battery Discharging
-  condition:
-  - condition: state
-    entity_id: sensor.ups_1500_status
-    state: Discharging
-  - condition: state
-    entity_id: sensor.ups_850_status
-    state: Discharging
+    from: Online
+  condition: []
   action:
   - service: scene.create
     data:
@@ -337,6 +335,9 @@
   - condition: state
     entity_id: binary_sensor.ps5
     state: 'off'
+  - condition: state
+    entity_id: binary_sensor.openclose_2
+    state: 'on'
   action:
   - service: script.turn_off_pc_2
     data: {}
@@ -351,7 +352,8 @@
       data: {}
   - service: script.change_tv_sound_output
     data: {}
-  - service: script.open_youtube_in_tv
+    enabled: false
+  - service: script.turn_on_fire_tv
     data: {}
   - parallel:
     - service: script.turn_off_monitor
@@ -399,6 +401,8 @@
       entity_id:
       - light.hue_play_right
     enabled: false
+  - service: script.open_youtube_in_tv
+    data: {}
   - service: input_datetime.set_datetime
     data:
       timestamp: '{{as_timestamp(now())}}'
@@ -1079,6 +1083,12 @@
     - binary_sensor.hue_motion_sensor_3_motion
     from: 'off'
     to: 'on'
+    enabled: false
+  - platform: state
+    entity_id:
+    - binary_sensor.chair_state
+    from: 'off'
+    to: 'on'
   condition:
   - condition: state
     entity_id: person.cristian_geovanni_aguilar_valencia
@@ -1228,6 +1238,9 @@
   - condition: state
     entity_id: person.cristian_geovanni_aguilar_valencia
     state: home
+  - condition: state
+    entity_id: binary_sensor.chair_state
+    state: 'off'
   action:
   - service: script.turn_off_pc_2
     data: {}
@@ -1238,6 +1251,11 @@
     data: {}
   - service: script.switch_hdmi_to_desk
     data: {}
+  - delay:
+      hours: 0
+      minutes: 0
+      seconds: 10
+      milliseconds: 0
   - service: script.change_tv_to_ps5
     data: {}
   - service: script.change_tv_sound_output
@@ -1355,8 +1373,10 @@
     continue_on_timeout: false
     timeout: 00:05:00
     enabled: false
-  - service: script.turn_off_everything
-    data: {}
+  - service: scene.turn_on
+    target:
+      entity_id: scene.turn_off_everything
+    metadata: {}
   - condition: state
     entity_id: input_boolean.cleaning_day
     state: 'on'
@@ -1480,85 +1500,41 @@
   description: ''
   trigger:
   - platform: state
-    entity_id: binary_sensor.hue_motion_sensor_1_motion
-    from: 'off'
-    to: 'on'
-  - platform: state
-    entity_id: binary_sensor.hue_motion_sensor_2_motion
-    from: 'off'
-    to: 'on'
-  - platform: numeric_state
-    entity_id: sensor.pc_escritori_system_idle_time
-    above: '30'
-    enabled: false
-  - platform: numeric_state
-    entity_id: sensor.0529gaguilar_system_idle_time
-    above: '30'
-    enabled: false
-  - platform: numeric_state
-    entity_id: sensor.pc_time_no_volume
-    above: '30'
-    enabled: false
-  - platform: numeric_state
-    entity_id: sensor.laptop_time_no_volume
-    above: '30'
-    enabled: false
-  - platform: state
-    entity_id: sensor.pc_inactive
-    to: 'on'
-  - platform: state
-    entity_id: sensor.laptop_inactive
-    to: 'on'
+    entity_id:
+    - binary_sensor.chair_state
+    from: 'on'
+    to: 'off'
+    for:
+      hours: 0
+      minutes: 5
+      seconds: 0
+  - platform: template
+    value_template: '{{states(''binary_sensor.chair_state'') == ''off'' and (as_timestamp(now())
+      | int - as_timestamp(states.binary_sensor.chair_state.last_changed) | int) >
+      301 and (as_timestamp(now()) | int - as_timestamp(states.binary_sensor.chair_state.last_changed)
+      | int) % 300 == 0}}'
   condition:
-  - condition: and
-    conditions:
-    - condition: or
-      conditions:
-      - condition: and
-        conditions:
-        - condition: state
-          entity_id: switch.computer
-          state: 'off'
-        - condition: state
-          entity_id: sensor.pc_volume
-          state: unavailable
-      - condition: numeric_state
-        entity_id: sensor.pc_volume
-        below: '1'
-    - condition: or
-      conditions:
-      - condition: and
-        conditions:
-        - condition: state
-          entity_id: switch.laptop
-          state: 'off'
-        - condition: state
-          entity_id: sensor.laptop_volume
-          state: unavailable
-      - condition: numeric_state
-        entity_id: sensor.laptop_volume
-        below: '1'
   - condition: or
     conditions:
     - condition: state
-      entity_id: binary_sensor.laptop_webcam
+      entity_id: binary_sensor.laptop_webcamactive
       state: 'off'
     - condition: state
-      entity_id: binary_sensor.laptop_webcam
+      entity_id: binary_sensor.laptop_webcamactive
       state: unknown
     - condition: state
-      entity_id: binary_sensor.laptop_webcam
+      entity_id: binary_sensor.laptop_webcamactive
       state: unavailable
   - condition: or
     conditions:
     - condition: state
-      entity_id: binary_sensor.laptop_microphone
+      entity_id: binary_sensor.laptop_microphoneactive
       state: 'off'
     - condition: state
-      entity_id: binary_sensor.laptop_microphone
+      entity_id: binary_sensor.laptop_microphoneactive
       state: unknown
     - condition: state
-      entity_id: binary_sensor.laptop_microphone
+      entity_id: binary_sensor.laptop_microphoneactive
       state: unavailable
   - condition: state
     entity_id: binary_sensor.ps5
@@ -1566,17 +1542,6 @@
   - condition: state
     entity_id: person.cristian_geovanni_aguilar_valencia
     state: home
-  - condition: time
-    before: 00:00:00
-    after: 09:00:00
-    weekday:
-    - sun
-    - sat
-    - fri
-    - thu
-    - wed
-    - tue
-    - mon
   - condition: not
     conditions:
     - condition: state
@@ -1585,37 +1550,13 @@
   - condition: state
     entity_id: media_player.lg_cx
     state: 'off'
-  - condition: not
-    conditions:
-    - condition: state
-      entity_id: sensor.pc_escritori_system_idle_time
-      state: unknown
-      for:
-        hours: 0
-        minutes: 4
-        seconds: 0
-  - condition: not
-    conditions:
-    - condition: state
-      entity_id: sensor.pc_escritori_system_idle_time
-      state: unavailable
-      for:
-        hours: 0
-        minutes: 4
-        seconds: 0
-  - condition: numeric_state
-    entity_id: sensor.laptop_time_no_volume
-    above: '29'
-  - condition: numeric_state
-    entity_id: sensor.pc_time_no_volume
-    above: '29'
   - condition: template
     value_template: '{{(as_timestamp(now()) | int - as_timestamp(state_attr(''automation.return_to_bedroom'',
       ''last_triggered'')) | int) > 420}}'
+  - condition: template
+    value_template: '{{(as_timestamp(now()) | int / 60 | int / 60 | int - as_timestamp(states(''input_datetime.last_time_sleep_routine_ran''))
+      | int / 60 | int / 60 | int) | int > 8}}'
   action:
-  - wait_template: '{{(as_timestamp(now()) | int - as_timestamp(state_attr(''automation.return_to_bedroom'',
-      ''last_triggered'')) | int) > 420}}'
-    enabled: false
   - service: script.empty_room_turn_off
     data: {}
   mode: single
@@ -1717,6 +1658,11 @@
     - sensor.mop
     from: Clean
     to: Not Ready
+  - platform: state
+    entity_id:
+    - sensor.mop
+    from: Pending
+    to: Ready
   condition:
   - condition: time
     before: '22:00:00'
@@ -1811,12 +1757,12 @@
   - condition: not
     conditions:
     - condition: state
-      entity_id: binary_sensor.laptop_webcam
+      entity_id: binary_sensor.laptop_webcamactive
       state: 'on'
   - condition: not
     conditions:
     - condition: state
-      entity_id: binary_sensor.laptop_microphone
+      entity_id: binary_sensor.laptop_microphoneactive
       state: 'on'
   - condition: state
     entity_id: switch.computer
@@ -1917,11 +1863,13 @@
       payload:
         id: youtube.leanback.v4
         contentId: nEi2Udjc0lQ
+    enabled: false
   - delay:
       hours: 0
       minutes: 0
       seconds: 10
       milliseconds: 0
+    enabled: false
   - service: webostv.command
     data:
       entity_id: media_player.lg_webos_smart_tv
@@ -2068,9 +2016,9 @@
       sequence:
       - service: media_player.select_source
         data:
-          source: Movie
+          source: PS5
         target:
-          entity_id: media_player.hue_sync_box
+          entity_id: media_player.hue_sync_tv
       - service: media_player.turn_on
         data: {}
         target:
@@ -2087,7 +2035,7 @@
       data:
         source: Movie
       target:
-        entity_id: media_player.hue_sync_box
+        entity_id: media_player.hue_sync_tv
     - service: script.turn_on_tv
       data: {}
     - service: media_player.turn_on
@@ -2121,12 +2069,13 @@
       \ 'temperature') -%}\n  true\n{%- else -%}\n  false\n{%- endif %}"
   - service: script.change_air_conditioner_temperature
     data:
-      temperature: "{% if states('sensor.mean_temperature_2') | float > 24.0 and state_attr('climate.air_conditioner',\
-        \ 'temperature') | int > 17 -%}\n  {{state_attr('climate.air_conditioner',\
-        \ 'temperature') | int - 1}}\n{%- elif states('sensor.mean_temperature_2')\
-        \ | float < 24.0 and state_attr('climate.air_conditioner', 'temperature')\
-        \ | int < 30 -%}\n  {{state_attr('climate.air_conditioner', 'temperature')\
-        \ | int + 1}}\n{%- else -%}\n  {{state_attr('climate.air_conditioner', 'temperature')}}\n\
+      temperature: "{% if states('sensor.mean_temperature_2') | float > states('input_number.desire_temperature')\
+        \ | float and state_attr('climate.air_conditioner', 'temperature') | int >\
+        \ 17 -%}\n  {{state_attr('climate.air_conditioner', 'temperature') | int -\
+        \ 1}}\n{%- elif states('sensor.mean_temperature_2') | float < states('input_number.desire_temperature')\
+        \ | float and state_attr('climate.air_conditioner', 'temperature') | int <\
+        \ 30 -%}\n  {{state_attr('climate.air_conditioner', 'temperature') | int +\
+        \ 1}}\n{%- else -%}\n  {{state_attr('climate.air_conditioner', 'temperature')}}\n\
         {%- endif %}\n"
   mode: single
 - id: '1651197180710'
@@ -2268,12 +2217,16 @@
   description: ''
   trigger:
   - platform: state
-    entity_id: sensor.ups_1500_status
+    entity_id:
+    - sensor.ups_1500_status
+    - sensor.ups_850_status
     from: On Battery Battery Discharging
     to: Online Battery Charging
   - platform: state
-    entity_id: sensor.ups_850_status
-    to: Online Battery Charging
+    entity_id:
+    - sensor.ups_850_status
+    - sensor.ups_1500_status
+    to: Online
     from: On Battery Battery Discharging
   condition: []
   action:
@@ -2320,28 +2273,28 @@
   trigger:
   - platform: state
     entity_id:
-    - input_boolean.laptop_extended_screen
+    - sensor.laptop_display_extended
     id: Laptop_screen_on
-    from: 'off'
-    to: 'on'
+    from: 'False'
+    to: 'True'
   - platform: state
     entity_id:
-    - input_boolean.pc_extended_screen
+    - sensor.pc_display_extended
     id: PC_screen_on
-    from: 'off'
-    to: 'on'
+    from: 'False'
+    to: 'True'
   - platform: state
     entity_id:
-    - input_boolean.laptop_extended_screen
+    - sensor.laptop_display_extended
     id: Laptop_screen_off
-    from: 'on'
-    to: 'off'
+    from: 'True'
+    to: 'False'
   - platform: state
     entity_id:
-    - input_boolean.pc_extended_screen
+    - sensor.pc_display_extended
     id: PC_screen_off
-    from: 'on'
-    to: 'off'
+    from: 'True'
+    to: 'False'
   condition: []
   action:
   - if:

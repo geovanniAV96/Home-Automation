@@ -71,7 +71,7 @@ dashboards:
     title: Main Mobile
     icon: mdi:menu
     show_in_sidebar: true
-    filename: ui_lovelace_minimalist/dashboard/test-dashboard.yaml
+    filename: ui_lovelace_minimalist/dashboard/mobile-dashboard.yaml
 resources:
   - url: /browser_mod.js
     type: module

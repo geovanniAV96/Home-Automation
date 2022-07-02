@@ -1,9 +1,9 @@
-#sensor:
-#  - name: "Bed"
-#    state_topic: "home/bedroom/bed"
-#    unit_of_measurement: "kg"
-#    availability_topic: "home/bedroom/bed/available"
-#  - name: "Bed Raw"
-#    state_topic: "home/bedroom/bed/raw"
-#    unit_of_measurement: "raw"
-#    availability_topic: "home/bedroom/bed/available"
+sensor:
+  - name: "Bed"
+    state_topic: "home/bedroom/bed"
+    unit_of_measurement: "kg"
+    availability_topic: "home/bedroom/bed/available"
+  - name: "Bed Raw"
+    state_topic: "home/bedroom/bed/raw"
+    unit_of_measurement: "raw"
+    availability_topic: "home/bedroom/bed/available"
